@@ -41,7 +41,7 @@ export default function SignInForm() {
           </Button>
           <Button variant='outline' className='w-full flex gap-2'>
             <FcGoogle size={20} />
-            Sign In with Google
+            <Link href='/dashboard'>Sign In with Google</Link>
           </Button>
         </div>
         <div className='mt-4 text-center text-sm'>
