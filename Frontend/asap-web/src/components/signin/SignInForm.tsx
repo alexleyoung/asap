@@ -3,13 +3,14 @@ import Link from "next/link";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { FcGoogle } from "react-icons/fc";
 
 export default function SignInForm() {
   return (
     <div className='grid h-full place-items-center py-12 border-r'>
       <div className='mx-auto grid w-[350px] gap-6'>
         <div className='grid gap-2 text-center'>
-          <h1 className='text-3xl font-bold'>Login</h1>
+          <h1 className='text-3xl font-bold'>Sign In</h1>
           <p className='text-balance text-muted-foreground'>
             Enter your email below to login to your account
           </p>
@@ -36,16 +37,17 @@ export default function SignInForm() {
             <Input id='password' type='password' required />
           </div>
           <Button type='submit' className='w-full'>
-            Login
+            Sign In
           </Button>
-          <Button variant='outline' className='w-full'>
-            Login with Google
+          <Button variant='outline' className='w-full flex gap-2'>
+            <FcGoogle size={20} />
+            Sign In with Google
           </Button>
         </div>
         <div className='mt-4 text-center text-sm'>
           Don&apos;t have an account?{" "}
           <Link href='#' className='underline'>
-            Sign up
+            Sign Up
           </Link>
         </div>
       </div>
