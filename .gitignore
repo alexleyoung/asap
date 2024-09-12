@@ -1,6 +1,14 @@
 # Created by https://www.toptal.com/developers/gitignore/api/java,android,maven
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,android,maven
 
+# Python
+__pycache__/
+.venv/
+
+#SQLAlchemy
+memory
+memory-journal
+
 ### Android ###
 # Gradle files
 .gradle/
