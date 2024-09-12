@@ -1,6 +1,9 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+
 import { motion, useScroll, useAnimate } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,9 +18,6 @@ import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 import { FloatingNav } from "@/components/ui/floating-navbar";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-// import { useTheme } from "next-themes";
-import Image from "next/image";
-import Link from "next/link";
 
 export default function LandingPage() {
   const { scrollYProgress } = useScroll();
@@ -86,7 +86,7 @@ export default function LandingPage() {
       title: "Fully Integrated",
       description:
         "Waste no time switching between apps. All your tasks, events, and reminders, in one place, integrated with your favorite tools.",
-      image: "/landing/features/integrations.png",
+      image: "/landing/features/integrationsDark.png",
       darkImage: "/landing/features/integrationsDark.png",
     },
   ];
