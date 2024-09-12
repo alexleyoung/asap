@@ -21,6 +21,9 @@ class users(BaseModel):
     email: str
     occupation: str
 
+class UserBase(BaseModel):
+    username: str
+
 def get_db():
     db = SessionLocal()
     try:
@@ -28,10 +31,12 @@ def get_db():
     finally:
         db.close()
 
-db_dependency = Annotated(Session, Depends(get_db))
+
 
 @app.post("/users/", status_code = status.HTTP_201_CREATED)
-async def create_user(user: UserBase, db: db_dependency):
+async def create_user(user: UserBase, db: Session = Depends(get_db)):
     db_user = models.User(**user.dict())
     db.add(db_user)
     db.commit()
+    db.refresh(db_user)
+    return db_user
