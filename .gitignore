@@ -5,6 +5,10 @@
 __pycache__/
 .venv/
 
+#SQLAlchemy
+memory
+memory-journal
+
 ### Android ###
 # Gradle files
 .gradle/
