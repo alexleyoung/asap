@@ -34,9 +34,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type ScheduleProps = {
   items: ScheduleItem[];
@@ -80,7 +90,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     const interval = setInterval(updateCurrentTimeLine, 60000); // Update every minute
 
     return () => clearInterval(interval);
-  }, [view]); // Add view as a dependency to re-run effect when view changes
+  }, [view]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, day: Date) => {
     if (scheduleRef.current) {
@@ -123,17 +133,26 @@ const Schedule: React.FC<ScheduleProps> = ({
   const renderTimeSlots = (showLabels: boolean = true) => {
     const slots = [];
     for (let i = 0; i < 24; i++) {
-      slots.push(
-        <div
-          key={i}
-          className='h-[60px] border-t border-gray-200 text-xs text-gray-500 relative'>
-          {showLabels && (
-            <span className='absolute -top-2 left-0'>{`${i
-              .toString()
-              .padStart(2, "0")}:00`}</span>
-          )}
-        </div>
-      );
+      if (i == 0) {
+        slots.push(
+          <div
+            key={i}
+            className='h-[60px] border-t border-gray-200 bg-background2 text-xs text-gray-500 relative'
+          />
+        );
+      } else {
+        slots.push(
+          <div
+            key={i}
+            className='h-[60px] border-t border-gray-200 bg-background2 text-xs text-gray-500 relative'>
+            {showLabels && (
+              <span className='absolute -top-2 left-0'>{`${i
+                .toString()
+                .padStart(2, "0")}:00`}</span>
+            )}
+          </div>
+        );
+      }
     }
     return slots;
   };
@@ -172,35 +191,35 @@ const Schedule: React.FC<ScheduleProps> = ({
   const renderDayView = () => {
     return (
       <div className='flex flex-col h-full'>
-        <div className='text-center font-semibold py-2'>
-          {format(currentDate, "MMMM d, yyyy")}
-        </div>
-        <div
-          className='flex-1 overflow-y-auto relative'
-          ref={scheduleRef}
-          onMouseMove={(e) => handleMouseMove(e, currentDate)}
-          onMouseLeave={handleMouseLeave}>
-          <div className='h-[1440px]'>
-            {" "}
+        <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
+          <div className='flex h-[1440px]'>
             {/* Set a fixed height for 24 hours */}
-            {renderTimeSlots()}
-            {scheduleRef.current &&
-              renderItems(currentDate, scheduleRef.current.scrollHeight)}
-            {ghostLinePosition &&
-              ghostLineDay &&
-              isSameDay(ghostLineDay, currentDate) && (
-                <div
-                  className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
-                  style={{ top: `${ghostLinePosition.top}px` }}>
-                  <span className='absolute right-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
-                    {format(ghostLinePosition.time, "HH:mm")}
-                  </span>
-                </div>
-              )}
+            <div className='w-16 flex-shrink-0 bg-background z-10'>
+              {renderTimeSlots()}
+            </div>
             <div
-              id='current-time-line'
-              className='absolute left-0 right-0 border-t border-red-500 pointer-events-none'
-            />
+              className='flex-1 relative'
+              onMouseMove={(e) => handleMouseMove(e, currentDate)}
+              onMouseLeave={handleMouseLeave}>
+              {renderTimeSlots(false)}
+              {scheduleRef.current &&
+                renderItems(currentDate, scheduleRef.current.scrollHeight)}
+              {ghostLinePosition &&
+                ghostLineDay &&
+                isSameDay(ghostLineDay, currentDate) && (
+                  <div
+                    className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
+                    style={{ top: `${ghostLinePosition.top}px` }}>
+                    <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
+                      {format(ghostLinePosition.time, "HH:mm")}
+                    </span>
+                  </div>
+                )}
+              <div
+                id='current-time-line'
+                className='absolute left-0 right-0 border-t border-red-500 pointer-events-none'
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -218,18 +237,17 @@ const Schedule: React.FC<ScheduleProps> = ({
         <div className='flex'>
           <div className='w-16' /> {/* Empty space for time labels */}
           {days.map((day) => (
-            <div
-              key={day.toISOString()}
-              className='flex-1 text-center font-semibold py-2'>
+            <div key={day.toISOString()} className='flex-1 text-center py-2'>
               {format(day, "EEE d")}
             </div>
           ))}
         </div>
         <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
           <div className='flex h-[1440px] relative'>
-            {" "}
             {/* Set a fixed height for 24 hours */}
-            <div className='w-16 flex-shrink-0'>{renderTimeSlots()}</div>
+            <div className='w-16 flex-shrink-0 bg-background z-10'>
+              {renderTimeSlots()}
+            </div>
             {days.map((day, index) => (
               <div
                 key={day.toISOString()}
@@ -245,7 +263,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                     <div
                       className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
                       style={{ top: `${ghostLinePosition.top}px` }}>
-                      <span className='absolute right-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
+                      <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
                         {format(ghostLinePosition.time, "HH:mm")}
                       </span>
                     </div>
@@ -321,30 +339,39 @@ const Schedule: React.FC<ScheduleProps> = ({
     <DndContext onDragEnd={handleDragEnd}>
       <div className='h-screen flex flex-col p-4 bg-background text-foreground'>
         <div className='flex justify-between items-center mb-4'>
-          <div>
-            <Button onClick={() => handleDateChange("prev")}>Previous</Button>
-            <Button onClick={() => handleDateChange("next")} className='ml-2'>
-              Next
+          <div className='flex gap-4 items-center'>
+            <ChevronLeft
+              size={32}
+              className='rounded-full hover:bg-muted p-1 transition-colors'
+              onClick={() => handleDateChange("prev")}
+            />
+            <ChevronRight
+              size={32}
+              className='rounded-full hover:bg-muted p-1 transition-colors'
+              onClick={() => handleDateChange("next")}
+            />
+            <Button
+              variant='outline'
+              onClick={() => setCurrentDate(new Date())}>
+              Today
             </Button>
+            <h2 className='font-medium text-xl'>
+              {view === "day"
+                ? format(currentDate, "MMMM d, yyyy")
+                : format(currentDate, "MMMM yyyy")}
+            </h2>
           </div>
-          <div>
-            <Button
-              onClick={() => handleViewChange("day")}
-              variant={view === "day" ? "default" : "outline"}>
-              Day
-            </Button>
-            <Button
-              onClick={() => handleViewChange("week")}
-              variant={view === "week" ? "default" : "outline"}
-              className='ml-2'>
-              Week
-            </Button>
-            <Button
-              onClick={() => handleViewChange("month")}
-              variant={view === "month" ? "default" : "outline"}
-              className='ml-2'>
-              Month
-            </Button>
+          <div className='flex gap-2'>
+            <Select value={view} onValueChange={handleViewChange}>
+              <SelectTrigger>
+                <SelectValue placeholder='View' className='text-sm' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='day'>Day</SelectItem>
+                <SelectItem value='week'>Week</SelectItem>
+                <SelectItem value='month'>Month</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className='flex-1 overflow-hidden'>
