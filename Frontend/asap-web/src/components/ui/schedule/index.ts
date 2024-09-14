@@ -1,3 +1,2 @@
-import { ScheduleWrapper as Schedule } from "./ScheduleWrapper";
-
+import Schedule from "./schedule";
 export default Schedule;
