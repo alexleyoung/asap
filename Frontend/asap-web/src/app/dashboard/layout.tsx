@@ -1,4 +1,6 @@
-import { Calendar } from "@/components/ui/calendar";
+import Header from "@/components/ui/dashboard/Header";
+import Sidebar from "@/components/ui/dashboard/Sidebar";
+import { ScheduleProvider } from "@/contexts/ScheduleContext";
 
 export default function DashboardLayout({
   children,
@@ -6,16 +8,14 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className='flex h-screen w-screen flex-col overflow-hidden'>
-      <header className='px-5 py-3 border-b border-border flex justify-between'>
-        <h1 className='text-2xl font-bold'>asap.</h1>
-      </header>
-      <div className='flex flex-grow h-full'>
-        <aside className='border-r border-border'>
-          <Calendar mode='single' />
-        </aside>
-        <main className='flex-grow h-full'>{children}</main>
+    <ScheduleProvider>
+      <div className='flex h-screen w-screen flex-col overflow-hidden'>
+        <Header />
+        <div className='flex flex-grow h-full'>
+          <Sidebar />
+          <main className='flex-grow h-full'>{children}</main>
+        </div>
       </div>
-    </div>
+    </ScheduleProvider>
   );
 }
