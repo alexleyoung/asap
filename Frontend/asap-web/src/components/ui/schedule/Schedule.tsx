@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import {
   format,
   addDays,
@@ -16,6 +23,8 @@ import {
   differenceInMinutes,
   startOfDay,
   addMinutes,
+  setHours,
+  setMinutes,
 } from "date-fns";
 import {
   DndContext,
@@ -48,6 +57,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+type ScheduleItem = {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  color: string;
+};
+
 type ScheduleProps = {
   items: ScheduleItem[];
   onItemUpdate: (item: ScheduleItem) => void;
@@ -72,6 +89,23 @@ const Schedule: React.FC<ScheduleProps> = ({
   const [selectedItem, setSelectedItem] = useState<ScheduleItem | null>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
 
+  useHotkeys("d", () => setView("day"), []);
+  useHotkeys("w", () => setView("week"), []);
+  useHotkeys("m", () => setView("month"), []);
+
+  const scrollToCurrentTime = useCallback(() => {
+    if (scheduleRef.current && (view === "day" || view === "week")) {
+      const now = new Date();
+      const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+      const scrollPosition =
+        (minutesSinceMidnight / 1440) * scheduleRef.current.scrollHeight;
+      scheduleRef.current.scrollTo({
+        top: scrollPosition - scheduleRef.current.clientHeight / 2,
+        behavior: "smooth",
+      });
+    }
+  }, [view]);
+
   useEffect(() => {
     const updateCurrentTimeLine = () => {
       const now = new Date();
@@ -89,8 +123,14 @@ const Schedule: React.FC<ScheduleProps> = ({
     updateCurrentTimeLine();
     const interval = setInterval(updateCurrentTimeLine, 60000); // Update every minute
 
+    scrollToCurrentTime(); // Scroll to current time when component mounts
+
     return () => clearInterval(interval);
-  }, [view]);
+  }, [scrollToCurrentTime]);
+
+  useEffect(() => {
+    scrollToCurrentTime(); // Scroll to current time when view changes
+  }, [view, scrollToCurrentTime]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>, day: Date) => {
     if (scheduleRef.current) {
@@ -120,88 +160,187 @@ const Schedule: React.FC<ScheduleProps> = ({
     if (over) {
       const updatedItem = items.find((item) => item.id === active.id);
       if (updatedItem) {
-        const dropTime = new Date(over.id as string);
-        const duration =
-          updatedItem.end.getTime() - updatedItem.start.getTime();
-        updatedItem.start = dropTime;
-        updatedItem.end = new Date(dropTime.getTime() + duration);
-        onItemUpdate(updatedItem);
+        const [dropDate, dropMonth, dropDay, dropMinutes] = (
+          over.id as string
+        ).split("-");
+        const dropDateObj = parseISO(dropDate + dropMonth + dropDay);
+        const dropTime = addMinutes(
+          startOfDay(dropDateObj),
+          parseInt(dropMinutes)
+        );
+
+        // Calculate the original duration
+        const originalDuration = differenceInMinutes(
+          updatedItem.end,
+          updatedItem.start
+        );
+
+        // Create new Date objects for start and end
+        const newStart = new Date(dropDateObj);
+        newStart.setHours(dropTime.getHours());
+        newStart.setMinutes(dropTime.getMinutes());
+
+        // Calculate the new end time based on the original duration
+        const newEnd = addMinutes(newStart, originalDuration);
+
+        onItemUpdate({
+          ...updatedItem,
+          start: newStart,
+          end: newEnd,
+        });
       }
     }
   };
 
-  const renderTimeSlots = (showLabels: boolean = true) => {
-    const slots = [];
-    for (let i = 0; i < 24; i++) {
-      if (i == 0) {
-        slots.push(
-          <div
-            key={i}
-            className='h-[60px] border-t border-gray-200 bg-background2 text-xs text-gray-500 relative'
-          />
-        );
-      } else {
-        slots.push(
-          <div
-            key={i}
-            className='h-[60px] border-t border-gray-200 bg-background2 text-xs text-gray-500 relative'>
-            {showLabels && (
-              <span className='absolute -top-2 left-0'>{`${i
-                .toString()
-                .padStart(2, "0")}:00`}</span>
-            )}
-          </div>
-        );
-      }
+  const handleScheduleClick = (day: Date, yPosition: number) => {
+    if (scheduleRef.current) {
+      const totalMinutes = Math.floor(
+        (yPosition / scheduleRef.current.scrollHeight) * 1440
+      );
+      const roundedMinutes = Math.round(totalMinutes / 15) * 15;
+      const clickedTime = addMinutes(startOfDay(day), roundedMinutes);
+      const endTime = addMinutes(clickedTime, 60); // Default duration: 1 hour
+
+      setNewItem({
+        title: "",
+        start: clickedTime,
+        end: endTime,
+      });
     }
-    return slots;
   };
 
-  const renderItems = (
-    day: Date,
-    containerHeight: number,
-    isMonthView: boolean = false
-  ) => {
-    const dayStart = startOfDay(day);
-    const dayItems = items.filter((item) => isSameDay(item.start, day));
+  const TimeSlot: React.FC<{ day: Date; hour: number; showLabel: boolean }> =
+    React.memo(({ day, hour, showLabel }) => {
+      const { setNodeRef } = useDroppable({
+        id: `${format(day, "yyyy-MM-dd")}-${hour * 60}`,
+      });
 
-    if (isMonthView) {
-      return dayItems.map((item, index) => (
+      return (
         <div
-          key={item.id}
-          className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
-          style={{ backgroundColor: item.color }}
-          onClick={() => setSelectedItem(item)}>
-          {item.title}
+          ref={setNodeRef}
+          className='h-[60px] border-t border-gray-200 text-xs text-gray-500 relative'>
+          {showLabel && (
+            <span className='absolute bg-background -top-2 left-0'>
+              {format(setHours(day, hour), "h a")}
+            </span>
+          )}
         </div>
+      );
+    });
+
+  const renderTimeSlots = useCallback(
+    (showLabels: boolean = true, day: Date) => {
+      return Array.from({ length: 24 }, (_, i) => (
+        <TimeSlot
+          key={i}
+          day={day}
+          hour={i}
+          showLabel={i === 0 ? false : showLabels}
+        />
       ));
-    }
+    },
+    []
+  );
 
-    return dayItems.map((item) => (
-      <DraggableItem
-        key={item.id}
-        item={item}
-        onItemClick={setSelectedItem}
-        containerHeight={containerHeight}
-        dayStart={dayStart}
-      />
-    ));
-  };
+  const DraggableItem: React.FC<{
+    item: ScheduleItem;
+    onItemClick: (item: ScheduleItem) => void;
+    containerHeight: number;
+    dayStart: Date;
+  }> = React.memo(({ item, onItemClick, containerHeight, dayStart }) => {
+    const { attributes, listeners, setNodeRef, transform } = useDraggable({
+      id: item.id,
+    });
 
-  const renderDayView = () => {
+    const style = transform
+      ? {
+          transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        }
+      : undefined;
+
+    const topPosition =
+      (differenceInMinutes(item.start, dayStart) / 1440) * containerHeight;
+    const height =
+      (differenceInMinutes(item.end, item.start) / 1440) * containerHeight;
+
+    return (
+      <div
+        ref={setNodeRef}
+        {...attributes}
+        {...listeners}
+        style={{
+          ...style,
+          position: "absolute",
+          top: `${topPosition}px`,
+          height: `${height}px`,
+          left: "0",
+          right: "0",
+          backgroundColor: item.color,
+          padding: "2px",
+          borderRadius: "4px",
+          cursor: "move",
+          zIndex: 10,
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          onItemClick(item);
+        }}>
+        {item.title}
+      </div>
+    );
+  });
+
+  const renderItems = useCallback(
+    (day: Date, containerHeight: number, isMonthView: boolean = false) => {
+      const dayStart = startOfDay(day);
+      const dayItems = items.filter((item) => isSameDay(item.start, day));
+
+      if (isMonthView) {
+        return dayItems.map((item) => (
+          <div
+            key={item.id}
+            className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+            style={{ backgroundColor: item.color }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedItem(item);
+            }}>
+            {item.title}
+          </div>
+        ));
+      }
+
+      return dayItems.map((item) => (
+        <DraggableItem
+          key={item.id}
+          item={item}
+          onItemClick={setSelectedItem}
+          containerHeight={containerHeight}
+          dayStart={dayStart}
+        />
+      ));
+    },
+    [items]
+  );
+
+  const renderDayView = useCallback(() => {
     return (
       <div className='flex flex-col h-full'>
         <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
           <div className='flex h-[1440px]'>
-            {/* Set a fixed height for 24 hours */}
             <div className='w-16 flex-shrink-0 bg-background z-10'>
-              {renderTimeSlots()}
+              {renderTimeSlots(true, currentDate)}
             </div>
             <div
               className='flex-1 relative'
               onMouseMove={(e) => handleMouseMove(e, currentDate)}
-              onMouseLeave={handleMouseLeave}>
-              {renderTimeSlots(false)}
+              onMouseLeave={handleMouseLeave}
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const yPosition = e.clientY - rect.top;
+                handleScheduleClick(currentDate, yPosition);
+              }}>
+              {renderTimeSlots(false, currentDate)}
               {scheduleRef.current &&
                 renderItems(currentDate, scheduleRef.current.scrollHeight)}
               {ghostLinePosition &&
@@ -217,16 +356,23 @@ const Schedule: React.FC<ScheduleProps> = ({
                 )}
               <div
                 id='current-time-line'
-                className='absolute left-0 right-0 border-t border-red-500 pointer-events-none'
-              />
+                className='absolute left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'>
+                <div className='size-2 rounded-full bg-red-500 -my-1 -ml-1'></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     );
-  };
+  }, [
+    currentDate,
+    ghostLineDay,
+    ghostLinePosition,
+    renderItems,
+    renderTimeSlots,
+  ]);
 
-  const renderWeekView = () => {
+  const renderWeekView = useCallback(() => {
     const startDate = startOfWeek(currentDate);
     const endDate = endOfWeek(currentDate);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
@@ -235,7 +381,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     return (
       <div className='flex flex-col h-full'>
         <div className='flex'>
-          <div className='w-16' /> {/* Empty space for time labels */}
+          <div className='w-16' />
           {days.map((day) => (
             <div key={day.toISOString()} className='flex-1 text-center py-2'>
               {format(day, "EEE d")}
@@ -244,17 +390,21 @@ const Schedule: React.FC<ScheduleProps> = ({
         </div>
         <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
           <div className='flex h-[1440px] relative'>
-            {/* Set a fixed height for 24 hours */}
             <div className='w-16 flex-shrink-0 bg-background z-10'>
-              {renderTimeSlots()}
+              {renderTimeSlots(true, days[0])}
             </div>
-            {days.map((day, index) => (
+            {days.map((day) => (
               <div
                 key={day.toISOString()}
                 className='flex-1 border-l border-gray-200 relative'
                 onMouseMove={(e) => handleMouseMove(e, day)}
-                onMouseLeave={handleMouseLeave}>
-                {renderTimeSlots(false)}
+                onMouseLeave={handleMouseLeave}
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const yPosition = e.clientY - rect.top;
+                  handleScheduleClick(day, yPosition);
+                }}>
+                {renderTimeSlots(false, day)}
                 {scheduleRef.current &&
                   renderItems(day, scheduleRef.current.scrollHeight)}
                 {ghostLinePosition &&
@@ -271,13 +421,14 @@ const Schedule: React.FC<ScheduleProps> = ({
                 {isSameDay(now, day) && (
                   <div
                     id='current-time-line'
-                    className='absolute left-0 right-0 border-t border-red-500 pointer-events-none'
+                    className='absolute left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'
                     style={{
                       top: `${
                         ((now.getHours() * 60 + now.getMinutes()) / 1440) * 100
                       }%`,
-                    }}
-                  />
+                    }}>
+                    <div className='size-2 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                  </div>
                 )}
               </div>
             ))}
@@ -285,9 +436,15 @@ const Schedule: React.FC<ScheduleProps> = ({
         </div>
       </div>
     );
-  };
+  }, [
+    currentDate,
+    ghostLineDay,
+    ghostLinePosition,
+    renderItems,
+    renderTimeSlots,
+  ]);
 
-  const renderMonthView = () => {
+  const renderMonthView = useCallback(() => {
     const startDate = startOfMonth(currentDate);
     const endDate = endOfMonth(currentDate);
     const days = eachDayOfInterval({ start: startDate, end: endDate });
@@ -307,13 +464,13 @@ const Schedule: React.FC<ScheduleProps> = ({
             }`}>
             <div className='text-right text-sm'>{format(day, "d")}</div>
             <div className='overflow-y-auto h-24'>
-              {renderItems(day, 96, true)} {/* 96px height, isMonthView=true */}
+              {renderItems(day, 96, true)}
             </div>
           </div>
         ))}
       </div>
     );
-  };
+  }, [currentDate, renderItems]);
 
   const handleViewChange = (newView: ViewType) => {
     setView(newView);
@@ -473,51 +630,6 @@ const Schedule: React.FC<ScheduleProps> = ({
         </Popover>
       </div>
     </DndContext>
-  );
-};
-
-const DraggableItem: React.FC<{
-  item: ScheduleItem;
-  onItemClick: (item: ScheduleItem) => void;
-  containerHeight: number;
-  dayStart: Date;
-}> = ({ item, onItemClick, containerHeight, dayStart }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: item.id,
-  });
-
-  const style = transform
-    ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-      }
-    : undefined;
-
-  const topPosition =
-    (differenceInMinutes(item.start, dayStart) / 1440) * containerHeight;
-  const height =
-    (differenceInMinutes(item.end, item.start) / 1440) * containerHeight;
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      style={{
-        ...style,
-        position: "absolute",
-        top: `${topPosition}px`,
-        height: `${height}px`,
-        left: "0",
-        right: "0",
-        backgroundColor: item.color,
-        padding: "2px",
-        borderRadius: "4px",
-        cursor: "move",
-        zIndex: 10,
-      }}
-      onClick={() => onItemClick(item)}>
-      {item.title}
-    </div>
   );
 };
 
