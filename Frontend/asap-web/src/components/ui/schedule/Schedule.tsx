@@ -56,6 +56,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ScrollArea } from "../scroll-area";
 
 type ScheduleItem = {
   id: string;
@@ -366,38 +367,44 @@ const Schedule: React.FC<ScheduleProps> = ({
   const renderDayView = useCallback(() => {
     return (
       <div className='flex flex-col h-full'>
-        <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
-          <div className='flex h-[1440px]'>
-            <div className='w-16 flex-shrink-0 bg-background z-10'>
-              {renderTimeSlots(true, currentDate)}
-            </div>
-            <div
-              className='flex-1 relative'
-              onMouseMove={(e) => handleMouseMove(e, currentDate)}
-              onMouseLeave={handleMouseLeave}
-              onClick={(e) => {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const yPosition = e.clientY - rect.top;
-                handleScheduleClick(currentDate, yPosition);
-              }}>
-              {renderTimeSlots(false, currentDate)}
-              {scheduleRef.current &&
-                renderItems(currentDate, scheduleRef.current.scrollHeight)}
-              {ghostLinePosition &&
-                ghostLineDay &&
-                isSameDay(ghostLineDay, currentDate) && (
-                  <div
-                    className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
-                    style={{ top: `${ghostLinePosition.top}px` }}>
-                    <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
-                      {format(ghostLinePosition.time, "HH:mm")}
-                    </span>
-                  </div>
-                )}
+        <div className='flex'>
+          <div className='w-16' />
+          <div className='flex-1 py-2'>{format(currentDate, "EEE d")}</div>
+        </div>
+        <div className='flex flex-col h-full'>
+          <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
+            <div className='flex h-[1440px]'>
+              <div className='w-16 flex-shrink-0 bg-background z-10'>
+                {renderTimeSlots(true, currentDate)}
+              </div>
               <div
-                id='current-time-line'
-                className='absolute left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'>
-                <div className='w-2 h-2 rounded-full bg-red-500 -ml-1'></div>
+                className='flex-1 relative'
+                onMouseMove={(e) => handleMouseMove(e, currentDate)}
+                onMouseLeave={handleMouseLeave}
+                onClick={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const yPosition = e.clientY - rect.top;
+                  handleScheduleClick(currentDate, yPosition);
+                }}>
+                {renderTimeSlots(false, currentDate)}
+                {scheduleRef.current &&
+                  renderItems(currentDate, scheduleRef.current.scrollHeight)}
+                {ghostLinePosition &&
+                  ghostLineDay &&
+                  isSameDay(ghostLineDay, currentDate) && (
+                    <div
+                      className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
+                      style={{ top: `${ghostLinePosition.top}px` }}>
+                      <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
+                        {format(ghostLinePosition.time, "HH:mm")}
+                      </span>
+                    </div>
+                  )}
+                <div
+                  id='current-time-line'
+                  className='absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'>
+                  <div className='size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                </div>
               </div>
             </div>
           </div>
@@ -419,7 +426,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     const now = new Date();
 
     return (
-      <div className='flex flex-col h-full'>
+      <div className='flex flex-col'>
         <div className='flex'>
           <div className='w-16' />
           {days.map((day) => (
@@ -461,13 +468,13 @@ const Schedule: React.FC<ScheduleProps> = ({
                 {isSameDay(now, day) && (
                   <div
                     id='current-time-line'
-                    className='absolute left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'
+                    className='absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'
                     style={{
                       top: `${
                         ((now.getHours() * 60 + now.getMinutes()) / 1440) * 100
                       }%`,
                     }}>
-                    <div className='w-2 h-2 rounded-full bg-red-500 -ml-1'></div>
+                    <div className='size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1'></div>
                   </div>
                 )}
               </div>
@@ -533,8 +540,11 @@ const Schedule: React.FC<ScheduleProps> = ({
   };
 
   return (
-    <DndContext onDragEnd={handleDragEnd} modifiers={[snapToTimeSlot]}>
-      <div className='h-screen flex flex-col p-4 bg-background text-foreground'>
+    <DndContext
+      onDragEnd={handleDragEnd}
+      modifiers={[snapToTimeSlot]}
+      autoScroll={false}>
+      <div className='flex-grow h-full flex flex-col p-4 bg-background text-foreground'>
         <div className='flex justify-between items-center mb-4'>
           <div className='flex gap-4 items-center'>
             <ChevronLeft
@@ -571,11 +581,11 @@ const Schedule: React.FC<ScheduleProps> = ({
             </Select>
           </div>
         </div>
-        <div className='flex-1 overflow-hidden'>
+        <ScrollArea className='h-full'>
           {view === "day" && renderDayView()}
           {view === "week" && renderWeekView()}
           {view === "month" && renderMonthView()}
-        </div>
+        </ScrollArea>
         <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
           <DialogContent>
             <DialogHeader>
