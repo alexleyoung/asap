@@ -8,6 +8,7 @@ import React, {
   useMemo,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
+import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import {
   format,
   addDays,
@@ -31,8 +32,8 @@ import {
   DragEndEvent,
   useDraggable,
   useDroppable,
+  Modifier,
 } from "@dnd-kit/core";
-import { createSnapModifier } from "@dnd-kit/modifiers";
 import {
   Dialog,
   DialogContent,
@@ -154,10 +155,30 @@ const Schedule: React.FC<ScheduleProps> = ({
     setGhostLineDay(null);
   };
 
-  const roundToNearestFiveMinutes = (date: Date): Date => {
+  const roundToNearestFifteenMinutes = (date: Date): Date => {
     const minutes = date.getMinutes();
-    const roundedMinutes = Math.round(minutes / 5) * 5;
+    const roundedMinutes = Math.round(minutes / 15) * 15;
     return setMinutes(date, roundedMinutes);
+  };
+
+  const snapToTimeSlot: Modifier = ({
+    transform,
+    draggingNodeRect,
+    containerNodeRect,
+  }) => {
+    if (!draggingNodeRect || !containerNodeRect) {
+      return transform;
+    }
+
+    const minutesSinceMidnight =
+      (transform.y / containerNodeRect.height) * 1440;
+    const roundedMinutes = Math.round(minutesSinceMidnight / 15) * 15;
+    const snappedY = (roundedMinutes / 1440) * containerNodeRect.height;
+
+    return {
+      ...transform,
+      y: snappedY,
+    };
   };
 
   const handleDragEnd = useCallback(
@@ -170,14 +191,21 @@ const Schedule: React.FC<ScheduleProps> = ({
             over.id as string
           ).split("-");
           const dropDate = parseISO(`${dropYear}-${dropMonth}-${dropDay}`);
-          const dropTime = addMinutes(
+          let dropTime = addMinutes(
             startOfDay(dropDate),
             parseInt(dropMinutes)
           );
 
+          // Snap to nearest 15-minute increment
+          dropTime = roundToNearestFifteenMinutes(dropTime);
+
           const timeDiff = differenceInMinutes(dropTime, updatedItem.start);
-          const newStart = addMinutes(updatedItem.start, timeDiff);
-          const newEnd = addMinutes(updatedItem.end, timeDiff);
+          const newStart = roundToNearestFifteenMinutes(
+            addMinutes(updatedItem.start, timeDiff)
+          );
+          const newEnd = roundToNearestFifteenMinutes(
+            addMinutes(updatedItem.end, timeDiff)
+          );
 
           onItemUpdate({
             ...updatedItem,
@@ -222,7 +250,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     return (
       <div
         ref={setNodeRef}
-        className={`h-[5px] ${
+        className={`h-[15px] ${
           isHourMark ? "border-t border-gray-200" : ""
         } relative`}>
         {showLabel && isHourMark && (
@@ -235,9 +263,9 @@ const Schedule: React.FC<ScheduleProps> = ({
   });
 
   const renderTimeSlots = useCallback((showLabels: boolean, day: Date) => {
-    return Array.from({ length: 24 * 12 }, (_, i) => {
-      const hour = Math.floor(i / 12);
-      const minute = (i % 12) * 5;
+    return Array.from({ length: 24 * 4 }, (_, i) => {
+      const hour = Math.floor(i / 4);
+      const minute = (i % 4) * 15;
       return (
         <TimeSlot
           key={i}
@@ -250,52 +278,42 @@ const Schedule: React.FC<ScheduleProps> = ({
     });
   }, []);
 
-  const sensors = useMemo(
-    () => [
-      {
-        sensor: {
-          activationConstraint: {
-            distance: 5, // Adjust this value to change drag sensitivity
-          },
-        },
-      },
-    ],
-    []
-  );
-
-  const DraggableItem: React.FC<{
+  const DraggableItem = React.memo<{
     item: ScheduleItem;
     onItemClick: (item: ScheduleItem) => void;
     containerHeight: number;
     dayStart: Date;
-  }> = useCallback(({ item, onItemClick, containerHeight, dayStart }) => {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
-      id: item.id,
-    });
+  }>(({ item, onItemClick, containerHeight, dayStart }) => {
+    const { attributes, listeners, setNodeRef, transform, isDragging } =
+      useDraggable({
+        id: item.id,
+        data: item,
+      });
 
-    const style: React.CSSProperties = useMemo(
-      () => ({
-        transform: transform
-          ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-          : undefined,
+    const style = useMemo(() => {
+      const topPercentage =
+        (differenceInMinutes(item.start, dayStart) / 1440) * 100;
+      const heightPercentage =
+        (differenceInMinutes(item.end, item.start) / 1440) * 100;
+
+      return {
         position: "absolute" as const,
-        top: `${
-          (differenceInMinutes(item.start, dayStart) / 1440) * containerHeight
-        }px`,
-        height: `${
-          (differenceInMinutes(item.end, item.start) / 1440) * containerHeight
-        }px`,
-        left: "0",
-        right: "0",
+        top: `${topPercentage}%`,
+        height: `${heightPercentage}%`,
+        left: 0,
+        right: 0,
         backgroundColor: item.color,
         padding: "2px",
         borderRadius: "4px",
-        cursor: "move",
-        zIndex: 10,
-        userSelect: "none" as const,
-      }),
-      [transform, item, dayStart, containerHeight]
-    );
+        cursor: isDragging ? "grabbing" : "grab",
+        zIndex: isDragging ? 20 : 10,
+        brightness: isDragging ? 0.8 : 1,
+        transform: transform
+          ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+          : undefined,
+        transition: isDragging ? "none" : "transform 0.1s",
+      };
+    }, [item, dayStart, containerHeight, transform, isDragging]);
 
     return (
       <div
@@ -310,7 +328,7 @@ const Schedule: React.FC<ScheduleProps> = ({
         {item.title}
       </div>
     );
-  }, []);
+  });
 
   const renderItems = useCallback(
     (day: Date, containerHeight: number, isMonthView: boolean = false) => {
@@ -515,7 +533,7 @@ const Schedule: React.FC<ScheduleProps> = ({
   };
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={handleDragEnd} modifiers={[snapToTimeSlot]}>
       <div className='h-screen flex flex-col p-4 bg-background text-foreground'>
         <div className='flex justify-between items-center mb-4'>
           <div className='flex gap-4 items-center'>
