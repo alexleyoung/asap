@@ -32,6 +32,7 @@ import {
   useDraggable,
   useDroppable,
 } from "@dnd-kit/core";
+import { createSnapModifier } from "@dnd-kit/modifiers";
 import {
   Dialog,
   DialogContent,
@@ -46,9 +47,7 @@ import {
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -155,42 +154,41 @@ const Schedule: React.FC<ScheduleProps> = ({
     setGhostLineDay(null);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over) {
-      const updatedItem = items.find((item) => item.id === active.id);
-      if (updatedItem) {
-        const [dropDate, dropMonth, dropDay, dropMinutes] = (
-          over.id as string
-        ).split("-");
-        const dropDateObj = parseISO(dropDate + dropMonth + dropDay);
-        const dropTime = addMinutes(
-          startOfDay(dropDateObj),
-          parseInt(dropMinutes)
-        );
-
-        // Calculate the original duration
-        const originalDuration = differenceInMinutes(
-          updatedItem.end,
-          updatedItem.start
-        );
-
-        // Create new Date objects for start and end
-        const newStart = new Date(dropDateObj);
-        newStart.setHours(dropTime.getHours());
-        newStart.setMinutes(dropTime.getMinutes());
-
-        // Calculate the new end time based on the original duration
-        const newEnd = addMinutes(newStart, originalDuration);
-
-        onItemUpdate({
-          ...updatedItem,
-          start: newStart,
-          end: newEnd,
-        });
-      }
-    }
+  const roundToNearestFiveMinutes = (date: Date): Date => {
+    const minutes = date.getMinutes();
+    const roundedMinutes = Math.round(minutes / 5) * 5;
+    return setMinutes(date, roundedMinutes);
   };
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (over) {
+        const updatedItem = items.find((item) => item.id === active.id);
+        if (updatedItem) {
+          const [dropYear, dropMonth, dropDay, dropMinutes] = (
+            over.id as string
+          ).split("-");
+          const dropDate = parseISO(`${dropYear}-${dropMonth}-${dropDay}`);
+          const dropTime = addMinutes(
+            startOfDay(dropDate),
+            parseInt(dropMinutes)
+          );
+
+          const timeDiff = differenceInMinutes(dropTime, updatedItem.start);
+          const newStart = addMinutes(updatedItem.start, timeDiff);
+          const newEnd = addMinutes(updatedItem.end, timeDiff);
+
+          onItemUpdate({
+            ...updatedItem,
+            start: newStart,
+            end: newEnd,
+          });
+        }
+      }
+    },
+    [items, onItemUpdate]
+  );
 
   const handleScheduleClick = (day: Date, yPosition: number) => {
     if (scheduleRef.current) {
@@ -209,36 +207,59 @@ const Schedule: React.FC<ScheduleProps> = ({
     }
   };
 
-  const TimeSlot: React.FC<{ day: Date; hour: number; showLabel: boolean }> =
-    React.memo(({ day, hour, showLabel }) => {
-      const { setNodeRef } = useDroppable({
-        id: `${format(day, "yyyy-MM-dd")}-${hour * 60}`,
-      });
-
-      return (
-        <div
-          ref={setNodeRef}
-          className='h-[60px] border-t border-gray-200 text-xs text-gray-500 relative'>
-          {showLabel && (
-            <span className='absolute bg-background -top-2 left-0'>
-              {format(setHours(day, hour), "h a")}
-            </span>
-          )}
-        </div>
-      );
+  const TimeSlot: React.FC<{
+    day: Date;
+    hour: number;
+    minute: number;
+    showLabel: boolean;
+  }> = React.memo(({ day, hour, minute, showLabel }) => {
+    const { setNodeRef } = useDroppable({
+      id: `${format(day, "yyyy-MM-dd")}-${hour * 60 + minute}`,
     });
 
-  const renderTimeSlots = useCallback(
-    (showLabels: boolean = true, day: Date) => {
-      return Array.from({ length: 24 }, (_, i) => (
+    const isHourMark = minute === 0;
+
+    return (
+      <div
+        ref={setNodeRef}
+        className={`h-[5px] ${
+          isHourMark ? "border-t border-gray-200" : ""
+        } relative`}>
+        {showLabel && isHourMark && (
+          <span className='absolute bg-background -top-2 left-0 text-xs text-gray-500'>
+            {format(setHours(setMinutes(day, minute), hour), "h a")}
+          </span>
+        )}
+      </div>
+    );
+  });
+
+  const renderTimeSlots = useCallback((showLabels: boolean, day: Date) => {
+    return Array.from({ length: 24 * 12 }, (_, i) => {
+      const hour = Math.floor(i / 12);
+      const minute = (i % 12) * 5;
+      return (
         <TimeSlot
           key={i}
           day={day}
-          hour={i}
-          showLabel={i === 0 ? false : showLabels}
+          hour={hour}
+          minute={minute}
+          showLabel={hour === 0 ? false : showLabels}
         />
-      ));
-    },
+      );
+    });
+  }, []);
+
+  const sensors = useMemo(
+    () => [
+      {
+        sensor: {
+          activationConstraint: {
+            distance: 5, // Adjust this value to change drag sensitivity
+          },
+        },
+      },
+    ],
     []
   );
 
@@ -247,40 +268,41 @@ const Schedule: React.FC<ScheduleProps> = ({
     onItemClick: (item: ScheduleItem) => void;
     containerHeight: number;
     dayStart: Date;
-  }> = React.memo(({ item, onItemClick, containerHeight, dayStart }) => {
+  }> = useCallback(({ item, onItemClick, containerHeight, dayStart }) => {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
       id: item.id,
     });
 
-    const style = transform
-      ? {
-          transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        }
-      : undefined;
-
-    const topPosition =
-      (differenceInMinutes(item.start, dayStart) / 1440) * containerHeight;
-    const height =
-      (differenceInMinutes(item.end, item.start) / 1440) * containerHeight;
+    const style: React.CSSProperties = useMemo(
+      () => ({
+        transform: transform
+          ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+          : undefined,
+        position: "absolute" as const,
+        top: `${
+          (differenceInMinutes(item.start, dayStart) / 1440) * containerHeight
+        }px`,
+        height: `${
+          (differenceInMinutes(item.end, item.start) / 1440) * containerHeight
+        }px`,
+        left: "0",
+        right: "0",
+        backgroundColor: item.color,
+        padding: "2px",
+        borderRadius: "4px",
+        cursor: "move",
+        zIndex: 10,
+        userSelect: "none" as const,
+      }),
+      [transform, item, dayStart, containerHeight]
+    );
 
     return (
       <div
         ref={setNodeRef}
+        style={style}
         {...attributes}
         {...listeners}
-        style={{
-          ...style,
-          position: "absolute",
-          top: `${topPosition}px`,
-          height: `${height}px`,
-          left: "0",
-          right: "0",
-          backgroundColor: item.color,
-          padding: "2px",
-          borderRadius: "4px",
-          cursor: "move",
-          zIndex: 10,
-        }}
         onClick={(e) => {
           e.stopPropagation();
           onItemClick(item);
@@ -288,7 +310,7 @@ const Schedule: React.FC<ScheduleProps> = ({
         {item.title}
       </div>
     );
-  });
+  }, []);
 
   const renderItems = useCallback(
     (day: Date, containerHeight: number, isMonthView: boolean = false) => {
@@ -357,7 +379,7 @@ const Schedule: React.FC<ScheduleProps> = ({
               <div
                 id='current-time-line'
                 className='absolute left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'>
-                <div className='size-2 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                <div className='w-2 h-2 rounded-full bg-red-500 -ml-1'></div>
               </div>
             </div>
           </div>
@@ -427,7 +449,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                         ((now.getHours() * 60 + now.getMinutes()) / 1440) * 100
                       }%`,
                     }}>
-                    <div className='size-2 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                    <div className='w-2 h-2 rounded-full bg-red-500 -ml-1'></div>
                   </div>
                 )}
               </div>
