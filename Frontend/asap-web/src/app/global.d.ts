@@ -5,3 +5,5 @@ declare type ScheduleItem = {
   end: Date;
   color: string;
 };
+
+declare type ViewType = "day" | "week" | "month";

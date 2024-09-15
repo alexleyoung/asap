@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dispatch,
   SetStateAction,
@@ -23,7 +25,7 @@ const CurrentDateContext = createContext<CurrentDateContextType | undefined>(
 
 export function ScheduleProvider({ children }: { children: React.ReactNode }) {
   const [view, setView] = useState("week");
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   return (
     <ViewContext.Provider value={{ view, setView }}>

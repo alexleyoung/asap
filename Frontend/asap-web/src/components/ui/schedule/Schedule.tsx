@@ -57,6 +57,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ScrollArea } from "../scroll-area";
+import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
 
 type ScheduleItem = {
   id: string;
@@ -72,15 +73,13 @@ type ScheduleProps = {
   onItemCreate: (item: ScheduleItem) => void;
 };
 
-type ViewType = "day" | "week" | "month";
-
 const Schedule: React.FC<ScheduleProps> = ({
   items,
   onItemUpdate,
   onItemCreate,
 }) => {
-  const [view, setView] = useState<ViewType>("week");
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { view, setView } = useView();
+  const { currentDate, setCurrentDate } = useCurrentDate();
   const [ghostLinePosition, setGhostLinePosition] = useState<{
     top: number;
     time: Date;
@@ -545,42 +544,6 @@ const Schedule: React.FC<ScheduleProps> = ({
       modifiers={[snapToTimeSlot]}
       autoScroll={false}>
       <div className='flex-grow h-full flex flex-col p-4 bg-background text-foreground'>
-        <div className='flex justify-between items-center mb-4'>
-          <div className='flex gap-4 items-center'>
-            <ChevronLeft
-              size={32}
-              className='rounded-full hover:bg-muted p-1 transition-colors'
-              onClick={() => handleDateChange("prev")}
-            />
-            <ChevronRight
-              size={32}
-              className='rounded-full hover:bg-muted p-1 transition-colors'
-              onClick={() => handleDateChange("next")}
-            />
-            <Button
-              variant='outline'
-              onClick={() => setCurrentDate(new Date())}>
-              Today
-            </Button>
-            <h2 className='font-medium text-xl'>
-              {view === "day"
-                ? format(currentDate, "MMMM d, yyyy")
-                : format(currentDate, "MMMM yyyy")}
-            </h2>
-          </div>
-          <div className='flex gap-2'>
-            <Select value={view} onValueChange={handleViewChange}>
-              <SelectTrigger>
-                <SelectValue placeholder='View' className='text-sm' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='day'>Day</SelectItem>
-                <SelectItem value='week'>Week</SelectItem>
-                <SelectItem value='month'>Month</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
         <ScrollArea className='h-full'>
           {view === "day" && renderDayView()}
           {view === "week" && renderWeekView()}
