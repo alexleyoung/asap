@@ -90,7 +90,7 @@ export default function Header() {
       <div className='flex gap-4 items-center'>
         <Popover>
           <PopoverTrigger>
-            <Avatar className='hover:cursor-pointer relative group ring-0'>
+            <Avatar className='hover:cursor-pointer relative group'>
               <div className='absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all' />
               <AvatarImage
                 src='https://github.com/alexleyoung.png'

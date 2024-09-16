@@ -116,7 +116,7 @@ const Schedule: React.FC<ScheduleProps> = ({
       const totalMinutes = Math.floor(
         (y / scheduleRef.current.scrollHeight) * 1440
       );
-      const roundedMinutes = Math.round(totalMinutes / 5) * 5;
+      const roundedMinutes = Math.round(totalMinutes / 15) * 15;
       const ghostTime = addMinutes(startOfDay(day), roundedMinutes);
       setGhostLinePosition({
         top: (roundedMinutes / 1440) * scheduleRef.current.scrollHeight,
@@ -350,7 +350,7 @@ const Schedule: React.FC<ScheduleProps> = ({
             e.stopPropagation();
             onItemClick(item);
           }}
-          className='scale-95 hover:scale-100 transition-transform p-2 rounded-md text-white'>
+          className='scale-95 rounded-sm transition-transform p-2 text-white'>
           <h1 className='font-medium truncate'>{item.title}</h1>
           <p className='text-xs'>
             {format(item.start, "h:mm a")} - {format(item.end, "h:mm a")}
@@ -446,7 +446,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                       className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
                       style={{ top: `${ghostLinePosition.top}px` }}>
                       <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
-                        {format(ghostLinePosition.time, "HH:mm")}
+                        {format(ghostLinePosition.time, "h:mm a")}
                       </span>
                     </div>
                   )}
@@ -511,7 +511,7 @@ const Schedule: React.FC<ScheduleProps> = ({
                       className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
                       style={{ top: `${ghostLinePosition.top}px` }}>
                       <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
-                        {format(ghostLinePosition.time, "HH:mm")}
+                        {format(ghostLinePosition.time, "h:mm a")}
                       </span>
                     </div>
                   )}

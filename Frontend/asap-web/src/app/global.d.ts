@@ -1,9 +1,11 @@
-declare type ScheduleItem = {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  color: string;
-};
+import {
+  ScheduleItem as SI,
+  ViewType as VT,
+  EventPost as EP,
+} from "@/lib/types";
 
-declare type ViewType = "day" | "week" | "month";
+declare global {
+  type ScheduleItem = SI;
+  type ViewType = VT;
+  type EventPost = EP;
+}

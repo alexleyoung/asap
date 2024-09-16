@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
-import Schedule from "@/components/ui/schedule";
+import Schedule from "@/components/dashboard/schedule";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 
 export default function Dashboard() {

@@ -1,5 +1,5 @@
-import Header from "@/components/ui/dashboard/Header";
-import Sidebar from "@/components/ui/dashboard/Sidebar";
+import Header from "@/components/dashboard/Header";
+import Sidebar from "@/components/dashboard/Sidebar";
 import { ScheduleProvider } from "@/contexts/ScheduleContext";
 
 export default function DashboardLayout({
