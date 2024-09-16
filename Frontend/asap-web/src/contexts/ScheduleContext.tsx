@@ -8,6 +8,7 @@ import {
   useReducer,
   useState,
 } from "react";
+import { testScheduleItems } from "@/lib/consts";
 
 interface ViewContextType {
   view: string;
@@ -23,14 +24,25 @@ const CurrentDateContext = createContext<CurrentDateContextType | undefined>(
   undefined
 );
 
+interface ScheduleItemsContextType {
+  items: ScheduleItem[];
+  setItems: Dispatch<SetStateAction<ScheduleItem[]>>;
+}
+const ScheduleItemsContext = createContext<
+  ScheduleItemsContextType | undefined
+>(undefined);
+
 export function ScheduleProvider({ children }: { children: React.ReactNode }) {
   const [view, setView] = useState("week");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [items, setItems] = useState<ScheduleItem[]>(testScheduleItems);
 
   return (
     <ViewContext.Provider value={{ view, setView }}>
       <CurrentDateContext.Provider value={{ currentDate, setCurrentDate }}>
-        {children}
+        <ScheduleItemsContext.Provider value={{ items, setItems }}>
+          {children}
+        </ScheduleItemsContext.Provider>
       </CurrentDateContext.Provider>
     </ViewContext.Provider>
   );
@@ -48,6 +60,14 @@ export function useCurrentDate() {
   const context = useContext(CurrentDateContext);
   if (context === undefined) {
     throw new Error("useCurrentDate must be used within a ScheduleProvider");
+  }
+  return context;
+}
+
+export function useScheduleItems() {
+  const context = useContext(ScheduleItemsContext);
+  if (context === undefined) {
+    throw new Error("useScheduleItems must be used within a ScheduleProvider");
   }
   return context;
 }

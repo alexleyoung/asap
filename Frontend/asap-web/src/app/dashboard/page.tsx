@@ -3,10 +3,10 @@
 import { useState } from "react";
 
 import Schedule from "@/components/ui/schedule";
-import { testScheduleItems } from "@/lib/consts";
+import { useScheduleItems } from "@/contexts/ScheduleContext";
 
 export default function Dashboard() {
-  const [items, setItems] = useState<ScheduleItem[]>(testScheduleItems);
+  const { items, setItems } = useScheduleItems();
 
   const handleItemUpdate = (updatedItem: ScheduleItem) => {
     setItems((prevItems) =>

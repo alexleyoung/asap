@@ -2,6 +2,7 @@
 
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
 import { addDays, addMonths, format } from "date-fns";
+import { useHotkeys } from "react-hotkeys-hook";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ThemeSelector } from "@/components/ThemeSelector";
+import { Separator } from "@/components/ui/separator";
 
 export default function Header() {
   const { view, setView } = useView();
@@ -42,6 +45,10 @@ export default function Header() {
       );
     }
   };
+
+  useHotkeys("d", () => setView("day"), []);
+  useHotkeys("w", () => setView("week"), []);
+  useHotkeys("m", () => setView("month"), []);
 
   return (
     <header className='px-5 py-3 border-b border-border flex items-center justify-between'>
@@ -83,7 +90,7 @@ export default function Header() {
       <div className='flex gap-4 items-center'>
         <Popover>
           <PopoverTrigger>
-            <Avatar className='hover:cursor-pointer relative group'>
+            <Avatar className='hover:cursor-pointer relative group ring-0'>
               <div className='absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all' />
               <AvatarImage
                 src='https://github.com/alexleyoung.png'
@@ -92,10 +99,12 @@ export default function Header() {
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </PopoverTrigger>
-          <PopoverContent sideOffset={5} className='mr-4 flex flex-col gap-4'>
-            <h3>settings</h3>
-            <h3>settings</h3>
-            <h3>settings</h3>
+          <PopoverContent
+            sideOffset={5}
+            className='mr-4 p-2 flex flex-col gap-4 text-sm'>
+            <h1 className='px-2 pt-1 font-medium'>Hi Alex!</h1>
+            <Separator />
+            <ThemeSelector />
           </PopoverContent>
         </Popover>
       </div>

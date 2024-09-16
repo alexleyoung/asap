@@ -7,16 +7,12 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
-import { snapCenterToCursor } from "@dnd-kit/modifiers";
 import {
   format,
-  addDays,
   startOfWeek,
   endOfWeek,
   eachDayOfInterval,
   isSameDay,
-  addMonths,
   startOfMonth,
   endOfMonth,
   isSameMonth,
@@ -26,6 +22,9 @@ import {
   addMinutes,
   setHours,
   setMinutes,
+  isWithinInterval,
+  isBefore,
+  isAfter,
 } from "date-fns";
 import {
   DndContext,
@@ -34,38 +33,19 @@ import {
   useDroppable,
   Modifier,
 } from "@dnd-kit/core";
+import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Popover, PopoverContent } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ScrollArea } from "../scroll-area";
-import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
-
-type ScheduleItem = {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  color: string;
-};
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type ScheduleProps = {
   items: ScheduleItem[];
@@ -88,10 +68,6 @@ const Schedule: React.FC<ScheduleProps> = ({
   const [newItem, setNewItem] = useState<Partial<ScheduleItem> | null>(null);
   const [selectedItem, setSelectedItem] = useState<ScheduleItem | null>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
-
-  useHotkeys("d", () => setView("day"), []);
-  useHotkeys("w", () => setView("week"), []);
-  useHotkeys("m", () => setView("month"), []);
 
   const scrollToCurrentTime = useCallback(() => {
     if (scheduleRef.current && (view === "day" || view === "week")) {
@@ -251,10 +227,10 @@ const Schedule: React.FC<ScheduleProps> = ({
       <div
         ref={setNodeRef}
         className={`h-[15px] ${
-          isHourMark ? "border-t border-gray-200" : ""
+          isHourMark ? "border-t border-border" : ""
         } relative`}>
         {showLabel && isHourMark && (
-          <span className='absolute bg-background -top-2 left-0 text-xs text-gray-500'>
+          <span className='absolute bg-background -top-2 left-0 text-xs text-accent-foreground'>
             {format(setHours(setMinutes(day, minute), hour), "h a")}
           </span>
         )}
@@ -278,57 +254,111 @@ const Schedule: React.FC<ScheduleProps> = ({
     });
   }, []);
 
+  const optimizeColumnDivision = (
+    items: ScheduleItem[]
+  ): (ScheduleItem | ScheduleItem[])[] => {
+    const sortedItems = [...items].sort(
+      (a, b) => a.start.getTime() - b.start.getTime()
+    );
+    const result: (ScheduleItem | ScheduleItem[])[] = [];
+    let currentGroup: ScheduleItem[] = [];
+
+    const isOverlapping = (item1: ScheduleItem, item2: ScheduleItem) =>
+      isBefore(item1.start, item2.end) && isAfter(item1.end, item2.start);
+
+    for (let i = 0; i < sortedItems.length; i++) {
+      if (
+        currentGroup.length === 0 ||
+        currentGroup.some((groupItem) =>
+          isOverlapping(sortedItems[i], groupItem)
+        )
+      ) {
+        currentGroup.push(sortedItems[i]);
+      } else {
+        result.push(currentGroup.length === 1 ? currentGroup[0] : currentGroup);
+        currentGroup = [sortedItems[i]];
+      }
+    }
+
+    if (currentGroup.length > 0) {
+      result.push(currentGroup.length === 1 ? currentGroup[0] : currentGroup);
+    }
+
+    return result;
+  };
+
   const DraggableItem = React.memo<{
     item: ScheduleItem;
     onItemClick: (item: ScheduleItem) => void;
     containerHeight: number;
     dayStart: Date;
-  }>(({ item, onItemClick, containerHeight, dayStart }) => {
-    const { attributes, listeners, setNodeRef, transform, isDragging } =
-      useDraggable({
-        id: item.id,
-        data: item,
-      });
+    columnWidth: number;
+    columnOffset: number;
+  }>(
+    ({
+      item,
+      onItemClick,
+      containerHeight,
+      dayStart,
+      columnWidth,
+      columnOffset,
+    }) => {
+      const { attributes, listeners, setNodeRef, transform, isDragging } =
+        useDraggable({
+          id: item.id,
+          data: item,
+        });
 
-    const style = useMemo(() => {
-      const topPercentage =
-        (differenceInMinutes(item.start, dayStart) / 1440) * 100;
-      const heightPercentage =
-        (differenceInMinutes(item.end, item.start) / 1440) * 100;
+      const style = useMemo(() => {
+        const topPercentage =
+          (differenceInMinutes(item.start, dayStart) / 1440) * 100;
+        const heightPercentage =
+          (differenceInMinutes(item.end, item.start) / 1440) * 100;
 
-      return {
-        position: "absolute" as const,
-        top: `${topPercentage}%`,
-        height: `${heightPercentage}%`,
-        left: 0,
-        right: 0,
-        backgroundColor: item.color,
-        padding: "2px",
-        borderRadius: "4px",
-        cursor: isDragging ? "grabbing" : "grab",
-        zIndex: isDragging ? 20 : 10,
-        brightness: isDragging ? 0.8 : 1,
-        transform: transform
-          ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
-          : undefined,
-        transition: isDragging ? "none" : "transform 0.1s",
-      };
-    }, [item, dayStart, containerHeight, transform, isDragging]);
+        return {
+          position: "absolute" as const,
+          top: `${topPercentage}%`,
+          height: `${heightPercentage}%`,
+          left: `${columnOffset * columnWidth}%`,
+          width: `${columnWidth}%`,
+          backgroundColor: item.color,
+          cursor: isDragging ? "grabbing" : "grab",
+          zIndex: isDragging ? 20 : 10,
+          opacity: isDragging ? 0.8 : 1,
+          transform: transform
+            ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+            : undefined,
+          transition: isDragging ? "none" : "transform 0.1s",
+        };
+      }, [
+        item,
+        dayStart,
+        containerHeight,
+        columnWidth,
+        columnOffset,
+        transform,
+        isDragging,
+      ]);
 
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        onClick={(e) => {
-          e.stopPropagation();
-          onItemClick(item);
-        }}>
-        {item.title}
-      </div>
-    );
-  });
+      return (
+        <div
+          ref={setNodeRef}
+          style={style}
+          {...attributes}
+          {...listeners}
+          onClick={(e) => {
+            e.stopPropagation();
+            onItemClick(item);
+          }}
+          className='scale-95 hover:scale-100 transition-transform p-2 rounded-md text-white'>
+          <h1 className='font-medium truncate'>{item.title}</h1>
+          <p className='text-xs'>
+            {format(item.start, "h:mm a")} - {format(item.end, "h:mm a")}
+          </p>
+        </div>
+      );
+    }
+  );
 
   const renderItems = useCallback(
     (day: Date, containerHeight: number, isMonthView: boolean = false) => {
@@ -350,15 +380,36 @@ const Schedule: React.FC<ScheduleProps> = ({
         ));
       }
 
-      return dayItems.map((item) => (
-        <DraggableItem
-          key={item.id}
-          item={item}
-          onItemClick={setSelectedItem}
-          containerHeight={containerHeight}
-          dayStart={dayStart}
-        />
-      ));
+      const optimizedItems = optimizeColumnDivision(dayItems);
+
+      return optimizedItems.flatMap((item, index) => {
+        if (Array.isArray(item)) {
+          const columnWidth = 100 / item.length;
+          return item.map((subItem, subIndex) => (
+            <DraggableItem
+              key={subItem.id}
+              item={subItem}
+              onItemClick={setSelectedItem}
+              containerHeight={containerHeight}
+              dayStart={dayStart}
+              columnWidth={columnWidth}
+              columnOffset={subIndex}
+            />
+          ));
+        } else {
+          return (
+            <DraggableItem
+              key={item.id}
+              item={item}
+              onItemClick={setSelectedItem}
+              containerHeight={containerHeight}
+              dayStart={dayStart}
+              columnWidth={100}
+              columnOffset={0}
+            />
+          );
+        }
+      });
     },
     [items]
   );
@@ -442,7 +493,7 @@ const Schedule: React.FC<ScheduleProps> = ({
             {days.map((day) => (
               <div
                 key={day.toISOString()}
-                className='flex-1 border-l border-gray-200 relative'
+                className='flex-1 border-l border-border relative'
                 onMouseMove={(e) => handleMouseMove(e, day)}
                 onMouseLeave={handleMouseLeave}
                 onClick={(e) => {
@@ -505,8 +556,8 @@ const Schedule: React.FC<ScheduleProps> = ({
         {days.map((day) => (
           <div
             key={day.toISOString()}
-            className={`border border-gray-200 p-1 ${
-              isSameMonth(day, currentDate) ? "bg-white" : "bg-gray-100"
+            className={`border border-border p-1 ${
+              isSameMonth(day, currentDate) ? "bg-background" : "bg-accent"
             }`}>
             <div className='text-right text-sm'>{format(day, "d")}</div>
             <div className='overflow-y-auto h-24'>
@@ -517,26 +568,6 @@ const Schedule: React.FC<ScheduleProps> = ({
       </div>
     );
   }, [currentDate, renderItems]);
-
-  const handleViewChange = (newView: ViewType) => {
-    setView(newView);
-  };
-
-  const handleDateChange = (direction: "prev" | "next") => {
-    if (view === "day") {
-      setCurrentDate((prevDate) =>
-        addDays(prevDate, direction === "prev" ? -1 : 1)
-      );
-    } else if (view === "week") {
-      setCurrentDate((prevDate) =>
-        addDays(prevDate, direction === "prev" ? -7 : 7)
-      );
-    } else {
-      setCurrentDate((prevDate) =>
-        addMonths(prevDate, direction === "prev" ? -1 : 1)
-      );
-    }
-  };
 
   return (
     <DndContext
