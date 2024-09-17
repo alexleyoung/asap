@@ -43,6 +43,10 @@ class Event(Base):
 class Task(Base):
     __tablename__ = "Tasks"
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
-    dueDate = Column("dueDate", )
+    dueDate = Column("dueDate", Integer)
+    priority = Column("priority", Integer)
+    difficulty = Column("difficulty", Integer)
+    duration = Column("duration", Integer) #in minutes??
+    flexibility = Column("flexibility", Integer)
 
 
