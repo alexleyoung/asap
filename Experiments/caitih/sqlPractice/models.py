@@ -10,4 +10,10 @@ class User(Base):
     email = Column(String(50), unique = True)
     occupation = Column(String(30))
 
+class schedule(Base):
+    __tablename__ = 'Schedule'
+
+    id = Column(Integer, primary_key = True, index = True, unique = True)
+    event = Column(String(20))
+
 
