@@ -68,9 +68,17 @@ export default function Sidebar() {
                     </button>
                   </div>
                 </div>
-                <div className="pt-4 ">Create New Item</div>
+                <div className="pt-4 ">
+                  {activeTab === "event"
+                    ? "Create New Event"
+                    : "Create New Task"}
+                </div>
               </DialogTitle>
-              <DialogDescription>Create a new event or task</DialogDescription>
+              <DialogDescription>
+                {activeTab === "event"
+                  ? "Create a new scheduled event"
+                  : "Create a new task to do"}
+              </DialogDescription>
               {/* Conditional Rendering based on activeTab */}
               <div className="form-content">
                 {activeTab === "event" && <EventForm onSubmit={() => {}} />}
