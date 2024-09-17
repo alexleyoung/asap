@@ -35,5 +35,14 @@ class Calendar(Base):
     description = Column("description", String)
     timezone = Column("timezone", String)
 
+class Event(Base):
+    __tablename__ = "Events"
+    id = Column("id", Integer, primary_key = True, index = True, unique = True)
+    location = Column("location", String)
+
+class Task(Base):
+    __tablename__ = "Tasks"
+    id = Column("id", Integer, primary_key = True, index = True, unique = True)
+    dueDate = Column("dueDate", )
 
 
