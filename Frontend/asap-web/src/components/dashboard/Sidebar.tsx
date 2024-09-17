@@ -44,27 +44,29 @@ export default function Sidebar() {
             <DialogHeader>
               <DialogTitle>
                 {/* Tab Navigation */}
-                <div className="tabs">
-                  <button
-                    className={`px-2 py-1 font-medium ${
-                      activeTab === "event"
-                        ? "border-b-2 border-blue-500 text-blue-500"
-                        : "text-gray-600"
-                    }`}
-                    onClick={() => setActiveTab("event")}
-                  >
-                    Event
-                  </button>
-                  <button
-                    className={`px-2 py-1 font-medium ${
-                      activeTab === "task"
-                        ? "border-b-2 border-blue-500 text-blue-500"
-                        : "text-gray-600"
-                    }`}
-                    onClick={() => setActiveTab("task")}
-                  >
-                    Task
-                  </button>
+                <div className="flex justify-center">
+                  <div className="tabs flex justify-center space-x-4">
+                    <button
+                      className={`px-4 py-1 font-medium ${
+                        activeTab === "event"
+                          ? "border-b-2 border-blue-500 text-blue-500"
+                          : "text-gray-600"
+                      }`}
+                      onClick={() => setActiveTab("event")}
+                    >
+                      Event
+                    </button>
+                    <button
+                      className={`px-4 py-1 font-medium ${
+                        activeTab === "task"
+                          ? "border-b-2 border-blue-500 text-blue-500"
+                          : "text-gray-600"
+                      }`}
+                      onClick={() => setActiveTab("task")}
+                    >
+                      Task
+                    </button>
+                  </div>
                 </div>
                 <div className="pt-4 ">Create New Item</div>
               </DialogTitle>
