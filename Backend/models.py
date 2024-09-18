@@ -22,7 +22,8 @@ class Calendar(Base):
     name = Column("name", String)
     description = Column("description", String)
     timezone = Column("timezone", String)
-
+    
+    #not sure about this
     owner = relationship("User", back_populates="calendars")
     
 #scheduleItems table
@@ -35,7 +36,7 @@ class scheduleItem(Base):
     end = Column("end", Integer)
     description = Column("description", String)
     category = Column("category", String)
-    frequency = Column("frequency", String)
+    frequency = Column("frequency", String) #?????
     userID = Column("userID", Integer, ForeignKey('users.id'))
     calendarID = Column("calendarID", Integer, ForeignKey('calendars.id'))
 

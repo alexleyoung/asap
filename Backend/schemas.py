@@ -24,16 +24,96 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str
 
+#main class
 class User(UserBase):
     id: int
 
+    class Config:
+        orm_mode = True
+
+###
 #create Calendar schemas
+class CalendarBase(BaseModel):
+    name: str
+    description: str
+    timezone: str
+
+#for creating a calendar
+class CalendarCreate(CalendarBase):
+    pass #nothing just to create that you cannot read
+
+#main class
 class Calendar(BaseModel):
+    id: int
+    ownerID: int
+
+    class Config:
+        orm_mode = True
+
+###
+#ScheduleItem
+class ScheduleItemBase(BaseModel):
+    title: str
+    start: int
+    end: int
+    description: str
+    category: str
+    frequency: str
+
+#to create
+class ScheduleItemCreate(ScheduleItemBase):
+    pass
+
+#main class
+class ScheduleItem(ScheduleItemBase):
+    id: int
+    userID: int
+    calendarID: int
+
+    class Config:
+        orm_mode = True
+
+###
+#Event
+class EventBase(BaseModel):
+    location: str
+
+#to create
+class EventCreate(EventBase):
+    pass
+
+#main class
+class Event(EventBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+###
+#Task
+class TaskBase(BaseModel):
+    dueDate: int
+    priority: int
+    difficulty: int
+    duration: int 
+    flexibility: int
+
+#to create
+class TaskCreate(TaskBase):
+    pass
+
+#main class
+class Task(TaskBase):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 
-class schedule(BaseModel):
-    event: str
 
+
+
+#run database
 def get_db():
     db = SessionLocal()
     try:
@@ -42,7 +122,7 @@ def get_db():
         db.close()
 
 
-
+#update 
 @app.post("/users/", status_code = status.HTTP_201_CREATED)
 async def create_user(user: UserBase, db: Session = Depends(get_db)):
     db_user = models.User(**user.dict())
