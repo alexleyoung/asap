@@ -7,22 +7,29 @@ from sqlalchemy.orm import Session
 
 
 
-
+#create app
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
 
-
-
-class users(BaseModel):
-    userID: int
+#create User schemas
+class UserBase(BaseModel):
+    username: str
     firstName: str
     lastName: str
     email: str
     occupation: str
 
-class UserBase(BaseModel):
-    username: str
+#for creating a user
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+
+#create Calendar schemas
+class Calendar(BaseModel):
+
 
 class schedule(BaseModel):
     event: str

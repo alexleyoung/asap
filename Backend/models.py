@@ -7,9 +7,11 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column("id", Integer, primary_key = True, index = True)
-    firstName = Column("firstName", String(20))
-    lastName = Column("lastName", String(20))
-    email = Column("email", String(50), unique = True)
+    username = Column("username", String, nullable = False)
+    hashedPassword = Column("hashedPassword", String, nullable=False)
+    firstName = Column("firstName", String(20), nullable=False)
+    lastName = Column("lastName", String(20), nullable=False)
+    email = Column("email", String(50), unique = True, nullable=False)
     occupation = Column("occupation", String(30))
 
 #calendars table
