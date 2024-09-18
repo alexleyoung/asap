@@ -26,12 +26,15 @@ import {
   isBefore,
   isAfter,
 } from "date-fns";
+
 import {
   DndContext,
   DragEndEvent,
   useDraggable,
   useDroppable,
   Modifier,
+  useSensor,
+  PointerSensor,
 } from "@dnd-kit/core";
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
 
@@ -58,8 +61,8 @@ const Schedule: React.FC<ScheduleProps> = ({
   onItemUpdate,
   onItemCreate,
 }) => {
-  const { view, setView } = useView();
-  const { currentDate, setCurrentDate } = useCurrentDate();
+  const { view } = useView();
+  const { currentDate } = useCurrentDate();
   const [ghostLinePosition, setGhostLinePosition] = useState<{
     top: number;
     time: Date;
@@ -286,6 +289,13 @@ const Schedule: React.FC<ScheduleProps> = ({
 
     return result;
   };
+
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      delay: 100,
+      tolerance: 5,
+    },
+  });
 
   const DraggableItem = React.memo<{
     item: ScheduleItem;
@@ -573,6 +583,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     <DndContext
       onDragEnd={handleDragEnd}
       modifiers={[snapToTimeSlot]}
+      sensors={[pointerSensor]}
       autoScroll={false}>
       <div className='flex-grow h-full flex flex-col p-4 bg-background text-foreground'>
         <ScrollArea className='h-full'>
