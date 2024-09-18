@@ -16,10 +16,10 @@ import { Button } from "@/components/ui/button";
 import { EventForm } from "./forms/EventForm";
 import { TaskForm } from "./forms/TaskForm";
 import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Sidebar() {
   const { currentDate, setCurrentDate } = useCurrentDate();
-  const [activeTab, setActiveTab] = useState("event"); // Manage active tab
 
   return (
     <aside className="border-r border-border p-2">
@@ -42,48 +42,20 @@ export default function Sidebar() {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>
-                {/* Tab Navigation */}
-                <div className="flex justify-center">
-                  <div className="tabs flex justify-center space-x-4">
-                    <button
-                      className={`px-4 py-1 font-medium ${
-                        activeTab === "event"
-                          ? "border-b-2 border-blue-500 text-blue-500"
-                          : "text-gray-600"
-                      }`}
-                      onClick={() => setActiveTab("event")}
-                    >
-                      Event
-                    </button>
-                    <button
-                      className={`px-4 py-1 font-medium ${
-                        activeTab === "task"
-                          ? "border-b-2 border-blue-500 text-blue-500"
-                          : "text-gray-600"
-                      }`}
-                      onClick={() => setActiveTab("task")}
-                    >
-                      Task
-                    </button>
-                  </div>
-                </div>
-                <div className="pt-4 ">
-                  {activeTab === "event"
-                    ? "Create New Event"
-                    : "Create New Task"}
-                </div>
-              </DialogTitle>
-              <DialogDescription>
-                {activeTab === "event"
-                  ? "Create a new scheduled event"
-                  : "Create a new task to do"}
-              </DialogDescription>
-              {/* Conditional Rendering based on activeTab */}
-              <div className="form-content">
-                {activeTab === "event" && <EventForm onSubmit={() => {}} />}
-                {activeTab === "task" && <TaskForm onSubmit={() => {}} />}
-              </div>
+              <Tabs defaultValue="event" className="w-[400px]">
+                <TabsList>
+                  <TabsTrigger value="event">Event</TabsTrigger>
+                  <TabsTrigger value="task">Task</TabsTrigger>
+                </TabsList>
+                <TabsContent value="event">
+                  Create an event here.
+                  <EventForm onSubmit={() => {}} />
+                </TabsContent>
+                <TabsContent value="task">
+                  Create a task here.
+                  <TaskForm onSubmit={() => {}} />
+                </TabsContent>
+              </Tabs>
             </DialogHeader>
           </DialogContent>
         </Dialog>
