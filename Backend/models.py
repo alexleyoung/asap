@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from database import Base
+from .database import Base
 
 #users table
 class User(Base):
@@ -12,9 +12,20 @@ class User(Base):
     email = Column("email", String(50), unique = True)
     occupation = Column("occupation", String(30))
 
+#calendars table
+class Calendar(Base):
+    __tablename__ = "calendars"
+    id = Column("id", Integer, primary_key = True, index = True, unique = True)
+    ownerID = Column("ownerID", Integer, ForeignKey('users.id')) 
+    name = Column("name", String)
+    description = Column("description", String)
+    timezone = Column("timezone", String)
+
+    owner = relationship("User", back_populates="calendars")
+    
 #scheduleItems table
 class scheduleItem(Base):
-    __tablename__ = 'Schedule'
+    __tablename__ = 'schedule'
 
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
     title = Column("title", String)
@@ -26,22 +37,14 @@ class scheduleItem(Base):
     userID = Column("userID", Integer, ForeignKey('users.id'))
     calendarID = Column("calendarID", Integer, ForeignKey('calendars.id'))
 
-#calendars table
-class Calendar(Base):
-    __tablename__ = "Calendars"
-    id = Column("id", Integer, primary_key = True, index = True, unique = True)
-    ownerID = Column("ownerID", Integer, ForeignKey('owners.id')) #doesnt exist yet but it will
-    name = Column("name", String)
-    description = Column("description", String)
-    timezone = Column("timezone", String)
 
 class Event(Base):
-    __tablename__ = "Events"
+    __tablename__ = "events"
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
     location = Column("location", String)
 
 class Task(Base):
-    __tablename__ = "Tasks"
+    __tablename__ = "tasks"
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
     dueDate = Column("dueDate", Integer)
     priority = Column("priority", Integer)
