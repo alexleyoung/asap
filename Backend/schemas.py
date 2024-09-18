@@ -31,6 +31,9 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+
+
+
 ###
 #create Calendar schemas
 class CalendarBase(BaseModel):
@@ -123,10 +126,10 @@ def get_db():
 
 
 #update 
-@app.post("/users/", status_code = status.HTTP_201_CREATED)
-async def create_user(user: UserBase, db: Session = Depends(get_db)):
-    db_user = models.User(**user.dict())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+# @app.post("/users/", status_code = status.HTTP_201_CREATED)
+# async def create_user(user: UserBase, db: Session = Depends(get_db)):
+#     db_user = models.User(**user.dict())
+#     db.add(db_user)
+#     db.commit()
+#     db.refresh(db_user)
+#     return db_user
