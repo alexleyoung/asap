@@ -17,3 +17,10 @@ export type EventPost = {
   user_id: string;
   calendar_id: string;
 };
+export type TaskPost = {
+  title: string;
+  due: string;
+  description?: string;
+  user_id: string;
+  calendar_id: string;
+};

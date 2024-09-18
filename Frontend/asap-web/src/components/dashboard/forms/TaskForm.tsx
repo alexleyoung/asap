@@ -26,6 +26,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import React from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -35,18 +37,17 @@ const formSchema = z.object({
   dueTime: z.string({
     required_error: "Start time is required",
   }),
-  difficulty: z.number().min(0, "Difficulty must be a positive number"),
-  location: z.string().optional(),
+  difficulty: z.enum(["easy", "medium", "hard"]),
   description: z.string().optional(),
   duration: z.number().min(0, "Duration must be a positive number"),
-  priority: z.enum(["low", "normal", "high"]),
-  flexibility: z.boolean(),
+  priority: z.enum(["low", "normal", "high, asap"]),
+  flexible: z.boolean(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface TaskFormProps {
-  onSubmit: (data: EventPost) => void;
+  onSubmit: (data: TaskPost) => void;
 }
 
 export function TaskForm({ onSubmit }: TaskFormProps) {
@@ -59,40 +60,38 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
       title: "",
       duration: 0,
       priority: "normal",
-      location: "",
       description: "",
-      flexibility: false,
-      difficulty: 0,
+      flexible: false,
+      difficulty: "easy",
       dueTime: format(new Date(), "HH:mm"),
       dueDate: format(new Date(), "yyyy-MM-dd"),
     },
   });
 
   const handleSubmit = (data: FormValues) => {
-    const start = new Date(`${data.startDate}T${data.startTime}`);
-    const end = new Date(`${data.endDate}T${data.endTime}`);
+    const due = new Date(`${data.dueDate}T${data.dueTime}`);
+
     onSubmit({
       title: data.title,
-      start: start.toISOString(),
-      end: end.toISOString(),
-      location: data.location || "",
+      due: due.toISOString(),
       description: data.description || "",
       user_id: "default-user-id", // This would be replaced with actual user ID
       calendar_id: "default-calendar-id", // This would be replaced with actual calendar ID
     });
   };
 
-  const handleDateChange = (
-    field: "startDate" | "endDate",
-    date: Date | undefined
-  ) => {
-    if (date) {
-      form.setValue(field, format(date, "yyyy-MM-dd"));
-      if (field === "startDate") setStartDate(date);
-      if (field === "endDate") setEndDate(date);
-    }
-  };
+  //   const handleDateChange = (
+  //     field: "startDate" | "endDate",
+  //     date: Date | undefined
+  //   ) => {
+  //     if (date) {
+  //       form.setValue(field, format(date, "yyyy-MM-dd"));
+  //       if (field === "startDate") setStartDate(date);
+  //       if (field === "endDate") setEndDate(date);
+  //     }
+  //   };
 
+  const [dueDate, setDate] = React.useState<Date | undefined>(new Date());
   return (
     <Form {...form}>
       <form
@@ -115,10 +114,10 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
         <div className="flex space-x-4">
           <FormField
             control={form.control}
-            name="startDate"
+            name="dueDate"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>Start Date</FormLabel>
+                <FormLabel>Due Date</FormLabel>
                 <div className="flex items-center">
                   <FormControl>
                     <Input
@@ -155,12 +154,9 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
                     <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
-                        selected={startDate}
-                        onSelect={(date) => handleDateChange("startDate", date)}
-                        disabled={(date) =>
-                          date < new Date(new Date().setHours(0, 0, 0, 0))
-                        }
-                        initialFocus
+                        selected={dueDate}
+                        onSelect={setDate}
+                        className="rounded-md border"
                       />
                     </PopoverContent>
                   </Popover>
@@ -171,87 +167,10 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
           />
           <FormField
             control={form.control}
-            name="startTime"
+            name="dueTime"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>Start Time</FormLabel>
-                <FormControl>
-                  <Input type="time" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className="flex space-x-4">
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>End Date</FormLabel>
-                <div className="flex items-center">
-                  <FormControl>
-                    <Input
-                      {...field}
-                      value={
-                        field.value
-                          ? format(new Date(field.value), "MMM. d, yyyy")
-                          : ""
-                      }
-                      onChange={(e) => {
-                        const date = parse(
-                          e.target.value,
-                          "MMM. d, yyyy",
-                          new Date()
-                        );
-                        field.onChange(format(date, "yyyy-MM-dd"));
-                        setEndDate(date);
-                      }}
-                      placeholder="MMM. DD, YYYY"
-                    />
-                  </FormControl>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "ml-2 w-10 p-0",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={endDate}
-                        onSelect={(date) => handleDateChange("endDate", date)}
-                        disabled={(date) => {
-                          const today = new Date(
-                            new Date().setHours(0, 0, 0, 0)
-                          );
-                          return (
-                            date < today ||
-                            (startDate ? date < startDate : false)
-                          );
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="endTime"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>End Time</FormLabel>
+                <FormLabel>Due Time</FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -262,17 +181,67 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
         </div>
         <FormField
           control={form.control}
-          name="location"
+          name="duration"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Location</FormLabel>
+              <FormLabel>Duration (in hours)</FormLabel>
               <FormControl>
-                <Input placeholder="Event location" {...field} />
+                <Input type="number" placeholder="Duration" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="difficulty"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Difficulty</FormLabel>
+              <FormControl>
+                <select {...field} className="w-full">
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="priority"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Priority</FormLabel>
+              <FormControl>
+                //CHANGE TO SELECT UI
+                <select {...field} className="w-full">
+                  <option value="low">Low</option>
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                  <option value="asap">ASAP</option>
+                </select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="flexible"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Flexible</FormLabel>
+              <FormControl>
+                <Checkbox />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="description"
@@ -287,7 +256,7 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
                 />
               </FormControl>
               <FormDescription>
-                You can provide additional details about the event here.
+                You can provide additional details about the task here.
               </FormDescription>
               <FormMessage />
             </FormItem>

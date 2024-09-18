@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { EventForm } from "./forms/EventForm";
 import { TaskForm } from "./forms/TaskForm";
-import { useState } from "react";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Sidebar() {
@@ -40,23 +40,25 @@ export default function Sidebar() {
           <DialogTrigger asChild>
             <Button variant="outline">Create</Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <Tabs defaultValue="event" className="w-[400px]">
-                <TabsList>
-                  <TabsTrigger value="event">Event</TabsTrigger>
-                  <TabsTrigger value="task">Task</TabsTrigger>
+          <DialogContent className="w-full">
+            <Tabs defaultValue="event" className="w-full">
+              <DialogHeader>
+                <TabsList className="w-full flex mt-6">
+                  <TabsTrigger value="event" className="flex-1">
+                    Event
+                  </TabsTrigger>
+                  <TabsTrigger value="task" className="flex-1">
+                    Task
+                  </TabsTrigger>
                 </TabsList>
-                <TabsContent value="event">
-                  Create an event here.
-                  <EventForm onSubmit={() => {}} />
-                </TabsContent>
-                <TabsContent value="task">
-                  Create a task here.
-                  <TaskForm onSubmit={() => {}} />
-                </TabsContent>
-              </Tabs>
-            </DialogHeader>
+              </DialogHeader>
+              <TabsContent value="event">
+                <EventForm onSubmit={() => {}} />
+              </TabsContent>
+              <TabsContent value="task">
+                <TaskForm onSubmit={() => {}} />
+              </TabsContent>
+            </Tabs>
           </DialogContent>
         </Dialog>
       </div>
