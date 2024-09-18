@@ -29,20 +29,18 @@ import {
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  startDate: z.string({
+  dueDate: z.string({
     required_error: "Start date is required",
   }),
-  startTime: z.string({
+  dueTime: z.string({
     required_error: "Start time is required",
   }),
-  endDate: z.string({
-    required_error: "End date is required",
-  }),
-  endTime: z.string({
-    required_error: "End time is required",
-  }),
+  difficulty: z.number().min(0, "Difficulty must be a positive number"),
   location: z.string().optional(),
   description: z.string().optional(),
+  duration: z.number().min(0, "Duration must be a positive number"),
+  priority: z.enum(["low", "normal", "high"]),
+  flexibility: z.boolean(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -59,12 +57,14 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
+      duration: 0,
+      priority: "normal",
       location: "",
       description: "",
-      startDate: format(new Date(), "yyyy-MM-dd"),
-      startTime: format(new Date(), "HH:mm"),
-      endDate: format(new Date(), "yyyy-MM-dd"),
-      endTime: format(new Date(), "HH:mm"),
+      flexibility: false,
+      difficulty: 0,
+      dueTime: format(new Date(), "HH:mm"),
+      dueDate: format(new Date(), "yyyy-MM-dd"),
     },
   });
 
