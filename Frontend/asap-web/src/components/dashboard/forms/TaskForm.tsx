@@ -28,6 +28,13 @@ import {
 } from "@/components/ui/popover";
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -184,7 +191,7 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
           name="duration"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Duration (in hours)</FormLabel>
+              <FormLabel>Duration (in minutes)</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="Duration" {...field} />
               </FormControl>
@@ -192,55 +199,53 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="difficulty"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Difficulty</FormLabel>
-              <FormControl>
-                <select {...field} className="w-full">
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="priority"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Priority</FormLabel>
-              <FormControl>
-                //CHANGE TO SELECT UI
-                <select {...field} className="w-full">
-                  <option value="low">Low</option>
-                  <option value="normal">Normal</option>
-                  <option value="high">High</option>
-                  <option value="asap">ASAP</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="flexible"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Flexible</FormLabel>
-              <FormControl>
-                <Checkbox />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex space-x-[5.5rem] ">
+          <FormField
+            control={form.control}
+            name="difficulty"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Difficulty</FormLabel>
+                <FormControl>
+                  <Select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="priority"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Priority</FormLabel>
+                <FormControl>
+                  <Select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="asap">ASAP</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
@@ -262,10 +267,28 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
             </FormItem>
           )}
         />
-        <div className="flex justify-end">
-          <Button type="submit" variant="secondary">
-            Create Task
-          </Button>
+        <div className="flex items-center space-x-64">
+          <FormField
+            control={form.control}
+            name="flexible"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center space-x-2">
+                  <FormLabel className="m-0">Flexible?</FormLabel>
+                  <FormControl>
+                    <Checkbox />
+                  </FormControl>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-end">
+            <Button type="submit" variant="secondary">
+              Create Task
+            </Button>
+          </div>
         </div>
       </form>
     </Form>

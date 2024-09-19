@@ -45,10 +45,10 @@ export default function Sidebar() {
               <DialogHeader>
                 <TabsList className="w-full flex mt-6">
                   <TabsTrigger value="event" className="flex-1">
-                    Event
+                    <span>Event</span>
                   </TabsTrigger>
                   <TabsTrigger value="task" className="flex-1">
-                    Task
+                    <span>Task</span>
                   </TabsTrigger>
                 </TabsList>
               </DialogHeader>
