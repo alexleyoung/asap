@@ -39,14 +39,21 @@ import {
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   dueDate: z.string({
-    required_error: "Start date is required",
+    required_error: "Due date is required",
   }),
   dueTime: z.string({
-    required_error: "Start time is required",
+    required_error: "Due time is required",
   }),
-  difficulty: z.enum(["easy", "medium", "hard"]),
+  difficulty: z.enum(["easy", "medium", "hard"], {
+    required_error: "Difficulty is required",
+  }),
+
   description: z.string().optional(),
-  duration: z.number().min(0, "Duration must be a positive number"),
+  duration: z
+    .number({
+      required_error: "Duration is required",
+    })
+    .min(0, "Duration must be a positive number"),
   priority: z.enum(["low", "normal", "high, asap"]),
   flexible: z.boolean(),
 });
@@ -58,8 +65,7 @@ interface TaskFormProps {
 }
 
 export function TaskForm({ onSubmit }: TaskFormProps) {
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  const [dueDate, setDueDate] = useState<Date>();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -86,8 +92,13 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
       calendar_id: "default-calendar-id", // This would be replaced with actual calendar ID
     });
   };
+  const handleDateChange = (field: "dueDate", date: Date | undefined) => {
+    if (date) {
+      form.setValue(field, format(date, "yyyy-MM-dd"));
+      if (field === "dueDate") setDueDate(date);
+    }
+  };
 
-  const [dueDate, setDate] = React.useState<Date | undefined>(new Date());
   return (
     <Form {...form}>
       <form
@@ -130,7 +141,7 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
                           new Date()
                         );
                         field.onChange(format(date, "yyyy-MM-dd"));
-                        setStartDate(date);
+                        setDueDate(date);
                       }}
                       placeholder="MMM. DD, YYYY"
                     />
@@ -151,7 +162,9 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
                       <Calendar
                         mode="single"
                         selected={dueDate}
-                        onSelect={setDate}
+                        onSelect={(date) => {
+                          handleDateChange("dueDate", date);
+                        }}
                         className="rounded-md border"
                       />
                     </PopoverContent>
