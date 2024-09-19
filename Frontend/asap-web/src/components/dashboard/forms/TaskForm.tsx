@@ -87,17 +87,6 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
     });
   };
 
-  //   const handleDateChange = (
-  //     field: "startDate" | "endDate",
-  //     date: Date | undefined
-  //   ) => {
-  //     if (date) {
-  //       form.setValue(field, format(date, "yyyy-MM-dd"));
-  //       if (field === "startDate") setStartDate(date);
-  //       if (field === "endDate") setEndDate(date);
-  //     }
-  //   };
-
   const [dueDate, setDate] = React.useState<Date | undefined>(new Date());
   return (
     <Form {...form}>
