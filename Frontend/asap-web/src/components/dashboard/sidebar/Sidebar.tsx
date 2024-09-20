@@ -3,14 +3,14 @@
 import { useCurrentDate } from "@/contexts/ScheduleContext";
 
 import { Calendar } from "@/components/ui/calendar";
-import { Separator } from "@/components/ui/separator";
 import CreateItemDialog from "./CreateItemDialog";
+import CalendarsCollapsible from "./CalendarsCollapsible";
 
 export default function Sidebar() {
   const { currentDate, setCurrentDate } = useCurrentDate();
 
   return (
-    <aside className='border-r border-border p-2'>
+    <aside className='border-r border-border p-4 flex flex-col gap-4'>
       <CreateItemDialog />
 
       <Calendar
@@ -24,9 +24,7 @@ export default function Sidebar() {
       />
 
       <div className='flex flex-col gap-2'>
-        <div>
-          <h3 className='font-semibold'>Calendars</h3>
-        </div>
+        <CalendarsCollapsible />
       </div>
     </aside>
   );
