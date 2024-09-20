@@ -11,6 +11,8 @@ export default function Sidebar() {
 
   return (
     <aside className='border-r border-border p-2'>
+      <CreateItemDialog />
+
       <Calendar
         mode='single'
         selected={currentDate}
@@ -21,10 +23,10 @@ export default function Sidebar() {
         }}
       />
 
-      <Separator className='mb-2' />
-
       <div className='flex flex-col gap-2'>
-        <CreateItemDialog />
+        <div>
+          <h3 className='font-semibold'>Calendars</h3>
+        </div>
       </div>
     </aside>
   );

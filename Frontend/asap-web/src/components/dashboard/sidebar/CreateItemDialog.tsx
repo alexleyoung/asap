@@ -1,3 +1,8 @@
+"use client";
+
+import { useHotkeys } from "react-hotkeys-hook";
+import { useState } from "react";
+
 import {
   Dialog,
   DialogHeader,
@@ -12,10 +17,19 @@ import { TaskForm } from "../forms/TaskForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function CreateItemDialog() {
+  const [open, setOpen] = useState(false);
+
+  useHotkeys("t", (e) => {
+    e.preventDefault();
+    setOpen(true);
+  });
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline'>Create</Button>
+        <Button variant='outline' className='w-full'>
+          Create (T)
+        </Button>
       </DialogTrigger>
       <DialogContent className='w-full'>
         <Tabs defaultValue='event' className='w-full'>
