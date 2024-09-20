@@ -5,6 +5,7 @@ import { useCurrentDate } from "@/contexts/ScheduleContext";
 import { Calendar } from "@/components/ui/calendar";
 import CreateItemDialog from "./CreateItemDialog";
 import CalendarsCollapsible from "./CalendarsCollapsible";
+import TodosCollapsible from "./TodosCollapsible";
 
 export default function Sidebar() {
   const { currentDate, setCurrentDate } = useCurrentDate();
@@ -25,6 +26,7 @@ export default function Sidebar() {
 
       <div className='flex flex-col gap-2'>
         <CalendarsCollapsible />
+        <TodosCollapsible />
       </div>
     </aside>
   );
