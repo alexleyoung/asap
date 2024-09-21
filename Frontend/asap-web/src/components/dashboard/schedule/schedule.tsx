@@ -45,11 +45,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import CreateItemDialog from "../forms/CreateItemDialog";
 import CreateItemTabs from "../forms/CreateItemTabs";
 import { DialogDescription } from "@radix-ui/react-dialog";
 

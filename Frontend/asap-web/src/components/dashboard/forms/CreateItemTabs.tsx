@@ -3,6 +3,8 @@ import { EventForm } from "../forms/EventForm";
 import { TaskForm } from "../forms/TaskForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+interface createItemTabsProps {}
+
 export default function CreateItemTabs() {
   return (
     <Tabs defaultValue='event' className='w-full'>
