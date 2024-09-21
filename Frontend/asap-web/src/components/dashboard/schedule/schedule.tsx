@@ -49,6 +49,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CreateItemDialog from "../forms/CreateItemDialog";
+import CreateItemTabs from "../forms/CreateItemTabs";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 type ScheduleProps = {
   items: ScheduleItem[];
@@ -592,82 +595,14 @@ const Schedule: React.FC<ScheduleProps> = ({
           {view === "month" && renderMonthView()}
         </ScrollArea>
         <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
+          <DialogHeader>
+            <DialogTitle className='sr-only'>Create New Item</DialogTitle>
+            <DialogDescription className='sr-only'>
+              Create a new item
+            </DialogDescription>
+          </DialogHeader>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Item</DialogTitle>
-            </DialogHeader>
-            <div className='grid gap-4 py-4'>
-              <div className='grid grid-cols-4 items-center gap-4'>
-                <Label htmlFor='title' className='text-right'>
-                  Title
-                </Label>
-                <Input
-                  id='title'
-                  value={newItem?.title || ""}
-                  onChange={(e) =>
-                    setNewItem((prev) => ({ ...prev, title: e.target.value }))
-                  }
-                  className='col-span-3'
-                />
-              </div>
-              <div className='grid grid-cols-4 items-center gap-4'>
-                <Label htmlFor='start' className='text-right'>
-                  Start
-                </Label>
-                <Input
-                  id='start'
-                  type='datetime-local'
-                  value={
-                    newItem?.start
-                      ? format(newItem.start, "yyyy-MM-dd'T'HH:mm")
-                      : ""
-                  }
-                  onChange={(e) =>
-                    setNewItem((prev) => ({
-                      ...prev,
-                      start: parseISO(e.target.value),
-                    }))
-                  }
-                  className='col-span-3'
-                />
-              </div>
-              <div className='grid grid-cols-4 items-center gap-4'>
-                <Label htmlFor='end' className='text-right'>
-                  End
-                </Label>
-                <Input
-                  id='end'
-                  type='datetime-local'
-                  value={
-                    newItem?.end
-                      ? format(newItem.end, "yyyy-MM-dd'T'HH:mm")
-                      : ""
-                  }
-                  onChange={(e) =>
-                    setNewItem((prev) => ({
-                      ...prev,
-                      end: parseISO(e.target.value),
-                    }))
-                  }
-                  className='col-span-3'
-                />
-              </div>
-            </div>
-            <Button
-              onClick={() => {
-                if (newItem?.title && newItem?.start && newItem?.end) {
-                  onItemCreate({
-                    id: Math.random().toString(36).substr(2, 9),
-                    title: newItem.title,
-                    start: newItem.start,
-                    end: newItem.end,
-                    color: "#3b82f6",
-                  });
-                  setNewItem(null);
-                }
-              }}>
-              Create
-            </Button>
+            <CreateItemTabs />
           </DialogContent>
         </Dialog>
         <Popover
