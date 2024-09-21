@@ -1,4 +1,4 @@
-export type ScheduleItem = {
+export interface ScheduleItem {
   siid: string;
   title: string;
   start: Date;
@@ -9,7 +9,20 @@ export type ScheduleItem = {
   uid: string;
   cid: string;
   color: string;
-};
+}
+
+export interface Event extends ScheduleItem {
+  location: string;
+}
+
+export interface Task extends ScheduleItem {
+  due: Date;
+  priority: string;
+  difficulty: string;
+  duration: string;
+  flexible: boolean;
+  auto: boolean;
+}
 
 export type ViewType = "day" | "week" | "month";
 
