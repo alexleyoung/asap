@@ -31,7 +31,7 @@ export default function TodosCollapsible() {
       </CollapsibleTrigger>
       <CollapsibleContent className='w-[240px] mt-3 px-2 space-y-2'>
         {asaps.map((asap) => (
-          <Label htmlFor={asap}>
+          <Label htmlFor={asap} key={asap}>
             <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md truncate'>
               <Checkbox
                 id={asap}

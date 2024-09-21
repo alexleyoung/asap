@@ -8,7 +8,9 @@ export default function Dashboard() {
 
   const handleItemUpdate = (updatedItem: ScheduleItem) => {
     setItems((prevItems) =>
-      prevItems.map((item) => (item.id === updatedItem.id ? updatedItem : item))
+      prevItems.map((item) =>
+        item.siid === updatedItem.siid ? updatedItem : item
+      )
     );
   };
 

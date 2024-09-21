@@ -43,6 +43,8 @@ const formSchema = z.object({
   }),
   location: z.string().optional(),
   description: z.string().optional(),
+  category: z.string().optional(),
+  frequency: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -77,8 +79,10 @@ export function EventForm({ onSubmit }: EventFormProps) {
       end: end.toISOString(),
       location: data.location || "",
       description: data.description || "",
-      user_id: "default-user-id", // This would be replaced with actual user ID
-      calendar_id: "default-calendar-id", // This would be replaced with actual calendar ID
+      category: data.category || "",
+      frequency: data.frequency || "",
+      uid: "default-user-id", // This would be replaced with actual user ID
+      cid: "default-calendar-id", // This would be replaced with actual calendar ID
     });
   };
 

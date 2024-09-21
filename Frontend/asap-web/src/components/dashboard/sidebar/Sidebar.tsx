@@ -3,7 +3,7 @@
 import { useCurrentDate } from "@/contexts/ScheduleContext";
 
 import { Calendar } from "@/components/ui/calendar";
-import CreateItemDialog from "./CreateItemDialog";
+import CreateItemDialog from "../forms/CreateItemDialog";
 import CalendarsCollapsible from "./CalendarsCollapsible";
 import TodosCollapsible from "./TodosCollapsible";
 
