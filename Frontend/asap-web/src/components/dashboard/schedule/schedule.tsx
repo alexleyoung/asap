@@ -167,7 +167,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     (event: DragEndEvent) => {
       const { active, over } = event;
       if (over) {
-        const updatedItem = items.find((item) => item.id === active.id);
+        const updatedItem = items.find((item) => item.siid === active.id);
         if (updatedItem) {
           const [dropYear, dropMonth, dropDay, dropMinutes] = (
             over.id as string
@@ -318,7 +318,7 @@ const Schedule: React.FC<ScheduleProps> = ({
     }) => {
       const { attributes, listeners, setNodeRef, transform, isDragging } =
         useDraggable({
-          id: item.id,
+          id: item.siid,
           data: item,
         });
 
@@ -381,7 +381,7 @@ const Schedule: React.FC<ScheduleProps> = ({
       if (isMonthView) {
         return dayItems.map((item) => (
           <div
-            key={item.id}
+            key={item.siid}
             className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
             style={{ backgroundColor: item.color }}
             onClick={(e) => {
@@ -400,7 +400,7 @@ const Schedule: React.FC<ScheduleProps> = ({
           const columnWidth = 100 / item.length;
           return item.map((subItem, subIndex) => (
             <DraggableItem
-              key={subItem.id}
+              key={subItem.siid}
               item={subItem}
               onItemClick={setSelectedItem}
               containerHeight={containerHeight}
@@ -412,7 +412,7 @@ const Schedule: React.FC<ScheduleProps> = ({
         } else {
           return (
             <DraggableItem
-              key={item.id}
+              key={item.siid}
               item={item}
               onItemClick={setSelectedItem}
               containerHeight={containerHeight}

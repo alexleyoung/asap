@@ -1,8 +1,13 @@
 export type ScheduleItem = {
-  id: string;
+  siid: string;
   title: string;
   start: Date;
   end: Date;
+  description: string;
+  catergory: string;
+  frequency: string;
+  uid: string;
+  cid: string;
   color: string;
 };
 
@@ -12,15 +17,26 @@ export type EventPost = {
   title: string;
   start: string;
   end: string;
-  location?: string;
-  description?: string;
-  user_id: string;
-  calendar_id: string;
+  description: string;
+  category: string;
+  frequency: string;
+  location: string;
+  uid: string;
+  cid: string;
 };
 export type TaskPost = {
   title: string;
+  start: string;
+  end: string;
+  description: string;
+  category: string;
+  frequency: string;
   due: string;
-  description?: string;
-  user_id: string;
-  calendar_id: string;
+  priority: string;
+  difficulty: string;
+  duration: string;
+  flexible: string;
+  auto: boolean;
+  uid: string;
+  cid: string;
 };
