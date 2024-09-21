@@ -11,9 +11,9 @@ export default function DashboardLayout({
     <ScheduleProvider>
       <div className='flex h-screen w-screen flex-col overflow-hidden'>
         <Header />
-        <div className='flex flex-grow h-full'>
+        <div className='flex flex-grow h-[90%]'>
           <Sidebar />
-          <main className='flex-grow h-full'>{children}</main>
+          <main className='flex-grow'>{children}</main>
         </div>
       </div>
     </ScheduleProvider>
