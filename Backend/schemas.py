@@ -6,12 +6,6 @@ from database import engine, SessionLocal
 from sqlalchemy.orm import Session
 
 
-
-#create app
-app = FastAPI()
-
-models.Base.metadata.create_all(bind=engine)
-
 #create User schemas
 class UserBase(BaseModel):
     username: str
@@ -112,24 +106,3 @@ class Task(TaskBase):
     class Config:
         orm_mode = True
 
-
-
-
-
-#run database
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-#update 
-# @app.post("/users/", status_code = status.HTTP_201_CREATED)
-# async def create_user(user: UserBase, db: Session = Depends(get_db)):
-#     db_user = models.User(**user.dict())
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user

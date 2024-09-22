@@ -16,6 +16,7 @@ class User(Base):
     email = Column("email", String(50), unique = True, nullable=False)
     occupation = Column("occupation", String(30))
 
+    #not sure if we need this
     #init function
     def __init__(self, id, username, hashedPassword, firstName, lastName, email, occupation):
         self.id = id
@@ -51,7 +52,7 @@ class scheduleItem(Base):
 
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
     title = Column("title", String)
-    Start = Column("start", Integer) #????
+    Start = Column("start", Integer) #???? DATE OBJECT
     end = Column("end", Integer)
     description = Column("description", String)
     category = Column("category", String)

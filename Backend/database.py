@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 URL_DATABASE = 'postgresql://postgres:toor!234@localhost:5433/CalendarApp'
 
-engine = create_engine(URL_DATABASE)
+engine = create_engine(URL_DATABASE, connect_args={"check_same_thread": False})
 
 SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
 
