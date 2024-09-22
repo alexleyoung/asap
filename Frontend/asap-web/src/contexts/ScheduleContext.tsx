@@ -25,8 +25,8 @@ const CurrentDateContext = createContext<CurrentDateContextType | undefined>(
 );
 
 interface ScheduleItemsContextType {
-  items: (ScheduleEvent | ScheduleTask)[];
-  setItems: Dispatch<SetStateAction<(ScheduleEvent | ScheduleTask)[]>>;
+  items: ScheduleItem[];
+  setItems: Dispatch<SetStateAction<ScheduleItem[]>>;
 }
 const ScheduleItemsContext = createContext<
   ScheduleItemsContextType | undefined
@@ -35,8 +35,7 @@ const ScheduleItemsContext = createContext<
 export function ScheduleProvider({ children }: { children: React.ReactNode }) {
   const [view, setView] = useState("week");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [items, setItems] =
-    useState<(ScheduleEvent | ScheduleTask)[]>(testScheduleItems);
+  const [items, setItems] = useState<ScheduleItem[]>(testScheduleItems);
 
   return (
     <ViewContext.Provider value={{ view, setView }}>
