@@ -4,7 +4,7 @@ export type ScheduleItem = {
   start: Date;
   end: Date;
   description: string;
-  catergory: string;
+  category: string;
   frequency: string;
   uid: string;
   cid: string;
