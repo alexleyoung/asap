@@ -9,13 +9,13 @@ export type ScheduleItem = {
   uid: string;
   cid: string;
   color: string;
-} & (Event | Task);
+} & (ScheduleEvent | ScheduleTask);
 
-export type Event = {
+export type ScheduleEvent = {
   location: string;
 };
 
-export type Task = {
+export type ScheduleTask = {
   due: Date;
   priority: string;
   difficulty: string;

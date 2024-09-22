@@ -50,7 +50,7 @@ import CreateItemTabs from "../forms/CreateItemTabs";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 type ScheduleProps = {
-  items: (ScheduleEvent | ScheduleTask)[];
+  items: ScheduleItem[];
   onItemUpdate: (item: ScheduleItem) => void;
   onItemCreate: (item: ScheduleItem) => void;
 };
