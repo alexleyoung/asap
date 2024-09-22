@@ -396,7 +396,7 @@ const Schedule: React.FC<ScheduleProps> = ({
           const columnWidth = 100 / item.length;
           return item.map((subItem, subIndex) => (
             <DraggableItem
-              key={index}
+              key={subItem.siid}
               item={subItem}
               onItemClick={setSelectedItem}
               containerHeight={containerHeight}
@@ -408,7 +408,7 @@ const Schedule: React.FC<ScheduleProps> = ({
         } else {
           return (
             <DraggableItem
-              key={index}
+              key={item.siid}
               item={item}
               onItemClick={setSelectedItem}
               containerHeight={containerHeight}
