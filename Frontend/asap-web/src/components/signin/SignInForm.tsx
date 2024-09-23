@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
 import React from "react";
-import { useState } from "react";
 
 export default function SignInForm() {
   return (
@@ -52,12 +51,6 @@ export default function SignInForm() {
             <FcGoogle size={20} />
             <Link href="/dashboard">Sign In with Google</Link>
           </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link href="#" className="underline">
-            Sign Up
-          </Link>
         </div>
       </div>
     </div>

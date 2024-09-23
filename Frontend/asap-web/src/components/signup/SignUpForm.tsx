@@ -61,12 +61,6 @@ export default function SignUpForm() {
             <Link href="/dashboard">Sign Up with Google</Link>
           </Button>
         </div>
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link href="#" className="underline">
-            Sign In
-          </Link>
-        </div>
       </div>
     </div>
   );
