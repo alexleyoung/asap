@@ -19,11 +19,20 @@ export default function SignUpForm() {
 
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">First Name</Label>
             <Input
-              id="name"
-              type="name"
-              placeholder="enter first and last name "
+              id="firstname"
+              type="firstname"
+              placeholder="enter first name "
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="name">Last Name</Label>
+            <Input
+              id="lastname"
+              type="lastname"
+              placeholder="enter last name "
               required
             />
           </div>
