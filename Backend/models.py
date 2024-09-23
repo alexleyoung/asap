@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
-from database import Base
+from .database import Base
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -16,20 +16,7 @@ class User(Base):
     email = Column("email", String(50), unique = True, nullable=False)
     occupation = Column("occupation", String(30))
 
-    #not sure if we need this
-    #init function
-    def __init__(self, id, username, hashedPassword, firstName, lastName, email, occupation):
-        self.id = id
-        self.username = username
-        self.hashedPassword = hashedPassword
-        self.firstName = firstName
-        self.lastName = lastName
-        self.email = email
-        self.occupation = occupation
-
-    def __repr__(self):
-        return f"User id: {self.id}\n Username: {self.username}\n Name: {self.firstName} {self.lastName}\n Email: {self.email}\n Occupation: {self.occupation}"
-
+   
 
 
 
@@ -44,7 +31,8 @@ class Calendar(Base):
     timezone = Column("timezone", String)
 
     #not sure about this
-    owner = relationship("User", back_populates="calendars")
+    
+    #owner = relationship("User", back_populates="calendars")
     
 #scheduleItems table
 class scheduleItem(Base):
