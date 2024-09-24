@@ -8,11 +8,9 @@ from sqlalchemy.orm import Session
 
 #create User schemas
 class UserBase(BaseModel):
-    username: str
     firstName: str
     lastName: str
     email: str
-    occupation: str
 
 #for creating a user
 class UserCreate(UserBase):

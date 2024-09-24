@@ -13,7 +13,10 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 def create_user(db: Session, user: schemas.UserCreate):
     fake_hashed = user.password + "notHashedLOL"
-    db_user = models.User(username=user.username, firstName=user.firstName, lastName=user.lastName, occupation = user.occupation, email=user.email, hashedPassword=fake_hashed)
+    db_user = models.User(firstName=user.firstName, 
+                          lastName=user.lastName, 
+                          email=user.email, 
+                          hashedPassword=fake_hashed)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
