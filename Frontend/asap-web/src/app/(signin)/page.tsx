@@ -35,7 +35,15 @@ export default function Home() {
           </>
         )}
       </div>
-      <div>{/* <Image /> */}</div>
+      <div>
+        <Image
+          src="/images/signin.svg"
+          alt="image here"
+          width={500}
+          height={500}
+          layout="responsive"
+        />
+      </div>
     </main>
   );
 }
