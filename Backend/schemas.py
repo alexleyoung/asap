@@ -1,16 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
 from typing import Annotated
-import models
-from database import engine, SessionLocal
+from Backend import models
+from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
 
-
-
-#create app
-app = FastAPI()
-
-models.Base.metadata.create_all(bind=engine)
 
 #create User schemas
 class UserBase(BaseModel):
@@ -29,7 +23,7 @@ class User(UserBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 
@@ -51,7 +45,7 @@ class Calendar(BaseModel):
     ownerID: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 ###
 #ScheduleItem
@@ -74,7 +68,7 @@ class ScheduleItem(ScheduleItemBase):
     calendarID: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 ###
 #Event
@@ -90,7 +84,7 @@ class Event(EventBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 ###
 #Task
@@ -110,26 +104,5 @@ class Task(TaskBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
-
-
-
-
-#run database
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-#update 
-# @app.post("/users/", status_code = status.HTTP_201_CREATED)
-# async def create_user(user: UserBase, db: Session = Depends(get_db)):
-#     db_user = models.User(**user.dict())
-#     db.add(db_user)
-#     db.commit()
-#     db.refresh(db_user)
-#     return db_user

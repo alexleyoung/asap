@@ -19,11 +19,20 @@ export default function SignUpForm() {
 
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">First Name</Label>
             <Input
-              id="name"
-              type="name"
-              placeholder="enter first and last name "
+              id="firstname"
+              type="firstname"
+              placeholder="enter first name "
+              required
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="name">Last Name</Label>
+            <Input
+              id="lastname"
+              type="lastname"
+              placeholder="enter last name "
               required
             />
           </div>
@@ -60,12 +69,6 @@ export default function SignUpForm() {
             <FcGoogle size={20} />
             <Link href="/dashboard">Sign Up with Google</Link>
           </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          Already have an account?{" "}
-          <Link href="#" className="underline">
-            Sign In
-          </Link>
         </div>
       </div>
     </div>
