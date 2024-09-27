@@ -5,9 +5,31 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
-import React from "react";
+import { signIn } from "../../lib/auth";
+import React, { useState } from "react";
+import { set } from "date-fns";
 
 export default function SignInForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await signIn(email, password);
+      if (response.ok) {
+        const { token } = await response.json();
+        localStorage.setItem("token", token);
+        setError("");
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
+    }
+  };
+
   return (
     <div className="grid h-full place-items-center py-12 border-r">
       <div className="mx-auto grid w-[350px] gap-6">
@@ -25,6 +47,7 @@ export default function SignInForm() {
               type="email"
               placeholder="m@example.com"
               required
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
@@ -37,8 +60,14 @@ export default function SignInForm() {
                 Forgot your password?
               </Link>
             </div>
-            <Input id="password" type="password" required />
+            <Input
+              id="password"
+              type="password"
+              required
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
           <Button type="submit" className="w-full">
             Sign In
           </Button>
