@@ -5,8 +5,34 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
+import { signIn } from "../../lib/auth";
+import React, { useState } from "react";
+import { set } from "date-fns";
 
 export default function SignUpForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await signIn(email, password);
+      if (response.ok) {
+        const { token } = await response.json();
+        localStorage.setItem("token", token);
+        setError("");
+        setSuccess("Account created successfully");
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
+    } catch (error) {
+      setError("An error occurred. Please try again.");
+      setSuccess("");
+    }
+  };
+
   return (
     <div className="grid h-full place-items-center py-12 border-r">
       <div className="mx-auto grid w-[350px] gap-6">
@@ -43,13 +69,19 @@ export default function SignUpForm() {
               type="email"
               placeholder="m@example.com"
               required
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="grid gap-2">
             <div className="flex items-center">
               <Label htmlFor="password">Password</Label>
             </div>
-            <Input id="password" type="password" required />
+            <Input
+              id="password"
+              type="password"
+              required
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div className="grid gap-2">
             <div className="flex items-center">
@@ -57,6 +89,8 @@ export default function SignUpForm() {
             </div>
             <Input id="confirmpass" type="password" required />
           </div>
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {success && <p className="text-green-500 text-sm">{success}</p>}
           <Button type="submit" className="w-full">
             Sign Up
           </Button>
