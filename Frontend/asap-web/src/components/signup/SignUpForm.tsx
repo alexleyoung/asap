@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
-import { signIn } from "../../lib/auth";
+import { signUp } from "../../lib/auth";
 import React, { useState } from "react";
 import { set } from "date-fns";
 
@@ -18,7 +18,7 @@ export default function SignUpForm() {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await signIn(email, password);
+      const response = await signUp(email, password);
       if (response.ok) {
         const { token } = await response.json();
         localStorage.setItem("token", token);
