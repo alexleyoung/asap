@@ -21,6 +21,12 @@ export function EventCard({ event }: EventCardProps) {
   const handleClick = (event: EventPost) => {
     setSelectedEvent(event);
   };
+  const deleteEvent = (event: EventPost) => {
+    //delete event
+  };
+  const editEvent = (event: EventPost) => {
+    //edit event
+  };
 
   return (
     <Card>
@@ -33,7 +39,8 @@ export function EventCard({ event }: EventCardProps) {
         <CardDescription>THIS SHOULD BE EVENT LOCATION</CardDescription>
       </CardContent>
       <CardFooter>
-        <button>THIS SHOULD BE EDIT BUTTON</button>
+        <button>Delete</button>
+        <button>Edit</button>
       </CardFooter>
     </Card>
   );

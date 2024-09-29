@@ -19,6 +19,12 @@ export function TaskCard({ task }: TaskCardProps) {
   const handleClick = (task: TaskPost) => {
     setSelectedTask(task);
   };
+  const deleteTask = (task: TaskPost) => {
+    //delete task
+  };
+  const editTask = (task: TaskPost) => {
+    //edit task
+  };
 
   return (
     <Card>
@@ -31,7 +37,8 @@ export function TaskCard({ task }: TaskCardProps) {
         <CardDescription>THIS SHOULD BE TASK LOCATION</CardDescription>
       </CardContent>
       <CardFooter>
-        <button>THIS SHOULD BE EDIT BUTTON</button>
+        <button>Delete</button>
+        <button>Edit</button>
       </CardFooter>
     </Card>
   );
