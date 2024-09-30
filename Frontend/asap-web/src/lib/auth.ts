@@ -1,5 +1,5 @@
 export const signUp = async (email: string, password: string) => {
-  const response = await fetch("/../components/signup/signup", {
+  const response = await fetch("http://localhost:8000/users/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -13,7 +13,7 @@ export const signUp = async (email: string, password: string) => {
   return data;
 };
 export const signIn = async (email: string, password: string) => {
-  const response = await fetch("signin", {
+  const response = await fetch("http://localhost:8000/users/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
