@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <main className='w-full lg:grid lg:grid-cols-2 h-screen'>
       {isSignIn ? (
-        <div>
+        <div className='h-full'>
           <SignInForm />
           <div className='-mt-24 text-center text-sm'>
             Don&apos;t have an account?{" "}
@@ -24,7 +24,7 @@ export default function Home() {
           </div>{" "}
         </div>
       ) : (
-        <div>
+        <div className='h-full'>
           <SignUpForm />
           <div className='-mt-24 text-center text-sm'>
             Already have an account?{" "}
