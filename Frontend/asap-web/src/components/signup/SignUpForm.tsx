@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { Label } from "@/components/ui/label";
@@ -8,13 +9,41 @@ import { Separator } from "@/components/ui/separator";
 import { signUp } from "../../lib/auth";
 import React, { useState } from "react";
 import { set } from "date-fns";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  email: z.string().email().min(1, "Email is required"),
+  password: z.string().min(1, "Password is required"),
+});
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    //here is where you would collect the data and send it to the server
+    console.log(data);
+  }
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -42,8 +71,86 @@ export default function SignUpForm() {
             Enter your info below to create your account
           </p>
         </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* <FormField
+            control={form.control}
+            name="firstname"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                  <Input {...field} type="text" placeholder="First Name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
+            {/* <FormField
+            control={form.control}
+            name="lastname"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input {...field} type="text" placeholder="Last Name" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          /> */}
 
-        <div className="grid gap-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="email" placeholder="m@email.com" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="create a password"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* <FormField
+              control={form.control}
+              name="confirmpassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}  
+            /> */}
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {success && <p className="text-green-500 text-sm">{success}</p>}
+            <Button type="submit" className="w-full">
+              Sign Up
+            </Button>
+          </form>
+        </Form>
+        {/* <div className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="name">First Name</Label>
             <Input
@@ -88,23 +195,19 @@ export default function SignUpForm() {
               <Label htmlFor="confirmpass">Confirm Password</Label>
             </div>
             <Input id="confirmpass" type="password" required />
-          </div>
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-          {success && <p className="text-green-500 text-sm">{success}</p>}
-          <Button type="submit" className="w-full">
-            Sign Up
-          </Button>
-          <Separator className="relative my-2">
-            <span className="absolute px-2 py-1 bg-background left-[45%] -top-4 text-primary/60">
-              or
-            </span>
-          </Separator>
-          <Button variant="outline" className="w-full flex gap-2">
-            <FcGoogle size={20} />
-            <Link href="/dashboard">Sign Up with Google</Link>
-          </Button>
-        </div>
+          </div> */}
+
+        <Separator className="relative my-2">
+          <span className="absolute px-2 py-1 bg-background left-[45%] -top-4 text-primary/60">
+            or
+          </span>
+        </Separator>
+        <Button variant="outline" className="w-full flex gap-2">
+          <FcGoogle size={20} />
+          <Link href="/dashboard">Sign Up with Google</Link>
+        </Button>
       </div>
     </div>
+    // </div>
   );
 }
