@@ -1,15 +1,16 @@
 export const signUp = async (
-  email: string,
-  password: string,
   firstName: string,
-  lastName: string
+  lastName: string,
+  email: string,
+  password: string
+  
 ) => {
   const response = await fetch("http://localhost:8000/users/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email, password, firstName, lastName }),
+    body: JSON.stringify({firstName, lastName, email, password}),
   });
   const data = await response.json();
   if (!response.ok) {
