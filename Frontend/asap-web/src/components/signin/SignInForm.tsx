@@ -63,10 +63,11 @@ export default function SignInForm() {
         </div>
         <Form {...form}>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSignIn();
-            }}
+            onSubmit={form.handleSubmit(handleSignIn)}
+            // {(e) => {
+            //   e.preventDefault();
+            //   handleSignIn();
+            // }}
             className="space-y-6"
           >
             <FormField

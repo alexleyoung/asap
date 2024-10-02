@@ -79,10 +79,11 @@ export default function SignUpForm() {
         </div>
         <Form {...form}>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSignUp({ firstname, lastname, email, password });
-            }}
+            onSubmit={form.handleSubmit(handleSignUp)}
+            // {(e) => {
+            //   e.preventDefault();
+            //   handleSignUp({ firstname, lastname, email, password });
+            // }}
             className="space-y-8"
           >
             <FormField
