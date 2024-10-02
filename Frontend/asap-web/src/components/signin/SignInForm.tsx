@@ -1,14 +1,11 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
 import { signIn } from "../../lib/auth";
 import React, { useState } from "react";
-import { set } from "date-fns";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,8 +25,8 @@ const formSchema = z.object({
 });
 
 export default function SignInForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email] = useState("");
+  const [password] = useState("");
   const [error, setError] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -39,11 +36,6 @@ export default function SignInForm() {
       password: "",
     },
   });
-
-  // function onSubmit(data: z.infer<typeof formSchema>) {
-  //   //here is where you would collect the data and send it to the server
-  //   console.log(data);
-  // }
 
   const handleSignIn = async () => {
     try {
@@ -71,10 +63,11 @@ export default function SignInForm() {
         </div>
         <Form {...form}>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSignIn();
-            }}
+            onSubmit={form.handleSubmit(handleSignIn)}
+            // {(e) => {
+            //   e.preventDefault();
+            //   handleSignIn();
+            // }}
             className="space-y-6"
           >
             <FormField
