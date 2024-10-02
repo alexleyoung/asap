@@ -40,13 +40,12 @@ export default function SignInForm() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    //here is where you would collect the data and send it to the server
-    console.log(data);
-  }
+  // function onSubmit(data: z.infer<typeof formSchema>) {
+  //   //here is where you would collect the data and send it to the server
+  //   console.log(data);
+  // }
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSignIn = async () => {
     try {
       const response = await signIn(email, password);
       if (response.ok) {
@@ -71,7 +70,13 @@ export default function SignInForm() {
           </p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSignIn();
+            }}
+            className="space-y-6"
+          >
             <FormField
               control={form.control}
               name="email"

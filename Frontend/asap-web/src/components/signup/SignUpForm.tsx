@@ -40,17 +40,23 @@ export default function SignUpForm() {
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    //here is where you would collect the data and send it to the server
-    console.log(data);
-  }
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // function onSubmit(data: z.infer<typeof formSchema>) {
+  //   //here is where you would collect the data and send it to the server
+  //   fetch("http://localhost:8000/api/auth/signup", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(data),
+  //   });
+  //   console.log(data);
+  // }
+  const handleSignUp = async (data: { email: string; password: string }) => {
     try {
-      const response = await signUp(email, password);
+      const response = await signUp(data.email, data.password);
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem("token", token);
+        // const { token } = await response.json();
+        // localStorage.setItem("token", token);
         setError("");
         setSuccess("Account created successfully");
       } else {
@@ -72,7 +78,13 @@ export default function SignUpForm() {
           </p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSignUp({ email, password });
+            }}
+            className="space-y-8"
+          >
             {/* <FormField
             control={form.control}
             name="firstname"
