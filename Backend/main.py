@@ -1,14 +1,24 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
-
+from fastapi.middleware.cors import CORSMiddleware
 from Backend import crud, models, schemas
 from .database import SessionLocal, engine
+
 
 
 #create app
 app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
+
+#allows cross origin resource sharing (stuff is on dif ports)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Or specify your frontend URL here like "http://localhost:3000"
+    allow_credentials=True,
+    allow_methods=["*"],  # This allows POST, GET, etc.
+    allow_headers=["*"],
+)
 
 #dependency
 def get_db():

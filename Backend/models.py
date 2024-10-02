@@ -10,7 +10,7 @@ class User(Base):
 
     id = Column("id", Integer, primary_key = True, index = True)
     hashedPassword = Column("hashedPassword", String, nullable=False)
-    firstName = Column("firstName", String(20), nullable=False)
+    firstName = Column("firstName", String(20), nullable=False) 
     lastName = Column("lastName", String(20), nullable=False)
     email = Column("email", String(50), unique = True, nullable=False)
 
