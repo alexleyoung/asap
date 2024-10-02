@@ -1,14 +1,11 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
 import { signUp } from "../../lib/auth";
 import React, { useState } from "react";
-import { set } from "date-fns";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -30,10 +27,10 @@ const formSchema = z.object({
 });
 
 export default function SignUpForm() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
+  const [email] = useState("");
+  const [password] = useState("");
+  const [firstname] = useState("");
+  const [lastname] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,17 +43,6 @@ export default function SignUpForm() {
     },
   });
 
-  // function onSubmit(data: z.infer<typeof formSchema>) {
-  //   //here is where you would collect the data and send it to the server
-  //   fetch("http://localhost:8000/api/auth/signup", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(data),
-  //   });
-  //   console.log(data);
-  // }
   const handleSignUp = async (data: {
     firstname: string;
     lastname: string;
@@ -71,8 +57,6 @@ export default function SignUpForm() {
         data.password
       );
       if (response.ok) {
-        // const { token } = await response.json();
-        // localStorage.setItem("token", token);
         setError("");
         setSuccess("Account created successfully");
       } else {
@@ -178,52 +162,6 @@ export default function SignUpForm() {
             </Button>
           </form>
         </Form>
-        {/* <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">First Name</Label>
-            <Input
-              id="firstname"
-              type="firstname"
-              placeholder="enter first name "
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="name">Last Name</Label>
-            <Input
-              id="lastname"
-              type="lastname"
-              placeholder="enter last name "
-              required
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="m@example.com"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="password">Password</Label>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              required
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div className="grid gap-2">
-            <div className="flex items-center">
-              <Label htmlFor="confirmpass">Confirm Password</Label>
-            </div>
-            <Input id="confirmpass" type="password" required />
-          </div> */}
 
         <Separator className="relative my-2">
           <span className="absolute px-2 py-1 bg-background left-[45%] -top-4 text-primary/60">
