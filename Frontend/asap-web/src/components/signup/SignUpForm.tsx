@@ -25,16 +25,22 @@ import {
 const formSchema = z.object({
   email: z.string().email().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
+  firstname: z.string().min(1, "First Name is required"),
+  lastname: z.string().min(1, "Last Name is required"),
 });
 
 export default function SignUpForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      firstname: "",
+      lastname: "",
       email: "",
       password: "",
     },
@@ -51,9 +57,19 @@ export default function SignUpForm() {
   //   });
   //   console.log(data);
   // }
-  const handleSignUp = async (data: { email: string; password: string }) => {
+  const handleSignUp = async (data: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+  }) => {
     try {
-      const response = await signUp(data.email, data.password);
+      const response = await signUp(
+        data.firstname,
+        data.lastname,
+        data.email,
+        data.password
+      );
       if (response.ok) {
         // const { token } = await response.json();
         // localStorage.setItem("token", token);
@@ -81,36 +97,36 @@ export default function SignUpForm() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              handleSignUp({ email, password });
+              handleSignUp({ firstname, lastname, email, password });
             }}
             className="space-y-8"
           >
-            {/* <FormField
-            control={form.control}
-            name="firstname"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>First Name</FormLabel>
-                <FormControl>
-                  <Input {...field} type="text" placeholder="First Name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
-            {/* <FormField
-            control={form.control}
-            name="lastname"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Last Name</FormLabel>
-                <FormControl>
-                  <Input {...field} type="text" placeholder="Last Name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
+            <FormField
+              control={form.control}
+              name="firstname"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>First Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="text" placeholder="First Name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastname"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="text" placeholder="Last Name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
