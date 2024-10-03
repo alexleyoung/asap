@@ -60,7 +60,9 @@ export default function SignUpForm() {
         setError("");
         setSuccess("Account created successfully");
       } else {
-        setError("Invalid email or password. Please try again.");
+        setError(
+          response.message || "Invalid email or password. Please try again."
+        );
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
