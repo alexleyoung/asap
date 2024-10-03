@@ -4,7 +4,7 @@ from typing import Annotated
 from Backend import models
 from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
-
+from typing import Optional
 
 #create User schemas
 class UserBase(BaseModel):
@@ -15,6 +15,12 @@ class UserBase(BaseModel):
 #for creating a user
 class UserCreate(UserBase):
     password: str
+
+#for updating a user
+class UserUpdate(BaseModel):
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+    email: Optional[str] = None
 
 #main class
 class User(UserBase):
