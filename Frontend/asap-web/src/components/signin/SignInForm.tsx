@@ -106,6 +106,7 @@ export default function SignInForm() {
             />
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
+            {success && <p className="text-green-500 text-sm">{success}</p>}
             <Button type="submit" className="w-full">
               Sign In
             </Button>
