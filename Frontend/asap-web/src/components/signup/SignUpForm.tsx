@@ -39,11 +39,6 @@ const formSchema = z
   });
 
 export default function SignUpForm() {
-  // const [email] = useState("");
-  // const [password] = useState("");
-  // const [firstname] = useState("");
-  // const [lastname] = useState("");
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const form = useForm<z.infer<typeof formSchema>>({
@@ -74,9 +69,7 @@ export default function SignUpForm() {
         setError("");
         setSuccess("Account created successfully");
       } else {
-        setError(
-          response.message || "Invalid email or password. Please try again."
-        );
+        setError("Invalid email or password. Please try again.");
       }
     } catch (error) {
       setError("An error occurred. Please try again.");

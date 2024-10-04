@@ -18,7 +18,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { set } from "date-fns";
 
 const formSchema = z.object({
   email: z.string().email().min(1, "Email is required"),
@@ -26,8 +25,6 @@ const formSchema = z.object({
 });
 
 export default function SignInForm() {
-  const [email] = useState("");
-  const [password] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -41,7 +38,7 @@ export default function SignInForm() {
 
   const handleSignIn = async (data: { email: string; password: string }) => {
     try {
-      const response = await signIn(email, password);
+      const response = await signIn(data.email, data.password);
       if (response.ok) {
         // const { token } = await response.json();
         // localStorage.setItem("token", token);
