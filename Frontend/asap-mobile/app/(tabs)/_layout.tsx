@@ -1,29 +1,31 @@
-import { Tabs } from "expo-router";
-import React from "react";
+import { Link, Tabs } from 'expo-router';
 
-import { TabBarIcon } from "@/components/navigation/TabBarIcon";
-import { Colors } from "@/constants/Colors";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { HeaderButton } from '../../components/HeaderButton';
+import { TabBarIcon } from '../../components/TabBarIcon';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
-        headerShown: false,
+        tabBarActiveTintColor: 'black',
       }}>
       <Tabs.Screen
-        name='schedule'
+        name="index"
         options={{
-          title: "Schedule",
+          title: 'Tab One',
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          headerRight: () => (
+            <Link href="/modal" asChild>
+              <HeaderButton />
+            </Link>
+          ),
         }}
       />
       <Tabs.Screen
-        name='tasks'
+        name="two"
         options={{
-          title: "Tasks",
+          title: 'Tab Two',
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
     </Tabs>
