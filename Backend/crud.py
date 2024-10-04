@@ -59,3 +59,15 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
     db.commit()
     db.refresh(user)
     return user
+
+
+##### EVENT CRUDS #####
+
+def create_event(db: Session, event: schemas.EventCreate):
+    db_event = models.event(location = event.location)
+    db.add(db_event)
+    db.commit()
+    db.refresh(db_event)
+    return db_event
+
+
