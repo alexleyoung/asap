@@ -31,9 +31,11 @@ export default function Dashboard() {
           setLoading(false);
         } else {
           router.back();
+          console.log("Not authenticated");
         }
       } catch (error) {
         router.back();
+        console.log("An error occurred. Please try again.");
       }
     };
     checkAuth();
