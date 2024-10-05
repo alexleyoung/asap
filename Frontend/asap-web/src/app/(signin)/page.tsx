@@ -4,14 +4,12 @@ import SignUpForm from "@/components/signup/SignUpForm";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 export default function Home() {
   const [isSignIn, setIsSignIn] = useState(true);
-  const router = useRouter();
 
   const toggleForm = () => {
-    setIsSignIn((prev) => !prev);
+    setIsSignIn(!isSignIn);
   };
 
   return (
