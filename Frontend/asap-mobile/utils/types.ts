@@ -22,6 +22,7 @@ export interface ScheduleTask extends ScheduleItem {
   duration: string;
   flexible: boolean;
   auto: boolean;
+  completed: boolean;
 }
 
 export type ViewType = 'day' | 'week' | 'month';

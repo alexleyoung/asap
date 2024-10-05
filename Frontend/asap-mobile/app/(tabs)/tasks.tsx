@@ -1,6 +1,7 @@
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, ScrollView, TextInput } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 
 import { ScheduleTask } from '~/utils/types';
@@ -24,6 +25,7 @@ const dummyTasks: ScheduleTask[] = [
     duration: '2 hours',
     flexible: true,
     auto: true,
+    completed: false, // Added completed: false
   },
   {
     siid: '2',
@@ -42,6 +44,7 @@ const dummyTasks: ScheduleTask[] = [
     duration: '1 hour',
     flexible: false,
     auto: true,
+    completed: false, // Added completed: false
   },
   {
     siid: '3',
@@ -60,6 +63,7 @@ const dummyTasks: ScheduleTask[] = [
     duration: '1 hour',
     flexible: true,
     auto: false,
+    completed: false, // Added completed: false
   },
   {
     siid: '4',
@@ -78,6 +82,7 @@ const dummyTasks: ScheduleTask[] = [
     duration: '30 minutes',
     flexible: false,
     auto: true,
+    completed: false, // Added completed: false
   },
   {
     siid: '5',
@@ -96,12 +101,24 @@ const dummyTasks: ScheduleTask[] = [
     duration: '2 hours',
     flexible: true,
     auto: false,
+    completed: false, // Added completed: false
   },
   // Add more dummy tasks as needed
 ];
 
 const TasksPage = () => {
   const [tasks, setTasks] = useState(dummyTasks);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newTask, setNewTask] = useState<Partial<ScheduleTask>>({
+    title: '',
+    description: '',
+    due: new Date(),
+    priority: 'Medium',
+    difficulty: 'Medium',
+    duration: '',
+    flexible: false,
+    auto: false,
+  });
 
   const toggleComplete = (siid: string) => {
     setTasks((prevTasks) =>
@@ -144,6 +161,33 @@ const TasksPage = () => {
     </View>
   );
 
+  const addTask = () => {
+    const task: ScheduleTask = {
+      ...newTask,
+      siid: Date.now().toString(),
+      start: new Date(),
+      end: new Date(),
+      category: 'Default',
+      frequency: 'Once',
+      uid: 'user1',
+      cid: 'calendar1',
+      color: '#000000',
+    } as ScheduleTask;
+
+    setTasks([...tasks, task]);
+    setModalVisible(false);
+    setNewTask({
+      title: '',
+      description: '',
+      due: new Date(),
+      priority: 'Medium',
+      difficulty: 'Medium',
+      duration: '',
+      flexible: false,
+      auto: false,
+    });
+  };
+
   return (
     <View className="flex-1 bg-white p-4">
       <Text className="mb-4 text-2xl font-bold">Tasks</Text>
@@ -156,9 +200,86 @@ const TasksPage = () => {
       <FlatList data={tasks} renderItem={renderItem} keyExtractor={(item) => item.siid} />
       <TouchableOpacity
         className="mt-4 items-center rounded-full bg-blue-500 px-4 py-2"
-        onPress={() => console.log('Add new task')}>
+        onPress={() => setModalVisible(true)}>
         <Text className="font-bold text-white">Add New Task</Text>
       </TouchableOpacity>
+
+      <Modal transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+        <View className="flex-1 items-center justify-center bg-black bg-opacity-50">
+          <View className="max-h-5/6 w-5/6 rounded-lg bg-white p-4">
+            <ScrollView>
+              <Text className="mb-4 text-xl font-bold">Add New Task</Text>
+              <TextInput
+                className="mb-2 rounded-md border border-gray-300 p-2"
+                placeholder="Title"
+                value={newTask.title}
+                onChangeText={(text) => setNewTask({ ...newTask, title: text })}
+              />
+              <TextInput
+                className="mb-2 rounded-md border border-gray-300 p-2"
+                placeholder="Description"
+                multiline
+                numberOfLines={3}
+                value={newTask.description}
+                onChangeText={(text) => setNewTask({ ...newTask, description: text })}
+              />
+              <Text className="mb-2">Due Date:</Text>
+              <DateTimePicker
+                value={newTask.due || new Date()}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) =>
+                  setNewTask({ ...newTask, due: selectedDate || newTask.due })
+                }
+              />
+              <Text className="mb-2 mt-4">Priority:</Text>
+              <View className="mb-2 flex-row justify-around">
+                {['Low', 'Medium', 'High'].map((priority) => (
+                  <TouchableOpacity
+                    key={priority}
+                    className={`rounded-full px-4 py-2 ${newTask.priority === priority ? getPriorityColor(priority) : 'bg-gray-200'}`}
+                    onPress={() => setNewTask({ ...newTask, priority })}>
+                    <Text
+                      className={`${newTask.priority === priority ? 'text-white' : 'text-black'}`}>
+                      {priority}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <TextInput
+                className="mb-2 rounded-md border border-gray-300 p-2"
+                placeholder="Duration (e.g., 2 hours)"
+                value={newTask.duration}
+                onChangeText={(text) => setNewTask({ ...newTask, duration: text })}
+              />
+              <View className="mb-2 flex-row items-center">
+                <Text className="mr-2">Flexible:</Text>
+                <Checkbox
+                  status={newTask.flexible ? 'checked' : 'unchecked'}
+                  onPress={() => setNewTask({ ...newTask, flexible: !newTask.flexible })}
+                />
+              </View>
+              <View className="mb-4 flex-row items-center">
+                <Text className="mr-2">Auto-schedule:</Text>
+                <Checkbox
+                  status={newTask.auto ? 'checked' : 'unchecked'}
+                  onPress={() => setNewTask({ ...newTask, auto: !newTask.auto })}
+                />
+              </View>
+              <View className="flex-row justify-end">
+                <TouchableOpacity
+                  className="mr-2 rounded-md bg-gray-300 px-4 py-2"
+                  onPress={() => setModalVisible(false)}>
+                  <Text>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="rounded-md bg-blue-500 px-4 py-2" onPress={addTask}>
+                  <Text className="text-white">Add Task</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
