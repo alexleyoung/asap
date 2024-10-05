@@ -40,8 +40,8 @@ export default function SignInForm() {
     try {
       const response = await signIn(data.email, data.password);
       if (response.ok) {
-        // const { token } = await response.json();
-        // localStorage.setItem("token", token);
+        const { token } = await response.json();
+        localStorage.setItem("token", token);
         setSuccess("Signed in successfully");
         setError("");
       } else {

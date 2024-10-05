@@ -4,28 +4,12 @@ import SignUpForm from "@/components/signup/SignUpForm";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 
 export default function Home() {
   const [isSignIn, setIsSignIn] = useState(true);
-  const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      router.push("/dashboard");
-    }
-  }, [router]);
 
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
-  };
-
-  const handleSignIn = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      router.push("/dashboard");
-    }
   };
 
   return (
@@ -35,7 +19,7 @@ export default function Home() {
           <SignInForm />
           <div className="-mt-24 text-center text-sm">
             Don&apos;t have an account?{" "}
-            <Link href="/dashboard" className="underline" onClick={toggleForm}>
+            <Link href="#" className="underline" onClick={toggleForm}>
               Sign Up
             </Link>
           </div>{" "}
