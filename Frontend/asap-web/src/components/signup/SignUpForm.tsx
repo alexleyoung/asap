@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useRouter } from "next/router";
 
 const formSchema = z
   .object({
@@ -41,6 +42,8 @@ const formSchema = z
 export default function SignUpForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,6 +71,7 @@ export default function SignUpForm() {
       if (response.ok) {
         setError("");
         setSuccess("Account created successfully");
+        router.push("/dashboard");
       } else {
         setError("Invalid email or password. Please try again.");
       }

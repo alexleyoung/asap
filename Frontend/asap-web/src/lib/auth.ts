@@ -42,3 +42,4 @@ const getProtectedData = async (endpoint: string) => {
   }
   return response.json();
 };
+export { getProtectedData };
