@@ -25,9 +25,8 @@ const formSchema = z.object({
 });
 
 export default function SignInForm() {
-  const [email] = useState("");
-  const [password] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,18 +36,20 @@ export default function SignInForm() {
     },
   });
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (data: { email: string; password: string }) => {
     try {
-      const response = await signIn(email, password);
+      const response = await signIn(data.email, data.password);
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem("token", token);
+        // const { token } = await response.json();
+        // localStorage.setItem("token", token);
+        setSuccess("Signed in successfully");
         setError("");
       } else {
         setError("Invalid email or password. Please try again.");
       }
     } catch (error) {
       setError("An error occurred. Please try again.");
+      setSuccess("");
     }
   };
 
@@ -64,10 +65,6 @@ export default function SignInForm() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignIn)}
-            // {(e) => {
-            //   e.preventDefault();
-            //   handleSignIn();
-            // }}
             className="space-y-6"
           >
             <FormField
@@ -106,6 +103,7 @@ export default function SignInForm() {
             />
 
             {error && <p className="text-red-500 text-sm">{error}</p>}
+            {success && <p className="text-green-500 text-sm">{success}</p>}
             <Button type="submit" className="w-full">
               Sign In
             </Button>

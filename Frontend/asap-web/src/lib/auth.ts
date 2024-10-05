@@ -11,10 +11,6 @@ export const signUp = async (
     },
     body: JSON.stringify({ firstName, lastName, email, password }),
   });
-  //   const data = await response.json();
-  //   if (!response.ok) {
-  //     throw new Error(data.error || "Something went wrong");
-  //   }
   return response;
 };
 export const signIn = async (email: string, password: string) => {
@@ -25,9 +21,9 @@ export const signIn = async (email: string, password: string) => {
     },
     body: JSON.stringify({ email, password }),
   });
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error || "Something went wrong");
-  }
-  return data;
+  //   const data = await response.json();
+  //   if (!response.ok) {
+  //     throw new Error(data.error || "Something went wrong");
+  //   }
+  return response;
 };
