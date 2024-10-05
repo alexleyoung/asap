@@ -23,25 +23,26 @@ export default function Dashboard() {
     setItems((prevItems) => [...prevItems, newItem]);
   };
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const data = await getProtectedData("token");
-        if (data) {
-          setLoading(false);
-        } else {
-          router.push("/signin");
-        }
-      } catch (error) {
-        router.push("/signin");
-      }
-    };
-    checkAuth();
-  }, [router]);
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     try {
+  //       const data = await getProtectedData("token");
+  //       if (data) {
+  //         setLoading(false);
+  //       } else {
+  //         //SIGN IN IS NOT A LINK LOL
+  //         router.push("/signin");
+  //       }
+  //     } catch (error) {
+  //       router.push("/signin");
+  //     }
+  //   };
+  //   checkAuth();
+  // }, [router]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <>
