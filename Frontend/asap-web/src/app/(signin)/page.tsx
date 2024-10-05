@@ -2,44 +2,61 @@
 import SignInForm from "@/components/signin/SignInForm";
 import SignUpForm from "@/components/signup/SignUpForm";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Home() {
   const [isSignIn, setIsSignIn] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    }
+  }, [router]);
+
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
   };
 
+  const handleSignIn = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/dashboard");
+    }
+  };
+
   return (
-    <main className='w-full lg:grid lg:grid-cols-2 h-screen'>
+    <main className="w-full lg:grid lg:grid-cols-2 h-screen">
       {isSignIn ? (
-        <div className='h-full'>
+        <div className="h-full">
           <SignInForm />
-          <div className='-mt-24 text-center text-sm'>
+          <div className="-mt-24 text-center text-sm">
             Don&apos;t have an account?{" "}
-            <Link href='#' className='underline' onClick={toggleForm}>
+            <Link href="/dashboard" className="underline" onClick={toggleForm}>
               Sign Up
             </Link>
           </div>{" "}
         </div>
       ) : (
-        <div className='h-full'>
+        <div className="h-full">
           <SignUpForm />
-          <div className='-mt-24 text-center text-sm'>
+          <div className="-mt-24 text-center text-sm">
             Already have an account?{" "}
-            <Link href='#' className='underline' onClick={toggleForm}>
+            <Link href="#" className="underline" onClick={toggleForm}>
               Sign In
             </Link>
           </div>
         </div>
       )}
       <Image
-        src='/images/signin.svg'
-        alt='image here'
+        src="/images/signin.svg"
+        alt="image here"
         width={500}
         height={500}
-        className='hidden lg:block'
+        className="hidden lg:block"
       />
     </main>
   );
