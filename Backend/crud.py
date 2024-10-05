@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 import bcrypt
-from Backend import models, schemas
+from Backend import models, schemas, auth
 
 
 ##### USER CRUDS #####
 
 #create user
 def create_user(db: Session, user: schemas.UserCreate):
-    hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
+    hashed_password = auth.get_password_hash(user.password)
     db_user = models.User(firstName=user.firstName, 
                           lastName=user.lastName, 
                           email=user.email, 

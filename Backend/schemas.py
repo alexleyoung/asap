@@ -6,11 +6,23 @@ from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from typing import Optional
 
+# For JWT token response
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: str | None = None
+
+
 #create User schemas
 class UserBase(BaseModel):
     firstName: str
     lastName: str
     email: str
+
+class UserInDB(UserBase):
+    hashed_password: str
 
 #for creating a user
 class UserCreate(UserBase):
