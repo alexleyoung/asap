@@ -1,4 +1,5 @@
 import { Tabs } from 'expo-router';
+
 import { TabBarIcon } from '../../components/TabBarIcon';
 
 export default function TabLayout() {
@@ -16,7 +17,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="Tasks"
+        name="tasks"
         options={{
           title: 'Tasks',
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
