@@ -31,21 +31,3 @@ export const signIn = async (email: string, password: string) => {
   }
   return data;
 };
-
-const getProtectedData = async (endpoint: string) => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    throw new Error("Unauthorized");
-  }
-  const response = await fetch(`http://localhost:8000/${endpoint}`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${endpoint}`,
-      "Content-Type": "application/json",
-    },
-  });
-  if (!response.ok) {
-    throw new Error("Something went wrong");
-  }
-  return response.json();
-};
