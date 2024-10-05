@@ -3,7 +3,7 @@
 import Schedule from "@/components/dashboard/schedule";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { getProtectedData } from "../../lib/auth";
 
 export default function Dashboard() {
