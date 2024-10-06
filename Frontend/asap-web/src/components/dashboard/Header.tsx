@@ -1,7 +1,7 @@
 "use client";
 
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
-import { addDays, addMonths, format } from "date-fns";
+import { addDays, addMonths, format, set } from "date-fns";
 import { useHotkeys } from "react-hotkeys-hook";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,11 +34,36 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useEffect, useState } from "react";
+import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 
 export default function Header() {
   const { view, setView } = useView();
   const { currentDate, setCurrentDate } = useCurrentDate();
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState({
+    name: "Alex Young",
+    email: "alexy@iastate.edu",
+    avatar: null,
+  });
+
+  // useEffect(() => {
+  //   // Fetch user data (replace with your API endpoint)
+  //   const fetchUserData = async () => {
+  //     try {
+  //       const response = await fetch("/api/user"); // Replace with your user API endpoint
+  //       if (!response.ok) throw new Error("Failed to fetch user data");
+  //       const data = await response.json();
+  //       setUser(data);
+  //     } catch (error) {
+  //       console.error(error);
+  //       // Handle error (e.g., redirect to sign-in if not authenticated)
+  //     }
+  //   };
+
+  //   fetchUserData();
+  // }, []);
 
   const handleViewChange = (newView: ViewType) => {
     setView(newView);
@@ -63,10 +88,6 @@ export default function Header() {
   useHotkeys("d", () => setView("day"), []);
   useHotkeys("w", () => setView("week"), []);
   useHotkeys("m", () => setView("month"), []);
-
-  const handleEditProfile = () => {
-    console.log("Edit profile");
-  };
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -132,9 +153,9 @@ export default function Header() {
             <Button
               variant="ghost"
               className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-              onClick={handleEditProfile}
+              onClick={() => setIsOpen(true)}
             >
-              Edit Profile
+              View Profile
             </Button>
 
             <AlertDialog>
@@ -164,6 +185,11 @@ export default function Header() {
             <ThemeSelector />
           </PopoverContent>
         </Popover>
+
+        {/* Render the Profile View Dialog if open */}
+        {isOpen && (
+          <ViewProfileDialog user={user} onClose={() => setIsOpen(false)} />
+        )}
       </div>
     </header>
   );
