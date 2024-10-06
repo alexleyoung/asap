@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -10,6 +9,7 @@ import {
 } from "@/components/ui/form"; // Adjust the import path as necessary
 import { Input } from "@/components/ui/input"; // Adjust the import path for Shadcn UI Input
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form"; // Import useForm from React Hook Form
 
 interface EditProfileFormProps {
   user: {
@@ -20,67 +20,56 @@ interface EditProfileFormProps {
 }
 
 const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
-  const [formData, setFormData] = useState({
-    name: user.name,
-    email: user.email,
-  });
+  const { register, handleSubmit, reset } = useForm();
 
   useEffect(() => {
-    setFormData({ name: user.name, email: user.email });
-  }, [user]);
+    // Reset form values when user prop changes
+    reset({ name: user.name, email: user.email });
+  }, [user, reset]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
+  const onSubmit = (data: { name: string; email: string }) => {
+    onSave(data); // Call onSave with form data
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit}>
-      <FormField
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Name</FormLabel>
-            <FormControl>
-              <Input
-                {...field}
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, name: e.target.value }))
-                }
-                placeholder="Enter your name"
-                required
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+    <Form>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <FormField
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input
+                  {...register("name")} // Register the input with react-hook-form
+                  placeholder="Enter your name"
+                  required
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <FormField
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input
-                {...field}
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, email: e.target.value }))
-                }
-                placeholder="Enter your email"
-                required
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  {...register("email")} // Register the input with react-hook-form
+                  placeholder="Enter your email"
+                  required
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-    </form>
-  </Form>on type="submit">Save</Button>
+        <Button type="submit">Save</Button>
+      </form>
     </Form>
   );
 };

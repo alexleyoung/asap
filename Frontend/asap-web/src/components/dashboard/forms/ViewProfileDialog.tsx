@@ -21,6 +21,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import EditProfileForm from "./EditProfileForm";
+import { useState } from "react";
 
 interface ProfileViewProps {
   user: {
@@ -29,12 +31,19 @@ interface ProfileViewProps {
     // Add other profile fields as needed
   };
   onClose: () => void; // Function to close or hide the profile view
+  onUpdate: (updatedUser: { name: string; email: string }) => void; // Function to update user
+  onDelete: () => void; // Function to delete user
 }
 
-export const ViewProfileDialog = ({ user, onClose, onUpdate, onDelete }) => {
+export const ViewProfileDialog = ({
+  user,
+  onClose,
+  onUpdate,
+  onDelete,
+}: ProfileViewProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleSave = (updatedUser) => {
+  const handleSave = (updatedUser: { name: string; email: string }) => {
     onUpdate(updatedUser); // Call the function passed in props to update the user
     setIsEditing(false);
   };
@@ -62,10 +71,9 @@ export const ViewProfileDialog = ({ user, onClose, onUpdate, onDelete }) => {
             )}
           </DialogDescription>
           <DialogFooter>
-           
             <AlertDialog>
               <AlertDialogTrigger>
-                <Button variant="danger">Delete Profile</Button>
+                <Button variant="destructive">Delete Profile</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -75,10 +83,13 @@ export const ViewProfileDialog = ({ user, onClose, onUpdate, onDelete }) => {
                   Are you sure you want to delete your profile?
                 </AlertDialogDescription>
                 <AlertDialogFooter>
-                  <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+                  <AlertDialogAction onClick={onDelete}>
+                    Delete
+                  </AlertDialogAction>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                 </AlertDialogFooter>
               </AlertDialogContent>
+            </AlertDialog>
           </DialogFooter>
         </DialogContent>
       </DialogPortal>
