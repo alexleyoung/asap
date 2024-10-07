@@ -13,9 +13,9 @@ export const signUp = async (
       body: JSON.stringify({ firstname, lastname, email, password }),
     });
 
-    if (!response.ok) {
-      throw new Error("Error during sign-up");
-    }
+    // if (!response.ok) {
+    //   throw new Error("Error during sign-up");
+    // }
 
     const data = await response.json();
 
