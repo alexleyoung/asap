@@ -1,11 +1,16 @@
-export const signUp = async (name: string, email: string, password: string) => {
+export const signUp = async (
+  firstname: string,
+  lastname: string,
+  email: string,
+  password: string
+) => {
   try {
     const response = await fetch("http://localhost:8000/users/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ firstname, lastname, email, password }),
     });
 
     const data = await response.json();
