@@ -19,9 +19,9 @@ export const signUp = async (
 
     const data = await response.json();
 
-    const { token, user } = data;
+    const { user } = data;
 
-    localStorage.setItem("token", token);
+    // localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(user));
 
     return user;
