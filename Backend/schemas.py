@@ -5,6 +5,7 @@ from Backend import models
 from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from typing import Optional
+from sqlalchemy import DateTime
 
 # For JWT token response
 class Token(BaseModel):
@@ -67,15 +68,29 @@ class Calendar(BaseModel):
 #ScheduleItem
 class ScheduleItemBase(BaseModel):
     title: str
-    start: int
-    end: int
-    description: str
-    category: str
-    frequency: str
+    start: DateTime
+    end: DateTime
+    description: Optional[str] = None  # Optional
+    category: Optional[str] = None  # Optional
+    frequency: Optional[str] = None  # Optional
 
 #to create
 class ScheduleItemCreate(ScheduleItemBase):
     pass
+
+#to update
+class ScheduleItemUpdate(BaseModel):
+    title: Optional[str] = None
+    start: Optional[DateTime] = None
+    end: Optional[DateTime] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    frequency: Optional[str] = None
+    userID: Optional[int] = None
+    calendarID: Optional[int] = None
+
+    class Config:
+        orm_mode = True
 
 #main class
 class ScheduleItem(ScheduleItemBase):

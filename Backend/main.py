@@ -104,3 +104,14 @@ def update_user_endpoint(user_id: int, user_update: schemas.UserUpdate, db: Sess
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+##### EVENT ENDPOINTS #####
+
+#to create an event
+@app.post("/events/", response_model=schemas.Event)
+def create_event_endpoint(event: schemas.EventCreate, db: Session = Depends(get_db)):
+    db_event = crud.create_event(db=db, event=event)
+    if not db_event:
+        raise HTTPException(status_code=400, detail="Event creation failed")
+    return db_event
