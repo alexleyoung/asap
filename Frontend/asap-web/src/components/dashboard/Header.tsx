@@ -1,3 +1,4 @@
+"use client";
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
 import { addDays, addMonths, format } from "date-fns";
 import { useHotkeys } from "react-hotkeys-hook";
