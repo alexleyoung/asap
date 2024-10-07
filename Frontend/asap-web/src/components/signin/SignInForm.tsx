@@ -42,8 +42,8 @@ export default function SignInForm() {
     try {
       const response = await signIn(data.email);
       if (response.ok) {
-        const { token } = await response.json();
-        localStorage.setItem("token", token);
+        // const { token } = await response.json();
+        // localStorage.setItem("token", token);
         setSuccess("Signed in successfully");
         setError("");
         router.push("/dashboard");
