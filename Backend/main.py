@@ -81,6 +81,14 @@ def read_user(userID: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+#to get user by email
+@app.get("/users/email/{email}", response_model=schemas.User)
+def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
+    user = crud.get_user_by_email(db, email=email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
 #change password
 @app.put("/users/{userID}/password", response_model=schemas.User)
 def change_user_password_endpoint(user_id: int, new_password: str, db: Session = Depends(get_db)):
