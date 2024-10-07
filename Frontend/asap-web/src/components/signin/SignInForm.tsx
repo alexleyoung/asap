@@ -38,9 +38,9 @@ export default function SignInForm() {
     },
   });
 
-  const handleSignIn = async (data: { email: string; password: string }) => {
+  const handleSignIn = async (data: { email: string }) => {
     try {
-      const response = await signIn(data.email, data.password);
+      const response = await signIn(data.email);
       if (response.ok) {
         const { token } = await response.json();
         localStorage.setItem("token", token);
