@@ -74,7 +74,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 #to get user by user id
-@app.get("/user/{userID}", response_model=schemas.User)
+@app.get("/users/{userID}", response_model=schemas.User)
 def read_user(userID: int, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, userID=userID)
     if db_user is None:
