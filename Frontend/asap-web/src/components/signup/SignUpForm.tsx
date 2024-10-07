@@ -76,7 +76,7 @@ export default function SignUpForm() {
         setError("Invalid email or password. Please try again.");
       }
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      setError("HI CAITI");
       setSuccess("");
     }
   };

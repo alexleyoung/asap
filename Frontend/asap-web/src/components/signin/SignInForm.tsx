@@ -51,7 +51,7 @@ export default function SignInForm() {
         setError("Invalid email or password. Please try again.");
       }
     } catch (error) {
-      setError("HI Caiti");
+      setError("An error occurred. Please try again.");
       setSuccess("");
     }
   };
