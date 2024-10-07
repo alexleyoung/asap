@@ -22,7 +22,7 @@ export const signUp = async (name: string, email: string, password: string) => {
   }
 };
 
-export const signIn = async (email: string) => {
+export const signIn = async (email: string, password: string) => {
   try {
     const response = await fetch(`http://localhost:8000/users/email/${email}`, {
       method: "GET",
