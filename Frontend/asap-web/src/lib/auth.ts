@@ -21,9 +21,9 @@ export const signUp = async (
     }
 
     // localStorage.setItem("token", data.token);
-    console.log("User data before storing in localStorage:", data.user);
-    localStorage.setItem("User", JSON.stringify(data.user));
-    console.log("User data after storing in localStorage:", data.user);
+    console.log("User data before storing in localStorage:", data);
+    localStorage.setItem("User", JSON.stringify(data));
+    console.log("User data after storing in localStorage:", data);
 
     return response; // Return the raw response
   } catch (error) {

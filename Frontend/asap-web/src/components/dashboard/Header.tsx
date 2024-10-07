@@ -42,7 +42,7 @@ export default function Header() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem("data");
     console.log("Stored User: " + storedUser);
     if (storedUser) {
       try {
@@ -50,7 +50,7 @@ export default function Header() {
       } catch (error) {
         console.error("Error parsing user data from localStorage:", error);
 
-        localStorage.removeItem("user");
+        localStorage.removeItem("data");
         router.push("/");
       }
     } else {
