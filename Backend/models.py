@@ -2,6 +2,7 @@ from sqlalchemy import Boolean, Column, Integer, String, ForeignKey, Table, Date
 from sqlalchemy.orm import relationship
 from .database import Base
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 
 #users table
@@ -38,8 +39,8 @@ class scheduleItem(Base):
 
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
     title = Column("title", String)
-    Start = Column(DateTime) #???? DATE OBJECT
-    end = Column(DateTime)
+    Start = Column("start", Integer) #???? DATE OBJECT
+    end = Column("end", Integer)
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String) #?????
