@@ -44,7 +44,14 @@ export default function Header() {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Error parsing user data from localStorage:", error);
+
+        localStorage.removeItem("user");
+        router.push("/");
+      }
     } else {
       router.push("/");
     }
