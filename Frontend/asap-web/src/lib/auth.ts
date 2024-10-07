@@ -22,21 +22,22 @@ export const signUp = async (name: string, email: string, password: string) => {
   }
 };
 
-export const signIn = async (email: string, password: string) => {
+export const signIn = async (email: string) => {
   try {
-    const response = await fetch("http://localhost:8000/users/", {
-      method: "POST",
+    const response = await fetch(`http://localhost:8000/users/email/${email}`, {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
     });
 
-    const data = await response.json();
+    if (!response.ok) {
+      throw new Error("User not found or error during sign-in");
+    }
 
-    const { token, user } = data;
+    const user = await response.json();
 
-    localStorage.setItem("token", token);
+    // Store user details in localStorage
     localStorage.setItem("user", JSON.stringify(user));
 
     return user;
