@@ -13,18 +13,17 @@ export const signUp = async (
       body: JSON.stringify({ firstname, lastname, email, password }),
     });
 
-    // if (!response.ok) {
-    //   throw new Error("Error during sign-up");
-    // }
-
     const data = await response.json();
+    console.log("Data:", data);
 
-    const { user } = data;
+    if (!response.ok) {
+      throw new Error("Error during sign-up");
+    }
 
-    // localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    // localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
 
-    return user;
+    return response; // Return the raw response
   } catch (error) {
     console.error("Error during sign-up:", error);
     throw error;

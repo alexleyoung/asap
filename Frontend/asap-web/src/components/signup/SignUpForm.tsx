@@ -68,7 +68,9 @@ export default function SignUpForm() {
         data.email,
         data.password
       );
-      if (response.ok) {
+
+      if (response) {
+        // Check if the response is valid, change the condition
         setError("");
         setSuccess("Account created successfully");
         router.push("/dashboard");
@@ -78,6 +80,7 @@ export default function SignUpForm() {
     } catch (error) {
       setError("HI CAITI");
       setSuccess("");
+      console.error(error); // Log the actual error
     }
   };
 
