@@ -43,6 +43,7 @@ export default function Header() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    console.log("Stored User: " + storedUser);
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
