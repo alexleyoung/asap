@@ -60,7 +60,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
 #to delete user
-@app.delete("/users/{userID}", response_model=schemas.User)
+@app.delete("/users/{userID}/delete", response_model=schemas.User)
 def delete_user_endpoint(user_id: int, db: Session = Depends(get_db)):
     user = crud.delete_user(db, user_id)
     if not user:
