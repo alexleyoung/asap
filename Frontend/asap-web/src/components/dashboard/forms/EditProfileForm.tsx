@@ -1,4 +1,11 @@
-import { useEffect } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -6,10 +13,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"; // Adjust the import path as necessary
-import { Input } from "@/components/ui/input"; // Adjust the import path for Shadcn UI Input
-import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form"; // Import useForm from React Hook Form
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+// Define the validation schema with zod
+const profileSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email format").min(1, "Email is required"),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
 
 interface EditProfileFormProps {
   user: {
@@ -20,31 +33,34 @@ interface EditProfileFormProps {
 }
 
 const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
-  const { register, handleSubmit, reset } = useForm();
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+    },
+  });
 
+  // Update form when user prop changes
   useEffect(() => {
-    // Reset form values when user prop changes
-    reset({ name: user.name, email: user.email });
-  }, [user, reset]);
+    form.reset(user);
+  }, [user]);
 
-  const onSubmit = (data: { name: string; email: string }) => {
-    onSave(data); // Call onSave with form data
+  const handleSubmit = (data: ProfileFormValues) => {
+    onSave(data); // Call the function passed in props to update the user
   };
 
   return (
-    <Form>
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <FormField
+          control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input
-                  {...register("name")} // Register the input with react-hook-form
-                  placeholder="Enter your name"
-                  required
-                />
+                <Input placeholder="Enter your name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -52,23 +68,24 @@ const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
         />
 
         <FormField
+          control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input
-                  {...register("email")} // Register the input with react-hook-form
-                  placeholder="Enter your email"
-                  required
-                />
+                <Input type="email" placeholder="Enter your email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit">Save</Button>
+        <div className="flex justify-end">
+          <Button type="submit" variant="secondary">
+            Save
+          </Button>
+        </div>
       </form>
     </Form>
   );
