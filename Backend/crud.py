@@ -67,7 +67,7 @@ def create_schedule_item(db: Session, scheduleItem: schemas.ScheduleItemCreate):
     db_schedule_item = models.scheduleItem(title = scheduleItem.title, start = scheduleItem.start,
                                            end = scheduleItem.end, description = scheduleItem.description,
                                            category = scheduleItem.category, frequency = scheduleItem.frequency,
-                                           userID = scheduleItem.userID, calendarID = scheduleItem.calendarID)
+                                            userID = scheduleItem.userID, calendarID = scheduleItem.calendarID)
     db.add(db_schedule_item)
     db.commit()
     db.refresh(db_schedule_item)

@@ -1,11 +1,12 @@
 from fastapi import FastAPI, HTTPException, Depends, status
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Annotated
 from Backend import models
 from .database import engine, SessionLocal
 from sqlalchemy.orm import Session
 from typing import Optional
 from sqlalchemy import DateTime
+from datetime import datetime
 
 # For JWT token response
 class Token(BaseModel):
@@ -68,11 +69,13 @@ class Calendar(BaseModel):
 #ScheduleItem
 class ScheduleItemBase(BaseModel):
     title: str
-    start: DateTime
-    end: DateTime
+    start: int
+    end: int
     description: Optional[str] = None  # Optional
     category: Optional[str] = None  # Optional
     frequency: Optional[str] = None  # Optional
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 #to create
 class ScheduleItemCreate(ScheduleItemBase):
@@ -81,8 +84,8 @@ class ScheduleItemCreate(ScheduleItemBase):
 #to update
 class ScheduleItemUpdate(BaseModel):
     title: Optional[str] = None
-    start: Optional[DateTime] = None
-    end: Optional[DateTime] = None
+    start: Optional[int] = None
+    end: Optional[int] = None
     description: Optional[str] = None
     category: Optional[str] = None
     frequency: Optional[str] = None
