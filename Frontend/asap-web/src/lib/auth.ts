@@ -1,30 +1,51 @@
-export const signUp = async (
-  firstName: string,
-  lastName: string,
-  email: string,
-  password: string
-) => {
-  const response = await fetch("http://localhost:8000/users/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ firstName, lastName, email, password }),
-  });
+export const signUp = async (name: string, email: string, password: string) => {
+  try {
+    const response = await fetch("http://localhost:8000/users/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email, password }),
+    });
 
-  return response;
+    const data = await response.json();
+
+    const { token, user } = data;
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    return user;
+  } catch (error) {
+    console.error("Error during sign-up:", error);
+    throw error;
+  }
 };
+
 export const signIn = async (email: string, password: string) => {
-  const response = await fetch("http://localhost:8000/users/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  try {
+    const response = await fetch("http://localhost:8000/users/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  return response;
+    const data = await response.json();
+
+    const { token, user } = data;
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+
+    return user;
+  } catch (error) {
+    console.error("Error during sign-in:", error);
+    throw error;
+  }
 };
+
 const getProtectedData = async (endpoint: string) => {
   const token = localStorage.getItem("token");
   if (!token) {

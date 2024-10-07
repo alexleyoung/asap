@@ -29,11 +29,17 @@ interface ProfileViewProps {
     id: string;
     name: string;
     email: string;
+    avatar: string;
 
     // Add other profile fields as needed
   };
   onClose: () => void; // Function to close or hide the profile view
-  onUpdate: (updatedUser: { id: string; name: string; email: string }) => void; // Function to update user
+  onUpdate: (updatedUser: {
+    id: string;
+    name: string;
+    email: string;
+    avatar: string;
+  }) => void; // Function to update user
   onDelete: () => void; // Function to delete user
 }
 
@@ -49,6 +55,7 @@ export const ViewProfileDialog = ({
     id: string;
     name: string;
     email: string;
+    avatar: string;
   }) => {
     onUpdate(updatedUser); // Call the function passed in props to update the user
     setIsEditing(false);

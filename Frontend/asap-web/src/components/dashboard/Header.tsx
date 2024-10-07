@@ -1,9 +1,6 @@
-"use client";
-
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
-import { addDays, addMonths, format, set } from "date-fns";
+import { addDays, addMonths, format } from "date-fns";
 import { useHotkeys } from "react-hotkeys-hook";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Popover,
@@ -21,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { Separator } from "@/components/ui/separator";
-import local from "next/font/local";
 import { useRouter } from "next/navigation";
 import {
   AlertDialog,
@@ -42,30 +38,18 @@ export default function Header() {
   const { currentDate, setCurrentDate } = useCurrentDate();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState({
-    id: "1",
-    name: "Alex Young",
-    email: "alexy@iastate.edu",
-  });
+  const [user, setUser] = useState<any>(null);
 
-  // useEffect(() => {
-  //   // Fetch user data (replace with your API endpoint)
-  //   const fetchUserData = async () => {
-  //     try {
-  //       const response = await fetch("/api/user"); // Replace with your user API endpoint
-  //       if (!response.ok) throw new Error("Failed to fetch user data");
-  //       const data = await response.json();
-  //       setUser(data);
-  //     } catch (error) {
-  //       console.error(error);
-  //       // Handle error (e.g., redirect to sign-in if not authenticated)
-  //     }
-  //   };
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      router.push("/signin");
+    }
+  }, []);
 
-  //   fetchUserData();
-  // }, []);
-
-  const handleViewChange = (newView: ViewType) => {
+  const handleViewChange = (newView: string) => {
     setView(newView);
   };
 
@@ -85,32 +69,27 @@ export default function Header() {
     }
   };
 
-  useHotkeys("d", () => setView("day"), []);
-  useHotkeys("w", () => setView("week"), []);
-  useHotkeys("m", () => setView("month"), []);
-
   const handleSignOut = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     router.push("/");
-    console.log("Signing out");
   };
 
   const handleDelete = async () => {
+    if (!user) return;
+
     try {
-      // Replace with your API endpoint
-      const response = await fetch("/api/users/delete", {
+      const response = await fetch(`/users/${user.id}/delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: user.email }), // Pass the current user's email as ID
+        body: JSON.stringify({ userId: user.id }), // Pass the current user's ID
       });
 
       if (!response.ok) {
         throw new Error("Failed to delete the profile");
       }
-
-      // Optionally handle UI state, such as redirecting or showing a success message
     } catch (error) {
       console.error("Error deleting profile:", error);
     }
@@ -154,60 +133,58 @@ export default function Header() {
         </div>
       </div>
       <div className="flex gap-4 items-center">
-        <Popover>
-          <PopoverTrigger>
-            <Avatar className="hover:cursor-pointer relative group">
-              <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
-              <AvatarImage
-                src="https://github.com/alexleyoung.png"
-                alt="@alexleyoung"
-              />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          </PopoverTrigger>
-          <PopoverContent
-            sideOffset={5}
-            className="mr-4 p-2 flex flex-col gap-4 text-sm"
-          >
-            <h1 className="px-2 pt-1 font-medium">Hi Alex!</h1>
-            <Separator />
-            <Button
-              variant="ghost"
-              className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-              onClick={() => setIsOpen(true)}
+        {user && (
+          <Popover>
+            <PopoverTrigger>
+              <Avatar className="hover:cursor-pointer relative group">
+                <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback>{user.name[0]}</AvatarFallback>
+              </Avatar>
+            </PopoverTrigger>
+            <PopoverContent
+              sideOffset={5}
+              className="mr-4 p-2 flex flex-col gap-4 text-sm"
             >
-              View Profile
-            </Button>
+              <h1 className="px-2 pt-1 font-medium">Hi {user.name}!</h1>
+              <Separator />
+              <Button
+                variant="ghost"
+                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                onClick={() => setIsOpen(true)}
+              >
+                View Profile
+              </Button>
 
-            <AlertDialog>
-              <AlertDialogTrigger>
-                <Button
-                  variant="ghost"
-                  className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                >
-                  Sign Out
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Click continue to sign out of your account
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleSignOut}>
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <ThemeSelector />
-          </PopoverContent>
-        </Popover>
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                  >
+                    Sign Out
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Click continue to sign out of your account.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleSignOut}>
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <ThemeSelector />
+            </PopoverContent>
+          </Popover>
+        )}
 
-        {/* Render the Profile View Dialog if open */}
         {isOpen && (
           <ViewProfileDialog
             user={user}
