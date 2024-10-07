@@ -43,9 +43,9 @@ export default function Header() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState({
+    id: "1",
     name: "Alex Young",
     email: "alexy@iastate.edu",
-    avatar: null,
   });
 
   // useEffect(() => {
@@ -93,6 +93,27 @@ export default function Header() {
     localStorage.removeItem("token");
     router.push("/");
     console.log("Signing out");
+  };
+
+  const handleDelete = async () => {
+    try {
+      // Replace with your API endpoint
+      const response = await fetch("/api/users/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: user.email }), // Pass the current user's email as ID
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete the profile");
+      }
+
+      // Optionally handle UI state, such as redirecting or showing a success message
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+    }
   };
 
   return (
@@ -188,7 +209,12 @@ export default function Header() {
 
         {/* Render the Profile View Dialog if open */}
         {isOpen && (
-          <ViewProfileDialog user={user} onClose={() => setIsOpen(false)} />
+          <ViewProfileDialog
+            user={user}
+            onClose={() => setIsOpen(false)}
+            onUpdate={(updatedUser) => setUser(updatedUser)}
+            onDelete={handleDelete}
+          />
         )}
       </div>
     </header>

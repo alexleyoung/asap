@@ -26,7 +26,7 @@ interface EditProfileFormProps {
     name: string;
     email: string;
   };
-  onSave: (updatedUser: { name: string; email: string }) => void;
+  onSave: (updatedUser: { id: string; name: string; email: string }) => void;
 }
 
 const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {

@@ -26,12 +26,14 @@ import { useState } from "react";
 
 interface ProfileViewProps {
   user: {
+    id: string;
     name: string;
     email: string;
+
     // Add other profile fields as needed
   };
   onClose: () => void; // Function to close or hide the profile view
-  onUpdate: (updatedUser: { name: string; email: string }) => void; // Function to update user
+  onUpdate: (updatedUser: { id: string; name: string; email: string }) => void; // Function to update user
   onDelete: () => void; // Function to delete user
 }
 
@@ -43,7 +45,11 @@ export const ViewProfileDialog = ({
 }: ProfileViewProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleSave = (updatedUser: { name: string; email: string }) => {
+  const handleSave = (updatedUser: {
+    id: string;
+    name: string;
+    email: string;
+  }) => {
     onUpdate(updatedUser); // Call the function passed in props to update the user
     setIsEditing(false);
   };
