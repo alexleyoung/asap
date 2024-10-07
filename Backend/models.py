@@ -11,8 +11,8 @@ class User(Base):
 
     id = Column("id", Integer, primary_key = True, index = True)
     hashed_password = Column("hashedPassword", String, nullable=False)
-    firstName = Column("firstName", String(20), nullable=False) 
-    lastName = Column("lastName", String(20), nullable=False)
+    firstname = Column("firstName", String(20), nullable=False) 
+    lastname = Column("lastName", String(20), nullable=False)
     email = Column("email", String(50), unique = True, nullable=False)
 
    

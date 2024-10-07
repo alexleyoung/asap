@@ -8,8 +8,8 @@ from Backend import models, schemas, auth
 #create user
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = auth.get_password_hash(user.password)
-    db_user = models.User(firstName=user.firstName, 
-                          lastName=user.lastName, 
+    db_user = models.User(firstname=user.firstname, 
+                          lastname=user.lastname, 
                           email=user.email, 
                           hashed_password=hashed_password.decode('utf-8'))
     db.add(db_user)
