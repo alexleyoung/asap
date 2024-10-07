@@ -46,7 +46,7 @@ export default function Header() {
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     } else {
-      router.push("/signin");
+      router.push("/");
     }
   }, []);
 
