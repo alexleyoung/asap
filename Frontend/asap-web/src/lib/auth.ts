@@ -41,9 +41,9 @@ export const signIn = async (email: string) => {
       },
     });
 
-    // if (!response.ok) {
-    //   throw new Error("User not found or error during sign-in");
-    // }
+    if (!response.ok) {
+      throw new Error("User not found or error during sign-in");
+    }
 
     const user = await response.json();
 

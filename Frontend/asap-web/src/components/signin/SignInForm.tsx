@@ -41,7 +41,7 @@ export default function SignInForm() {
   const handleSignIn = async (data: { email: string }) => {
     try {
       const response = await signIn(data.email);
-      if (response.ok) {
+      if (response) {
         // const { token } = await response.json();
         // localStorage.setItem("token", token);
         setSuccess("Signed in successfully");
