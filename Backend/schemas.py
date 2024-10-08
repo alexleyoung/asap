@@ -102,7 +102,14 @@ class TaskBase(BaseModel):
 
 #to create
 class TaskCreate(TaskBase):
-    pass
+    title: str
+    description: str
+    category: str
+    dueDate: datetime
+    priority: str
+    difficulty: str
+    duration: int
+    flexibility: bool
 
 #main class
 class Task(TaskBase):
