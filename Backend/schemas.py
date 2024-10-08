@@ -1,21 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, status
-from pydantic import BaseModel, ConfigDict
-from typing import Annotated
-from Backend import models
-from .database import engine, SessionLocal
-from sqlalchemy.orm import Session
+from pydantic import BaseModel
 from typing import Optional
-from sqlalchemy import DateTime
 from datetime import datetime
-
-# For JWT token response
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-class TokenData(BaseModel):
-    email: str | None = None
-
 
 #create User schemas
 class UserBase(BaseModel):
@@ -66,47 +51,14 @@ class Calendar(BaseModel):
         from_attributes = True
 
 ###
-#ScheduleItem
-class ScheduleItemBase(BaseModel):
-    title: str
-    start: int
-    end: int
-    description: Optional[str] = None  # Optional
-    category: Optional[str] = None  # Optional
-    frequency: Optional[str] = None  # Optional
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
-#to create
-class ScheduleItemCreate(ScheduleItemBase):
-    pass
-
-#to update
-class ScheduleItemUpdate(BaseModel):
-    title: Optional[str] = None
-    start: Optional[int] = None
-    end: Optional[int] = None
-    description: Optional[str] = None
-    category: Optional[str] = None
-    frequency: Optional[str] = None
-    userID: Optional[int] = None
-    calendarID: Optional[int] = None
-
-    class Config:
-        orm_mode = True
-
-#main class
-class ScheduleItem(ScheduleItemBase):
-    id: int
-    userID: int
-    calendarID: int
-
-    class Config:
-        from_attributes = True
-
-###
 #Event
 class EventBase(BaseModel):
+    title: str
+    start: datetime
+    end: datetime
+    description: str
+    category: str
+    frequency: str
     location: str
 
 #to create
@@ -123,11 +75,17 @@ class Event(EventBase):
 ###
 #Task
 class TaskBase(BaseModel):
-    dueDate: int
-    priority: int
-    difficulty: int
-    duration: int 
-    flexibility: int
+    title: str
+    start: datetime
+    end: datetime
+    description: str
+    category: str
+    frequency: str
+    dueDate: datetime
+    priority: str
+    difficulty: str
+    duration: int
+    flexibility: bool
 
 #to create
 class TaskCreate(TaskBase):
