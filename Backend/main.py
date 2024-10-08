@@ -61,8 +61,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 #to delete user
 @app.delete("/users/{userID}/delete", response_model=schemas.User)
-def delete_user_endpoint(user_id: int, db: Session = Depends(get_db)):
-    user = crud.delete_user(db, user_id)
+def delete_user_endpoint(userID: int, db: Session = Depends(get_db)):
+    user = crud.delete_user(db, userID)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
