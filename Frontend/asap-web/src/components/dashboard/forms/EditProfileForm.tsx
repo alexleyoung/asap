@@ -14,7 +14,8 @@ import {
 import { Input } from "@/components/ui/input";
 
 const profileSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  firstname: z.string().min(1, "Firstname is required"),
+  lastname: z.string().min(1, "Lastname is required"),
   email: z.string().email("Invalid email format").min(1, "Email is required"),
 });
 
@@ -23,13 +24,15 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 interface EditProfileFormProps {
   user: {
     id: string;
-    name: string;
+    firstname: string;
+    lastname: string;
     email: string;
     avatar: string;
   };
   onSave: (updatedUser: {
     id: string;
-    name: string;
+    firstname: string;
+    lastname: string;
     email: string;
     avatar: string;
   }) => void;
@@ -39,7 +42,8 @@ const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: user.name,
+      firstname: user.firstname,
+      lastname: user.lastname,
       email: user.email,
     },
   });
@@ -74,12 +78,25 @@ const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="name"
+          name="firstname"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>First Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter your name" {...field} />
+                <Input placeholder="Enter your first name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="lastname"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter your last name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

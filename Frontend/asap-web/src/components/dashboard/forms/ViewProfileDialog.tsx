@@ -27,7 +27,8 @@ import { useState } from "react";
 interface ProfileViewProps {
   user: {
     id: string;
-    name: string;
+    firstname: string;
+    lastname: string;
     email: string;
     avatar: string;
 
@@ -36,7 +37,8 @@ interface ProfileViewProps {
   onClose: () => void; // Function to close or hide the profile view
   onUpdate: (updatedUser: {
     id: string;
-    name: string;
+    firstname: string;
+    lastname: string;
     email: string;
     avatar: string;
   }) => void; // Function to update user
@@ -53,7 +55,8 @@ export const ViewProfileDialog = ({
 
   const handleSave = (updatedUser: {
     id: string;
-    name: string;
+    firstname: string;
+    lastname: string;
     email: string;
     avatar: string;
   }) => {
@@ -75,7 +78,9 @@ export const ViewProfileDialog = ({
               <EditProfileForm user={user} onSave={handleSave} />
             ) : (
               <div>
-                <p>Name: {user.name}</p>
+                <p>
+                  Name: {user.firstname} {user.lastname}
+                </p>
                 <p>Email: {user.email}</p>
                 <Button variant="outline" onClick={() => setIsEditing(true)}>
                   Edit Profile

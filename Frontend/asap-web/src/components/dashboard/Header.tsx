@@ -34,25 +34,38 @@ import {
 import { useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 
+interface User {
+  id: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  avatar: string;
+}
+
 export default function Header() {
   const { view, setView } = useView();
   const { currentDate, setCurrentDate } = useCurrentDate();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("data");
+    const storedUser = localStorage.getItem("User");
     console.log("Stored User: " + storedUser);
+
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        console.log("User data after parsing:", parsedUser);
+        setUser(parsedUser);
+        console.log("User data after parsing:", user);
       } catch (error) {
         console.error("Error parsing user data from localStorage:", error);
 
         localStorage.removeItem("data");
         router.push("/");
       }
+      router.push("/dashboard");
     } else {
       router.push("/");
     }
@@ -147,15 +160,15 @@ export default function Header() {
             <PopoverTrigger>
               <Avatar className="hover:cursor-pointer relative group">
                 <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback>{user.name[0]}</AvatarFallback>
+                <AvatarImage src={user.avatar} alt={user.firstname} />
+                <AvatarFallback>{user.firstname[0]}</AvatarFallback>
               </Avatar>
             </PopoverTrigger>
             <PopoverContent
               sideOffset={5}
               className="mr-4 p-2 flex flex-col gap-4 text-sm"
             >
-              <h1 className="px-2 pt-1 font-medium">Hi {user.name}!</h1>
+              <h1 className="px-2 pt-1 font-medium">Hi {user.firstname}!</h1>
               <Separator />
               <Button
                 variant="ghost"
@@ -194,7 +207,7 @@ export default function Header() {
           </Popover>
         )}
 
-        {isOpen && (
+        {isOpen && user && (
           <ViewProfileDialog
             user={user}
             onClose={() => setIsOpen(false)}

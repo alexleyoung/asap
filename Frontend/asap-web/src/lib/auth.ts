@@ -48,7 +48,7 @@ export const signIn = async (email: string) => {
     const user = await response.json();
 
     // Store user details in localStorage
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("User", JSON.stringify(user));
 
     return user;
   } catch (error) {
