@@ -16,8 +16,6 @@ class User(Base):
     email = Column("email", String(50), unique = True, nullable=False)
     avatar = Column("avatar", String)
 
-   
-
 
 
 
