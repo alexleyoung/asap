@@ -141,12 +141,20 @@ def read_task_endpoint(task_id: int, db: Session = Depends(get_db)):
     return task
 
 @app.get("/tasks/", response_model=list[schemas.Task])
-def read_user_tasks_endpoint(db: Session = Depends(get_db), userID: int = None, limit: int = 10):
+def read_user_tasks_endpoint(userID: int, db: Session = Depends(get_db), limit: int = 10):
     if not userID:
         raise HTTPException(status_code=400, detail="User ID is required")
     tasks = crud.get_tasks(db, userID, limit)
     # handle errors here ...
     return tasks
+
+# takes entire TaskCreate instead of partial
+@app.put("/tasks/{task_id}", response_model=schemas.Task)
+def update_task_endpoint(task_id: int, task_update: schemas.TaskCreate, db: Session = Depends(get_db)):
+    task = crud.update_task(db, task_id, task_update)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
 
 
 ##### CALENDAR ENDPOINTS #####

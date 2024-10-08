@@ -52,7 +52,7 @@ class Task(Base):
     __tablename__ = "tasks"
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
     title = Column("title", String)
-    Start = Column("start", DateTime)
+    start = Column("start", DateTime)
     end = Column("end", DateTime)
     description = Column("description", String)
     category = Column("category", String)

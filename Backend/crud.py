@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 import bcrypt
 from Backend import models, schemas, auth
+from datetime import date
 
 
 ##### USER CRUDS #####
@@ -77,9 +78,9 @@ def create_schedule_item(db: Session, Event: schemas.EventCreate):
 ##### TASK CRUDS #####
 
 def create_task(db: Session, Task: schemas.TaskCreate):
-    db_task = models.Task(title = Task.title, Start = None,
-                          end = None, description = Task.description,
-                          category = Task.category, frequency = None,
+    db_task = models.Task(title = Task.title, start = date.today(),
+                          end = date.today(), description = Task.description,
+                          category = Task.category, frequency = "",
                           dueDate = Task.dueDate, priority = Task.priority,
                           difficulty = Task.difficulty, duration = Task.duration,
                           flexibility = Task.flexibility, userID=Task.userID, calendarID=Task.calendarID) # calendar TBD
