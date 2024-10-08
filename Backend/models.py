@@ -14,6 +14,7 @@ class User(Base):
     firstname = Column("firstName", String(20), nullable=False) 
     lastname = Column("lastName", String(20), nullable=False)
     email = Column("email", String(50), unique = True, nullable=False)
+    avatar = Column("avatar", String)
 
    
 
