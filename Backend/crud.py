@@ -77,12 +77,12 @@ def create_schedule_item(db: Session, Event: schemas.EventCreate):
 ##### TASK CRUDS #####
 
 def create_task(db: Session, Task: schemas.TaskCreate):
-    db_task = models.Task(title = Task.title, start = None,
+    db_task = models.Task(title = Task.title, Start = None,
                           end = None, description = Task.description,
                           category = Task.category, frequency = None,
                           dueDate = Task.dueDate, priority = Task.priority,
                           difficulty = Task.difficulty, duration = Task.duration,
-                          flexibility = Task.flexibility, userID=Task.userID, calendarID=-1)
+                          flexibility = Task.flexibility, userID=Task.userID, calendarID=Task.calendarID) # calendar TBD
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
@@ -99,8 +99,8 @@ def delete_task(db: Session, task_id: int):
 def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
-def get_tasks(db: Session, userID: int, skip: int = 0, limit: int = 100):
-    return db.query(models.Task).filter(models.Task.userID == userID).offset(skip).limit(limit).all()
+def get_tasks(db: Session, userID: int, limit: int = 10):
+    return db.query(models.Task).filter(models.Task.userID == userID).limit(limit).all()
 
 def update_task(db: Session, task_id: int, task_update: schemas.TaskCreate):
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
@@ -111,3 +111,14 @@ def update_task(db: Session, task_id: int, task_update: schemas.TaskCreate):
     db.commit()
     db.refresh(task)
     return task
+
+
+### CALENDARS ### 
+
+def create_calendar(db: Session, Calendar: schemas.CalendarCreate):
+    db_calendar = models.Calendar(name = Calendar.name, description = Calendar.description,
+                                  timezone = Calendar.timezone, ownerID = Calendar.ownerID)
+    db.add(db_calendar)
+    db.commit()
+    db.refresh(db_calendar)
+    return db_calendar

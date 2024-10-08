@@ -53,12 +53,11 @@ class CalendarBase(BaseModel):
 
 #for creating a calendar
 class CalendarCreate(CalendarBase):
-    pass #nothing just to create that you cannot read
+    ownerID: int
 
 #main class
 class Calendar(BaseModel):
     id: int
-    ownerID: int
 
     class Config:
         from_attributes = True
@@ -103,7 +102,7 @@ class TaskBase(BaseModel):
     calendarID: int
 
 #to create
-class TaskCreate(TaskBase):
+class TaskCreate(BaseModel):
     title: str
     description: str
     category: str
