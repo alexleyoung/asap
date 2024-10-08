@@ -79,22 +79,43 @@ export const ViewProfileDialog = ({
               <EditProfileForm user={user} onSave={handleSave} />
             ) : (
               <div>
-                <Avatar className="hover:cursor-pointer relative group">
-                  <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
-                  <AvatarImage src={user.avatar} alt={user.firstname} />
-                  <AvatarFallback>{user.firstname[0]}</AvatarFallback>
-                </Avatar>
+                <div className="flex justify-center">
+                  {" "}
+                  {/* Center the avatar */}
+                  <Avatar className="hover:cursor-pointer relative group w-24 h-24">
+                    {" "}
+                    {/* Adjust size here */}
+                    <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
+                    <AvatarImage
+                      src={user.avatar}
+                      alt={user.firstname}
+                      className="rounded-full w-full h-full" // Ensure image fits the Avatar size
+                    />
+                    <AvatarFallback className="w-full h-full flex items-center justify-center">
+                      {user.firstname[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+                <br />
                 <p>
                   Name: {user.firstname} {user.lastname}
                 </p>
+                <br />
                 <p>Email: {user.email}</p>
-                <Button variant="outline" onClick={() => setIsEditing(true)}>
-                  Edit Profile
-                </Button>
+                <br />
               </div>
             )}
           </DialogDescription>
           <DialogFooter>
+            {isEditing ? (
+              <Button variant="outline" onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={() => setIsEditing(true)}>
+                Edit Profile
+              </Button>
+            )}
             <AlertDialog>
               <AlertDialogTrigger>
                 <Button variant="destructive">Delete Profile</Button>
