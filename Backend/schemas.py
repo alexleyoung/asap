@@ -1,10 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
-from typing import Annotated
-from Backend import models
-from .database import engine, SessionLocal
-from sqlalchemy.orm import Session
 from typing import Optional
+from datetime import datetime
 
 #create User schemas
 class UserBase(BaseModel):
@@ -55,8 +51,8 @@ class Calendar(BaseModel):
 #Event
 class EventBase(BaseModel):
     title: str
-    start: int
-    end: int
+    start: datetime
+    end: datetime
     description: str
     category: str
     frequency: str
@@ -77,16 +73,16 @@ class Event(EventBase):
 #Task
 class TaskBase(BaseModel):
     title: str
-    start: int
-    end: int
+    start: datetime
+    end: datetime
     description: str
     category: str
     frequency: str
-    dueDate: int
-    priority: int
-    difficulty: int
-    duration: int 
-    flexibility: int
+    dueDate: datetime
+    priority: str
+    difficulty: str
+    duration: int
+    flexibility: bool
 
 #to create
 class TaskCreate(TaskBase):
