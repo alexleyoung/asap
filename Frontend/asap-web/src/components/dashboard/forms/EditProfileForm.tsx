@@ -56,7 +56,7 @@ const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
 
   const handleSubmit = async (data: ProfileFormValues) => {
     try {
-      const response = await fetch(`/users/${user.id}`, {
+      const response = await fetch(`http://localhost:8000/users/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +64,12 @@ const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
         body: JSON.stringify(data),
       });
 
+      console.log("Response:", response);
+      console.log("Data:", data);
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error updating profile:", errorData);
+
         throw new Error("Failed to update user profile");
       }
 

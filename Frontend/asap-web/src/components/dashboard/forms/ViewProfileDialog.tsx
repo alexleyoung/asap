@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import EditProfileForm from "./EditProfileForm";
 import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ProfileViewProps {
   user: {
@@ -78,6 +79,11 @@ export const ViewProfileDialog = ({
               <EditProfileForm user={user} onSave={handleSave} />
             ) : (
               <div>
+                <Avatar className="hover:cursor-pointer relative group">
+                  <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
+                  <AvatarImage src={user.avatar} alt={user.firstname} />
+                  <AvatarFallback>{user.firstname[0]}</AvatarFallback>
+                </Avatar>
                 <p>
                   Name: {user.firstname} {user.lastname}
                 </p>
