@@ -2,6 +2,15 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+
+# For JWT token response
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: str | None = None
+
 #create User schemas
 class UserBase(BaseModel):
     firstname: str
@@ -10,6 +19,10 @@ class UserBase(BaseModel):
 
 class UserInDB(UserBase):
     hashed_password: str
+
+class UserInDB(UserBase):
+    hashed_password: str
+
 
 #for creating a user
 class UserCreate(UserBase):
