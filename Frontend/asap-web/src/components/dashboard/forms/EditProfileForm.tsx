@@ -54,22 +54,40 @@ const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
     form.reset(user);
   }, [user]);
 
-  const handleSubmit = async (data: ProfileFormValues) => {
+  const handleSubmit = async (data: Omit<ProfileFormValues, "id">) => {
     try {
-      const response = await fetch(`/users/${user.id}`, {
+      const dataToSend = {
+        ...data,
+        avatar: data.avatar ?? null, // Send null if avatar is undefined
+      };
+
+      console.log("Data to send:", dataToSend); // Debugging info
+
+      const response = await fetch(`http://localhost:8000/users/${user.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(dataToSend),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update user profile");
-      }
+      console.log("Response:", response);
+      console.log("Data:", data);
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error updating profile:", errorData);
+
+        // Check if errorData has a detail property to give more context
+        const errorMessage = errorData.detail
+          ? JSON.stringify(errorData.detail)
+          : "Failed to update user profile";
+        throw new Error(errorMessage);
+      }
+      console.log("Response: still reading");
       const updatedUser = await response.json();
-      onSave(updatedUser);
+      onSave({ ...updatedUser, id: user.id });
+      localStorage.setItem("User", JSON.stringify(updatedUser));
     } catch (error) {
       console.error(error);
     }
@@ -126,7 +144,7 @@ const EditProfileForm = ({ user, onSave }: EditProfileFormProps) => {
             <FormItem>
               <FormLabel>Avatar</FormLabel>
               <FormControl>
-                <Input type="file" {...field} />
+                <Input placeholder="enter link to avatar" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
