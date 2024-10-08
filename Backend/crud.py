@@ -1,17 +1,17 @@
 from sqlalchemy.orm import Session
 import bcrypt
-from Backend import models, schemas
+from Backend import models, schemas, auth
 
 
 ##### USER CRUDS #####
 
 #create user
 def create_user(db: Session, user: schemas.UserCreate):
-    hashed_password = bcrypt.hashpw(user.password.encode('utf-8'), bcrypt.gensalt())
-    db_user = models.User(firstName=user.firstName, 
-                          lastName=user.lastName, 
+    hashed_password = auth.get_password_hash(user.password)
+    db_user = models.User(firstname=user.firstname, 
+                          lastname=user.lastname, 
                           email=user.email, 
-                          hashedPassword=hashed_password.decode('utf-8'))
+                          hashed_password=hashed_password.decode('utf-8'))
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -63,11 +63,14 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
 
 ##### EVENT CRUDS #####
 
-def create_event(db: Session, event: schemas.EventCreate):
-    db_event = models.event(location = event.location)
-    db.add(db_event)
+def create_schedule_item(db: Session, scheduleItem: schemas.ScheduleItemCreate):
+    db_schedule_item = models.scheduleItem(title = scheduleItem.title, start = scheduleItem.start,
+                                           end = scheduleItem.end, description = scheduleItem.description,
+                                           category = scheduleItem.category, frequency = scheduleItem.frequency,
+                                            userID = scheduleItem.userID, calendarID = scheduleItem.calendarID)
+    db.add(db_schedule_item)
     db.commit()
-    db.refresh(db_event)
-    return db_event
+    db.refresh(db_schedule_item)
+    return db_schedule_item
 
 

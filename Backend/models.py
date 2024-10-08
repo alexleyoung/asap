@@ -2,6 +2,7 @@ from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey, T
 from sqlalchemy.orm import relationship
 from .database import Base
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 
 #users table
@@ -9,9 +10,9 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column("id", Integer, primary_key = True, index = True)
-    hashedPassword = Column("hashedPassword", String, nullable=False)
-    firstName = Column("firstName", String(20), nullable=False) 
-    lastName = Column("lastName", String(20), nullable=False)
+    hashed_password = Column("hashedPassword", String, nullable=False)
+    firstname = Column("firstName", String(20), nullable=False) 
+    lastname = Column("lastName", String(20), nullable=False)
     email = Column("email", String(50), unique = True, nullable=False)
 
    

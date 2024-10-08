@@ -4,9 +4,12 @@ from datetime import datetime
 
 #create User schemas
 class UserBase(BaseModel):
-    firstName: str
-    lastName: str
+    firstname: str
+    lastname: str
     email: str
+
+class UserInDB(UserBase):
+    hashed_password: str
 
 #for creating a user
 class UserCreate(UserBase):
@@ -14,8 +17,8 @@ class UserCreate(UserBase):
 
 #for updating a user
 class UserUpdate(BaseModel):
-    firstName: Optional[str] = None
-    lastName: Optional[str] = None
+    firstname: Optional[str] = None
+    lastname: Optional[str] = None
     email: Optional[str] = None
 
 #main class
