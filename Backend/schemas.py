@@ -52,31 +52,14 @@ class Calendar(BaseModel):
         from_attributes = True
 
 ###
-#ScheduleItem
-class ScheduleItemBase(BaseModel):
+#Event
+class EventBase(BaseModel):
     title: str
     start: int
     end: int
     description: str
     category: str
     frequency: str
-
-#to create
-class ScheduleItemCreate(ScheduleItemBase):
-    pass
-
-#main class
-class ScheduleItem(ScheduleItemBase):
-    id: int
-    userID: int
-    calendarID: int
-
-    class Config:
-        from_attributes = True
-
-###
-#Event
-class EventBase(BaseModel):
     location: str
 
 #to create
@@ -93,6 +76,12 @@ class Event(EventBase):
 ###
 #Task
 class TaskBase(BaseModel):
+    title: str
+    start: int
+    end: int
+    description: str
+    category: str
+    frequency: str
     dueDate: int
     priority: int
     difficulty: int

@@ -32,10 +32,9 @@ class Calendar(Base):
     
     #owner = relationship("User", back_populates="calendars")
     
-#scheduleItems table
-class scheduleItem(Base):
-    __tablename__ = 'schedule'
-
+# Events table
+class Event(Base):
+    __tablename__ = "events"
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
     title = Column("title", String)
     Start = Column("start", Integer) #???? DATE OBJECT
@@ -45,20 +44,22 @@ class scheduleItem(Base):
     frequency = Column("frequency", String) #?????
     userID = Column("userID", Integer, ForeignKey('users.id'))
     calendarID = Column("calendarID", Integer, ForeignKey('calendars.id'))
-
-
-class Event(Base):
-    __tablename__ = "events"
-    id = Column("id", Integer, primary_key = True, index = True, unique = True)
     location = Column("location", String)
 
+# Tasks table
 class Task(Base):
     __tablename__ = "tasks"
     id = Column("id", Integer, primary_key = True, index = True, unique = True)
+    title = Column("title", String)
+    Start = Column("start", Integer) #???? DATE OBJECT
+    end = Column("end", Integer)
+    description = Column("description", String)
+    category = Column("category", String)
+    frequency = Column("frequency", String) #?????
+    userID = Column("userID", Integer, ForeignKey('users.id'))
+    calendarID = Column("calendarID", Integer, ForeignKey('calendars.id'))
     dueDate = Column("dueDate", Integer)
     priority = Column("priority", Integer)
     difficulty = Column("difficulty", Integer)
     duration = Column("duration", Integer) #in minutes??
     flexibility = Column("flexibility", Integer)
-
-
