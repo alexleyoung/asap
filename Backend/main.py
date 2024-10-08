@@ -115,3 +115,13 @@ def create_event_endpoint(event: schemas.EventCreate, db: Session = Depends(get_
     if not db_event:
         raise HTTPException(status_code=400, detail="Event creation failed")
     return db_event
+
+
+##### TASK ENDPOINTS #####
+
+@app.post("/tasks/", response_model=schemas.Task)
+def create_task_endpoint(task: schemas.TaskCreate, db: Session = Depends(get_db)):
+    db_task = crud.create_task(db=db, task=task)
+    if not db_task:
+        raise HTTPException(status_code=400, detail="Task creation failed")
+    return db_task

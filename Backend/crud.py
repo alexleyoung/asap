@@ -77,12 +77,12 @@ def create_schedule_item(db: Session, Event: schemas.EventCreate):
 ##### TASK CRUDS #####
 
 def create_task(db: Session, Task: schemas.TaskCreate):
-    db_task = models.Task(title = Task.title, start = Task.start,
-                          end = Task.end, description = Task.description,
-                          category = Task.category, frequency = Task.frequency,
+    db_task = models.Task(title = Task.title, start = None,
+                          end = None, description = Task.description,
+                          category = Task.category, frequency = None,
                           dueDate = Task.dueDate, priority = Task.priority,
                           difficulty = Task.difficulty, duration = Task.duration,
-                          flexibility = Task.flexibility)
+                          flexibility = Task.flexibility, userID=Task.userID, calendarID=-1)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)
@@ -99,8 +99,8 @@ def delete_task(db: Session, task_id: int):
 def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
-def get_tasks(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.Task).offset(skip).limit(limit).all()
+def get_tasks(db: Session, userID: int, skip: int = 0, limit: int = 100):
+    return db.query(models.Task).filter(models.Task.userID == userID).offset(skip).limit(limit).all()
 
 def update_task(db: Session, task_id: int, task_update: schemas.TaskCreate):
     task = db.query(models.Task).filter(models.Task.id == task_id).first()

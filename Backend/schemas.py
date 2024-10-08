@@ -99,6 +99,8 @@ class TaskBase(BaseModel):
     difficulty: str
     duration: int
     flexibility: bool
+    userID: int
+    calendarID: int
 
 #to create
 class TaskCreate(TaskBase):
@@ -110,6 +112,8 @@ class TaskCreate(TaskBase):
     difficulty: str
     duration: int
     flexibility: bool
+    userID: int
+    calendarID: int
 
 #main class
 class Task(TaskBase):
