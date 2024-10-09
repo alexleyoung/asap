@@ -18,8 +18,8 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 #delete user
-def delete_user(db: Session, user_id: int):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+def delete_user(db: Session, userID: int):
+    user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
     db.delete(user)
@@ -39,8 +39,8 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 #to change password
-def change_user_password(db: Session, user_id: int, new_password: str):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+def change_user_password(db: Session, userID: int, new_password: str):
+    user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
     hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
@@ -50,8 +50,8 @@ def change_user_password(db: Session, user_id: int, new_password: str):
     return user
 
 #update info
-def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+def update_user(db: Session, userID: int, user_update: schemas.UserUpdate):
+    user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
     for key, value in user_update.model_dump(exclude_unset=True).items():
