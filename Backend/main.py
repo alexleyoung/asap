@@ -109,11 +109,13 @@ def update_user_endpoint(userID: int, user_update: schemas.UserUpdate, db: Sessi
 ##### EVENT ENDPOINTS #####
 
 #to create an event
-@app.post("/events/", response_model=schemas.Event)
-def create_event_endpoint(event: schemas.EventCreate, db: Session = Depends(get_db)):
-    db_event = crud.create_event(db=db, event=event)
-    if not db_event:
-        raise HTTPException(status_code=400, detail="Event creation failed")
+@app.post("/users/{userID}/events", response_model=schemas.Event)
+def create_event_endpoint(userID: int, event: schemas.EventCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, userID=userID)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_event = crud.create_event(db=db, event=event, userID=userID)
     return db_event
 
 #edit event
@@ -139,3 +141,22 @@ def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
     if db_event is None:
         raise HTTPException(status_code=404, detail="Event not found")
     return db_event
+
+#get a user's events
+@app.get("/users/{userID}/events", response_model=list[schemas.Event])
+def get_user_events(userID: int, db: Session = Depends(get_db)):
+    events = crud.get_events_by_user(db, userID)
+    if not events:
+        raise HTTPException(status_code=404, detail="No events found for this user")
+    return events
+
+
+# Endpoint to create a new calendar
+@app.post("/users/{userID}/calendars", response_model=schemas.Calendar)
+def create_calendar_endpoint(userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, userID=userID)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_calendar = crud.create_calendar(db=db, calendar=calendar, userID=userID)
+    return db_calendar

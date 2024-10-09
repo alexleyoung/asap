@@ -63,11 +63,12 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
 
 ##### EVENT CRUDS #####
 
-def create_event(db: Session, event: schemas.EventCreate):
+def create_event(db: Session, event: schemas.EventCreate, userID: int):
     db_event = models.Event(title = event.title, start = event.start,
                                    end = event.end, description = event.description,
                                    category = event.category, frequency = event.frequency,
-                                   location = event.location)
+                                   location = event.location, userID=userID,
+                                   calendarID = event.calendarID)
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
@@ -99,3 +100,21 @@ def delete_event(db: Session, eventID: int):
     db.delete(db_event)
     db.commit()
     return db_event
+
+#get a user's events
+def get_events_by_user(db: Session, userID: int):
+    return db.query(models.Event).filter(models.Event.userID == userID).all()
+
+
+# CRUD operation to create a new calendar
+def create_calendar(db: Session, calendar: schemas.CalendarCreate, userID: int):
+    db_calendar = models.Calendar(
+        name=calendar.name,
+        description=calendar.description,
+        timezone=calendar.timezone,
+        userID=userID  # Linking the calendar to the user who owns it
+    )
+    db.add(db_calendar)
+    db.commit()
+    db.refresh(db_calendar)
+    return db_calendar

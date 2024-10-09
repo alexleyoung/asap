@@ -23,10 +23,6 @@ class UserBase(BaseModel):
 class UserInDB(UserBase):
     hashed_password: str
 
-class UserInDB(UserBase):
-    hashed_password: str
-
-
 #for creating a user
 class UserCreate(UserBase):
     password: str
@@ -57,12 +53,12 @@ class CalendarBase(BaseModel):
 
 #for creating a calendar
 class CalendarCreate(CalendarBase):
-    pass #nothing just to create that you cannot read
+    pass
 
 #main class
 class Calendar(BaseModel):
     id: int
-    ownerID: int
+    userID: int
 
     class Config:
         from_attributes = True
@@ -80,7 +76,7 @@ class EventBase(BaseModel):
 
 #to create
 class EventCreate(EventBase):
-    pass
+    calendarID: int  # Foreign key
 
 #to update
 class EventUpdate(EventBase):
@@ -95,6 +91,8 @@ class EventUpdate(EventBase):
 #main class
 class Event(EventBase):
     id: int
+    userID: int  # Foreign key
+    calendarID: int  # Foreign key
 
     class Config:
         from_attributes = True
@@ -114,9 +112,12 @@ class TaskBase(BaseModel):
     duration: int
     flexibility: bool
 
+
+
 #to create
 class TaskCreate(TaskBase):
-    pass
+    userID: int
+    calendarID: int
 
 #main class
 class Task(TaskBase):
