@@ -23,6 +23,22 @@ export default function Dashboard() {
     setItems((prevItems) => [...prevItems, newItem]);
   };
 
+  useEffect(() => {
+    const fetchScheduleItems = async () => {
+      try {
+        const response = await fetch("/api/events"); //NEED CORRECT ENDPOINT FOR SCHEDULE ITEMS
+        const data = await response.json();
+        setItems(data);
+      } catch (error) {
+        console.error("Failed to fetch schedule items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScheduleItems();
+  }, [setItems]);
+
   // useEffect(() => {
   //   const checkAuth = async () => {
   //     try {

@@ -6,22 +6,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface createItemTabsProps {}
 
 export default function CreateItemTabs() {
+  const handleEventSubmit = async (eventData: EventPost) => {
+    try {
+      const response = await fetch("http://localhost:8000/events/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(eventData),
+      });
+      console.log("Event data:", eventData);
+      console.log("Response:", response);
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error creating event:", errorData);
+      }
+    } catch (error) {
+      console.error("Error creating event:", error);
+    }
+  };
+
   return (
-    <Tabs defaultValue='event' className='w-full'>
+    <Tabs defaultValue="event" className="w-full">
       <DialogHeader>
-        <TabsList className='w-full flex mt-6'>
-          <TabsTrigger value='event' className='flex-1'>
+        <TabsList className="w-full flex mt-6">
+          <TabsTrigger value="event" className="flex-1">
             <span>Event</span>
           </TabsTrigger>
-          <TabsTrigger value='task' className='flex-1'>
+          <TabsTrigger value="task" className="flex-1">
             <span>Task</span>
           </TabsTrigger>
         </TabsList>
       </DialogHeader>
-      <TabsContent value='event'>
-        <EventForm onSubmit={() => {}} />
+      <TabsContent value="event">
+        <EventForm onSubmit={handleEventSubmit} />
       </TabsContent>
-      <TabsContent value='task'>
+      <TabsContent value="task">
         <TaskForm onSubmit={() => {}} />
       </TabsContent>
     </Tabs>

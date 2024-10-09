@@ -230,9 +230,10 @@ const Schedule: React.FC<ScheduleProps> = ({
         ref={setNodeRef}
         className={`h-[15px] ${
           isHourMark ? "border-t border-border" : ""
-        } relative`}>
+        } relative`}
+      >
         {showLabel && isHourMark && (
-          <span className='absolute bg-background -top-2 left-0 text-xs text-accent-foreground'>
+          <span className="absolute bg-background -top-2 left-0 text-xs text-accent-foreground">
             {format(setHours(setMinutes(day, minute), hour), "h a")}
           </span>
         )}
@@ -359,9 +360,10 @@ const Schedule: React.FC<ScheduleProps> = ({
             e.stopPropagation();
             onItemClick(item);
           }}
-          className='scale-95 rounded-sm transition-transform p-2 text-white'>
-          <h1 className='font-medium truncate'>{item.title}</h1>
-          <p className='text-xs'>
+          className="scale-95 rounded-sm transition-transform p-2 text-white"
+        >
+          <h1 className="font-medium truncate">{item.title}</h1>
+          <p className="text-xs">
             {format(item.start, "h:mm a")} - {format(item.end, "h:mm a")}
           </p>
         </div>
@@ -378,12 +380,13 @@ const Schedule: React.FC<ScheduleProps> = ({
         return dayItems.map((item) => (
           <div
             key={item.siid}
-            className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+            className="text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
             style={{ backgroundColor: item.color }}
             onClick={(e) => {
               e.stopPropagation();
               setSelectedItem(item);
-            }}>
+            }}
+          >
             {item.title}
           </div>
         ));
@@ -425,26 +428,27 @@ const Schedule: React.FC<ScheduleProps> = ({
 
   const renderDayView = useCallback(() => {
     return (
-      <div className='flex flex-col h-full'>
-        <div className='flex'>
-          <div className='w-16' />
-          <div className='flex-1 py-2'>{format(currentDate, "EEE d")}</div>
+      <div className="flex flex-col h-full">
+        <div className="flex">
+          <div className="w-16" />
+          <div className="flex-1 py-2">{format(currentDate, "EEE d")}</div>
         </div>
-        <div className='flex flex-col h-full'>
-          <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
-            <div className='flex h-[1440px]'>
-              <div className='w-16 flex-shrink-0 bg-background z-10'>
+        <div className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto relative" ref={scheduleRef}>
+            <div className="flex h-[1440px]">
+              <div className="w-16 flex-shrink-0 bg-background z-10">
                 {renderTimeSlots(true, currentDate)}
               </div>
               <div
-                className='flex-1 relative'
+                className="flex-1 relative"
                 onMouseMove={(e) => handleMouseMove(e, currentDate)}
                 onMouseLeave={handleMouseLeave}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const yPosition = e.clientY - rect.top;
                   handleScheduleClick(currentDate, yPosition);
-                }}>
+                }}
+              >
                 {renderTimeSlots(false, currentDate)}
                 {scheduleRef.current &&
                   renderItems(currentDate, scheduleRef.current.scrollHeight)}
@@ -452,17 +456,19 @@ const Schedule: React.FC<ScheduleProps> = ({
                   ghostLineDay &&
                   isSameDay(ghostLineDay, currentDate) && (
                     <div
-                      className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
-                      style={{ top: `${ghostLinePosition.top}px` }}>
-                      <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
+                      className="absolute left-0 right-0 border-t border-blue-300 pointer-events-none"
+                      style={{ top: `${ghostLinePosition.top}px` }}
+                    >
+                      <span className="absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl">
                         {format(ghostLinePosition.time, "h:mm a")}
                       </span>
                     </div>
                   )}
                 <div
-                  id='current-time-line'
-                  className='absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'>
-                  <div className='size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                  id="current-time-line"
+                  className="absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center"
+                >
+                  <div className="size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1"></div>
                 </div>
               </div>
             </div>
@@ -485,31 +491,32 @@ const Schedule: React.FC<ScheduleProps> = ({
     const now = new Date();
 
     return (
-      <div className='flex flex-col'>
-        <div className='flex'>
-          <div className='w-16' />
+      <div className="flex flex-col">
+        <div className="flex">
+          <div className="w-16" />
           {days.map((day) => (
-            <div key={day.toISOString()} className='flex-1 text-center py-2'>
+            <div key={day.toISOString()} className="flex-1 text-center py-2">
               {format(day, "EEE d")}
             </div>
           ))}
         </div>
-        <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
-          <div className='flex h-[1440px] relative'>
-            <div className='w-16 flex-shrink-0 bg-background z-10'>
+        <div className="flex-1 overflow-y-auto relative" ref={scheduleRef}>
+          <div className="flex h-[1440px] relative">
+            <div className="w-16 flex-shrink-0 bg-background z-10">
               {renderTimeSlots(true, days[0])}
             </div>
             {days.map((day) => (
               <div
                 key={day.toISOString()}
-                className='flex-1 border-l border-border relative'
+                className="flex-1 border-l border-border relative"
                 onMouseMove={(e) => handleMouseMove(e, day)}
                 onMouseLeave={handleMouseLeave}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const yPosition = e.clientY - rect.top;
                   handleScheduleClick(day, yPosition);
-                }}>
+                }}
+              >
                 {renderTimeSlots(false, day)}
                 {scheduleRef.current &&
                   renderItems(day, scheduleRef.current.scrollHeight)}
@@ -517,23 +524,25 @@ const Schedule: React.FC<ScheduleProps> = ({
                   ghostLineDay &&
                   isSameDay(ghostLineDay, day) && (
                     <div
-                      className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
-                      style={{ top: `${ghostLinePosition.top}px` }}>
-                      <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
+                      className="absolute left-0 right-0 border-t border-blue-300 pointer-events-none"
+                      style={{ top: `${ghostLinePosition.top}px` }}
+                    >
+                      <span className="absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl">
                         {format(ghostLinePosition.time, "h:mm a")}
                       </span>
                     </div>
                   )}
                 {isSameDay(now, day) && (
                   <div
-                    id='current-time-line'
-                    className='absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'
+                    id="current-time-line"
+                    className="absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center"
                     style={{
                       top: `${
                         ((now.getHours() * 60 + now.getMinutes()) / 1440) * 100
                       }%`,
-                    }}>
-                    <div className='size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                    }}
+                  >
+                    <div className="size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1"></div>
                   </div>
                 )}
               </div>
@@ -556,9 +565,9 @@ const Schedule: React.FC<ScheduleProps> = ({
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
     return (
-      <div className='grid grid-cols-7 gap-1 h-full'>
+      <div className="grid grid-cols-7 gap-1 h-full">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day} className='text-center font-semibold py-2'>
+          <div key={day} className="text-center font-semibold py-2">
             {day}
           </div>
         ))}
@@ -567,9 +576,10 @@ const Schedule: React.FC<ScheduleProps> = ({
             key={day.toISOString()}
             className={`border border-border p-1 ${
               isSameMonth(day, currentDate) ? "bg-background" : "bg-accent"
-            }`}>
-            <div className='text-right text-sm'>{format(day, "d")}</div>
-            <div className='overflow-y-auto h-24'>
+            }`}
+          >
+            <div className="text-right text-sm">{format(day, "d")}</div>
+            <div className="overflow-y-auto h-24">
               {renderItems(day, 96, true)}
             </div>
           </div>
@@ -583,17 +593,18 @@ const Schedule: React.FC<ScheduleProps> = ({
       onDragEnd={handleDragEnd}
       modifiers={[snapToTimeSlot]}
       sensors={[pointerSensor]}
-      autoScroll={false}>
-      <div className='flex-grow h-full flex flex-col p-4 bg-background text-foreground'>
-        <ScrollArea className='h-full'>
+      autoScroll={false}
+    >
+      <div className="flex-grow h-full flex flex-col p-4 bg-background text-foreground">
+        <ScrollArea className="h-full">
           {view === "day" && renderDayView()}
           {view === "week" && renderWeekView()}
           {view === "month" && renderMonthView()}
         </ScrollArea>
         <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
           <DialogHeader>
-            <DialogTitle className='sr-only'>Create New Item</DialogTitle>
-            <DialogDescription className='sr-only'>
+            <DialogTitle className="sr-only">Create New Item</DialogTitle>
+            <DialogDescription className="sr-only">
               Create a new item
             </DialogDescription>
           </DialogHeader>
@@ -603,11 +614,12 @@ const Schedule: React.FC<ScheduleProps> = ({
         </Dialog>
         <Popover
           open={selectedItem !== null}
-          onOpenChange={() => setSelectedItem(null)}>
+          onOpenChange={() => setSelectedItem(null)}
+        >
           <PopoverContent>
             {selectedItem && (
               <div>
-                <h3 className='font-semibold'>{selectedItem.title}</h3>
+                <h3 className="font-semibold">{selectedItem.title}</h3>
                 <p>Start: {format(selectedItem.start, "PPp")}</p>
                 <p>End: {format(selectedItem.end, "PPp")}</p>
               </div>
