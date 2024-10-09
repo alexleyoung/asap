@@ -133,7 +133,7 @@ def get_event_endpoint(eventID: int, db: Session = Depends(get_db)):
     return db_event
 
 #delete event
-@app.delete("/events/{eventID}", response_model=schemas.Event)
+@app.delete("/events/{eventID}/delete", response_model=schemas.Event)
 def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
     db_event = crud.delete_event(db=db, eventID=eventID)
     if db_event is None:
