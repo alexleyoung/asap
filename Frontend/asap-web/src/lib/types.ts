@@ -53,3 +53,14 @@ export type TaskPost = {
   uid: string;
   cid: string;
 };
+export type EventFormData = {
+  title: string;
+  start: Date;
+  end: Date;
+  description: string;
+  category: string;
+  frequency: string;
+  location: string;
+  uid: number;
+  calendarID: number;
+};

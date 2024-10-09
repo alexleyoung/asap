@@ -1,4 +1,9 @@
-export async function createItem(itemData: EventFormData | TaskFormData) {
+import { EventFormData } from "./types";
+
+export async function createItem(
+  user: { id: string },
+  itemData: EventFormData | TaskFormData
+) {
   const isEvent = "location" in itemData;
   const isTask = "priority" in itemData;
 
@@ -9,7 +14,7 @@ export async function createItem(itemData: EventFormData | TaskFormData) {
   let data;
   let response;
   if (isEvent) {
-    response = await fetch("/api/events", {
+    response = await fetch(`http://localhost:8000/users/${user.id}/events`, {
       method: "POST",
       body: JSON.stringify(itemData),
       headers: {

@@ -2,27 +2,60 @@ import { DialogHeader } from "@/components/ui/dialog";
 import { EventForm } from "../forms/EventForm";
 import { TaskForm } from "../forms/TaskForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createItem } from "../../../lib/scheduleCrud";
+import { useEffect, useState } from "react";
+import { EventFormData } from "@/lib/types";
 
 interface createItemTabsProps {}
 
 export default function CreateItemTabs() {
-  const handleEventSubmit = async (eventData: EventPost) => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false); // Define loading state
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("User");
+    const storedUserId = storedUser ? JSON.parse(storedUser).id : null;
+    setUserId(storedUserId);
+  }, []);
+
+  type EventDataToSend = Omit<EventFormData, "uid">;
+
+  const handleEventSubmit = async (eventData: EventFormData) => {
+    const {
+      title,
+      start,
+      end,
+      location,
+      description,
+      category,
+      frequency,
+      calendarID,
+    } = eventData;
+    const dataToSend: EventDataToSend = {
+      title,
+      start,
+      end,
+      location: location || "",
+      description: description || "",
+      category: category || "",
+      frequency: frequency || "",
+      calendarID: typeof calendarID === "number" ? calendarID : 0,
+    };
+    console.log("Event data:", dataToSend);
+    console.log("User ID:", userId);
     try {
-      const response = await fetch("http://localhost:8000/events/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(eventData),
-      });
-      console.log("Event data:", eventData);
-      console.log("Response:", response);
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error creating event:", errorData);
+      setLoading(true);
+      let response;
+      if (userId) {
+        response = await createItem({ id: userId }, dataToSend); // Call createItem with event data
+      } else {
+        throw new Error("User ID is null");
       }
+      console.log("Event created successfully:", response);
     } catch (error) {
-      console.error("Error creating event:", error);
+      console.error("Failed to create event:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,4 +79,7 @@ export default function CreateItemTabs() {
       </TabsContent>
     </Tabs>
   );
+}
+function setLoading(arg0: boolean) {
+  throw new Error("Function not implemented.");
 }
