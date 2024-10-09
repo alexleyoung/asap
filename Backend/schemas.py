@@ -84,9 +84,13 @@ class EventCreate(EventBase):
 
 #to update
 class EventUpdate(EventBase):
+    title: Optional[str] = None
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+    description: Optional[datetime] = None
+    category: Optional[datetime] = None
+    frequency: Optional[datetime] = None
     location: Optional[str] = None
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
 
 #main class
 class Event(EventBase):

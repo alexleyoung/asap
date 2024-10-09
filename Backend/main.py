@@ -115,3 +115,27 @@ def create_event_endpoint(event: schemas.EventCreate, db: Session = Depends(get_
     if not db_event:
         raise HTTPException(status_code=400, detail="Event creation failed")
     return db_event
+
+#edit event
+@app.put("/events/{eventID}", response_model=schemas.Event)
+def edit_event_endpoint(eventID: int, event_update: schemas.EventUpdate, db: Session = Depends(get_db)):
+    db_event = crud.edit_event(db=db, eventID=eventID, event_update=event_update)
+    if db_event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return db_event
+
+#get event
+@app.get("/events/{eventID}", response_model=schemas.Event)
+def get_event_endpoint(eventID: int, db: Session = Depends(get_db)):
+    db_event = crud.get_event(db=db, eventID=eventID)
+    if db_event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return db_event
+
+#delete event
+@app.delete("/events/{eventID}", response_model=schemas.Event)
+def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
+    db_event = crud.delete_event(db=db, eventID=eventID)
+    if db_event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return db_event
