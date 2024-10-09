@@ -82,6 +82,12 @@ class EventBase(BaseModel):
 class EventCreate(EventBase):
     pass
 
+#to update
+class EventUpdate(EventBase):
+    location: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+
 #main class
 class Event(EventBase):
     id: int

@@ -63,11 +63,11 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
 
 ##### EVENT CRUDS #####
 
-def create_schedule_item(db: Session, Event: schemas.EventCreate):
-    db_event = models.scheduleItem(title = Event.title, start = Event.start,
-                                   end = Event.end, description = Event.description,
-                                   category = Event.category, frequency = Event.frequency,
-                                   location = Event.location)
+def create_event(db: Session, event: schemas.EventCreate):
+    db_event = models.Event(title = event.title, start = event.start,
+                                   end = event.end, description = event.description,
+                                   category = event.category, frequency = event.frequency,
+                                   location = event.location)
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
