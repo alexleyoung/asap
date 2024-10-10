@@ -11,6 +11,9 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: str | None = None
 
+##### USER #####
+
+
 #create User schemas
 class UserBase(BaseModel):
     firstname: str
@@ -33,6 +36,7 @@ class UserUpdate(BaseModel):
     firstname: Optional[str] = None
     lastname: Optional[str] = None
     email: Optional[str] = None
+    avatar: Optional[str] = None
 
 #main class
 class User(UserBase):

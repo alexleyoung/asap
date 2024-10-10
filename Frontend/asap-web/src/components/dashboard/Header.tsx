@@ -98,20 +98,25 @@ export default function Header() {
   };
 
   const handleDelete = async () => {
-    if (!user) return;
-
     try {
-      const response = await fetch(`/users/${user.id}/delete`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId: user.id }), // Pass the current user's ID
-      });
+      if (!user) return;
+
+      const response = await fetch(
+        `http://localhost:8000/users/${user.id}/delete`, // Adjust the endpoint if needed
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to delete the profile");
       }
+      setUser(null);
+      router.push("/");
+      localStorage.removeItem("User");
     } catch (error) {
       console.error("Error deleting profile:", error);
     }

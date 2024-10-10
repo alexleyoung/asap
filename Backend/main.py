@@ -61,8 +61,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 #to delete user
 @app.delete("/users/{userID}/delete", response_model=schemas.User)
-def delete_user_endpoint(user_id: int, db: Session = Depends(get_db)):
-    user = crud.delete_user(db, user_id)
+def delete_user_endpoint(userID: int, db: Session = Depends(get_db)):
+    user = crud.delete_user(db, userID)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -89,7 +89,7 @@ def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-#change password
+#to change password
 @app.put("/users/{userID}/password", response_model=schemas.User)
 def change_user_password_endpoint(user_id: int, new_password: str, db: Session = Depends(get_db)):
     user = crud.change_user_password(db, user_id, new_password)
@@ -99,8 +99,8 @@ def change_user_password_endpoint(user_id: int, new_password: str, db: Session =
 
 #to update user
 @app.put("/users/{userID}", response_model=schemas.User)
-def update_user_endpoint(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
-    user = crud. update_user(db, user_id, user_update)
+def update_user_endpoint(userID: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
+    user = crud. update_user(db, userID, user_update)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
