@@ -1,6 +1,7 @@
 import { EventFormData } from "@/lib/types";
 import React, { use, useEffect, useState } from "react";
 import { updateEvent } from "@/lib/scheduleCrud";
+import { deleteEvent } from "@/lib/scheduleCrud";
 
 interface EditEventFormProps {
   eventId: number;
@@ -8,6 +9,10 @@ interface EditEventFormProps {
   eventData: EventFormData;
   onSubmit: (updatedEvent: EventFormData) => void;
 }
+export type OmittedEventFormData = Omit<
+  EventFormData,
+  "siid" | "uid" | "calendarID" | "type"
+>;
 
 export function EditEventForm({
   eventId,
@@ -23,17 +28,36 @@ export function EditEventForm({
   const [loading, setLoading] = useState(false);
   const [newEventData, setEventData] = useState<EventFormData | null>(null);
 
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this event?")) {
+      try {
+        setLoading(true);
+        await deleteEvent(eventId); // Call the delete handler with eventId
+        onClose(); // Close the form after deletion
+      } catch (error) {
+        console.error("Failed to delete event:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const updatedEvent = {
-      ...eventData,
+
+    // Create the updated event object with the correct types
+    const updatedEvent: OmittedEventFormData = {
       title,
       description,
       start,
       end,
       location,
+      category: eventData.category, // Ensure this is a string
+      frequency: eventData.frequency, // Ensure this is a string
     };
-    handleUpdate(updatedEvent); // call the update handler
+
+    // Call the update handler
+    handleUpdate(updatedEvent);
   };
 
   useEffect(() => {
@@ -53,13 +77,40 @@ export function EditEventForm({
     };
 
     fetchEventData();
-  }, [eventId]);
+  }, [eventId, deleteEvent]);
 
-  const handleUpdate = async (updatedEvent: EventFormData) => {
+  const handleUpdate = async (updatedEvent: OmittedEventFormData) => {
     try {
       setLoading(true);
-      await updateEvent(updatedEvent, eventId);
-      onSubmit(updatedEvent);
+
+      // Format start and end to ISO string if required by the backend
+      const formattedEvent = {
+        title: updatedEvent.title,
+        start: updatedEvent.start,
+        end: updatedEvent.end,
+        description: updatedEvent.description,
+        category: updatedEvent.category,
+        frequency: updatedEvent.frequency,
+        location: updatedEvent.location,
+      };
+      const response = await updateEvent(formattedEvent, eventId);
+
+      // Check if the response is OK
+      if (!response.ok) {
+        // Log detailed error information
+        const errorDetails = await response.json(); // Assuming the backend returns JSON errors
+        console.error("Failed to update event:", errorDetails);
+        throw new Error(`Error: ${errorDetails.message || "Unknown error"}`);
+      }
+
+      const fullEvent = {
+        ...formattedEvent,
+        siid: eventId,
+        uid: eventData.uid,
+        type: eventData.type,
+        calendarID: eventData.calendarID,
+      };
+      onSubmit(fullEvent);
     } catch (error) {
       console.error("Failed to update event:", error);
     } finally {
@@ -110,6 +161,9 @@ export function EditEventForm({
         />
       </div>
       <button type="submit">Save Changes</button>
+      <button type="button" onClick={handleDelete} disabled={loading}>
+        Delete Event
+      </button>
     </form>
   );
 }

@@ -1,4 +1,5 @@
 import { EventFormData } from "./types";
+import { OmittedEventFormData } from "@/components/dashboard/forms/EditEventForm";
 
 export async function createItem(
   user: { id: string },
@@ -42,7 +43,10 @@ export async function createItem(
   return data;
 }
 
-export async function updateEvent(event: EventFormData, eventId: number) {
+export async function updateEvent(
+  event: OmittedEventFormData,
+  eventId: number
+) {
   try {
     const response = await fetch(`http://localhost:8000/events/${eventId}`, {
       method: "PUT",
@@ -63,10 +67,10 @@ export async function updateEvent(event: EventFormData, eventId: number) {
     throw error; // Re-throw the error after logging it
   }
 }
-export async function deleteEvent(event: CalendarEvent) {
+export async function deleteEvent(eventId: number) {
   try {
     const response = await fetch(
-      `/api/events/${event.id}?userId=${event.user_id}`,
+      `http://localhost:8000/events/${eventId}/delete`,
       {
         method: "DELETE",
       }
