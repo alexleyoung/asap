@@ -11,7 +11,7 @@ import { EditEventForm } from "@/components/dashboard/forms/EditEventForm";
 import { EventFormData } from "@/lib/types";
 
 interface EventCardProps {
-  event: ScheduleEvent;
+  event: EventFormData;
   onDelete: (eventId: string) => void;
   onUpdate: (updatedEvent: EventFormData) => void; // callback to update the event
   onClose: () => void;
@@ -21,7 +21,6 @@ export function EventCard({
   event,
   onDelete,
   onUpdate,
-  item,
   onClose,
 }: EventCardProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -42,7 +41,14 @@ export function EventCard({
         <CardDescription>{event.description}</CardDescription>
       </CardHeader>
       {isEditing ? (
-        <EditEventForm eventData={event} onSubmit={handleSaveChanges} />
+        <EditEventForm
+          eventData={event}
+          onSubmit={handleSaveChanges}
+          eventId={event.siid.toString()}
+          onClose={function (): void {
+            throw new Error("Function not implemented.");
+          }}
+        />
       ) : (
         <CardContent>
           <CardDescription>

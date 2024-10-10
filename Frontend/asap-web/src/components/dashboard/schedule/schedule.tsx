@@ -50,6 +50,7 @@ import CreateItemTabs from "../forms/CreateItemTabs";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { EventFormData } from "@/lib/types";
 import EventCard from "./EventCard";
+import { Edit } from "lucide-react";
 
 export type ScheduleProps = {
   items: ScheduleItem[];
@@ -361,6 +362,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
           onClick={(e) => {
             e.stopPropagation();
             onItemClick(item);
+            console.log("item clicked, item:", item);
           }}
           className="scale-95 rounded-sm transition-transform p-2 text-white"
         >
@@ -387,6 +389,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
             onClick={(e) => {
               e.stopPropagation();
               setSelectedItem(item);
+              console.log("item clicked");
             }}
           >
             {item.title}

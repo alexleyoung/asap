@@ -42,6 +42,27 @@ export async function createItem(
   return data;
 }
 
+export async function updateEvent(event: EventFormData) {
+  try {
+    const response = await fetch(`http://localhost:8000/events/${event.id}`, {
+      method: "PUT",
+      body: JSON.stringify(event),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || "Something went wrong");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to update event:", error);
+    throw error; // Re-throw the error after logging it
+  }
+}
 export async function deleteEvent(event: CalendarEvent) {
   try {
     const response = await fetch(
