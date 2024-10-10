@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -79,7 +79,9 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
     const end = new Date(`${data.endDate}T${data.endTime}`);
     const userData = JSON.parse(localStorage.getItem("User") || "{}");
     const userId = Number(userData.id); // Ensure user.id is converted to a number
+    const eventID = Math.floor(Math.random() * 1000); // Generate a random event ID
     const newEvent: EventFormData & ScheduleEvent = {
+      type: "event",
       title: data.title,
       start: start,
       end: end,
@@ -89,6 +91,7 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
       frequency: data.frequency || "",
       uid: userId,
       calendarID: 1,
+      siid: eventID,
     };
     console.log("New event:", newEvent);
     onSubmit(newEvent);

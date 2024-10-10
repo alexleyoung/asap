@@ -19,7 +19,7 @@ export default function CreateItemTabs() {
     setUserId(storedUserId);
   }, []);
 
-  type EventDataToSend = Omit<EventFormData, "uid">;
+  type EventDataToSend = Omit<EventFormData, "uid" | "siid" | "type">;
 
   const handleEventSubmit = async (eventData: EventFormData) => {
     const {

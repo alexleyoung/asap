@@ -48,6 +48,8 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CreateItemTabs from "../forms/CreateItemTabs";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { EventFormData } from "@/lib/types";
+import EventCard from "./EventCard";
 
 export type ScheduleProps = {
   items: ScheduleItem[];
@@ -55,7 +57,7 @@ export type ScheduleProps = {
   onItemCreate: (item: ScheduleItem) => void;
 };
 
-const Schedule: React.FC<ScheduleProps> = ({
+export const Schedule: React.FC<ScheduleProps> = ({
   items,
   onItemUpdate,
   onItemCreate,

@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Card,
   CardContent,
@@ -6,41 +7,56 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import { EventPost } from "@/types/event";
-import React from "react";
+import { EditEventForm } from "@/components/dashboard/forms/EditEventForm";
+import { EventFormData } from "@/lib/types";
 
 interface EventCardProps {
-  event: EventPost;
+  event: ScheduleEvent;
+  onDelete: (eventId: string) => void;
+  onUpdate: (updatedEvent: EventFormData) => void; // callback to update the event
+  onClose: () => void;
 }
 
-export function EventCard({ event }: EventCardProps) {
-  const [selectedEvent, setSelectedEvent] = React.useState<EventPost | null>(
-    null
-  );
-  //when event is clicked, data is pulled to display in the card
-  const handleClick = (event: EventPost) => {
-    setSelectedEvent(event);
+export function EventCard({
+  event,
+  onDelete,
+  onUpdate,
+  item,
+  onClose,
+}: EventCardProps) {
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
   };
-  const deleteEvent = (event: EventPost) => {
-    //delete event
-  };
-  const editEvent = (event: EventPost) => {
-    //edit event
+
+  const handleSaveChanges = (updatedEvent: EventFormData) => {
+    onUpdate(updatedEvent);
+    setIsEditing(false); // close edit form after saving
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>THIS SHOULD BE EVENT TITLE</CardTitle>
-        <CardDescription>THIS SHOULD BE EVENT DESCRIPTION</CardDescription>
+        <CardTitle>{event.title}</CardTitle>
+        <CardDescription>{event.description}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <CardDescription>THIS SHOULD BE EVENT DATE</CardDescription>
-        <CardDescription>THIS SHOULD BE EVENT LOCATION</CardDescription>
-      </CardContent>
+      {isEditing ? (
+        <EditEventForm eventData={event} onSubmit={handleSaveChanges} />
+      ) : (
+        <CardContent>
+          <CardDescription>
+            Start Date: {event.start.toLocaleDateString()}
+          </CardDescription>
+          <CardDescription>
+            End Date: {event.end.toLocaleDateString()}
+          </CardDescription>
+          <CardDescription>Location: {event.location}</CardDescription>
+        </CardContent>
+      )}
       <CardFooter>
-        <button>Delete</button>
-        <button>Edit</button>
+        <button onClick={() => onDelete(event.siid.toString())}>Delete</button>
+        {!isEditing && <button onClick={handleEditClick}>Edit</button>}
       </CardFooter>
     </Card>
   );

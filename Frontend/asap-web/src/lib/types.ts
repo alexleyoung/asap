@@ -35,7 +35,7 @@ export type EventPost = {
   frequency: string;
   location: string;
   uid: string;
-  cid: string;
+  calendarID: string;
 };
 export type TaskPost = {
   title: string;
@@ -54,6 +54,7 @@ export type TaskPost = {
   cid: string;
 };
 export type EventFormData = {
+  type: "event";
   title: string;
   start: Date;
   end: Date;
@@ -63,4 +64,5 @@ export type EventFormData = {
   location: string;
   uid: number;
   calendarID: number;
+  siid: number;
 };
