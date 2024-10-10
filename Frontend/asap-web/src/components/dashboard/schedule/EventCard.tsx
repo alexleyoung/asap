@@ -44,7 +44,7 @@ export function EventCard({
         <EditEventForm
           eventData={event}
           onSubmit={handleSaveChanges}
-          eventId={event.siid.toString()}
+          eventId={event.siid}
           onClose={function (): void {
             throw new Error("Function not implemented.");
           }}
@@ -52,7 +52,7 @@ export function EventCard({
       ) : (
         <CardContent>
           <CardDescription>
-            Start Date: {event.start.toLocaleDateString()}
+            Start Date: {event.start.toISOString()}
           </CardDescription>
           <CardDescription>
             End Date: {event.end.toLocaleDateString()}

@@ -41,6 +41,8 @@ export default function Dashboard() {
           ...item,
           start: new Date(item.start), // Ensure start is a Date object
           end: new Date(item.end), // Ensure end is a Date object
+          siid: item.id,
+          uid: item.userID,
         }));
         console.log("Fetched data:", data);
         setItems(itemsWithDates);

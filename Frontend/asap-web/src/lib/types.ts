@@ -1,5 +1,5 @@
 export type ScheduleItem = {
-  siid: string;
+  siid: number;
   title: string;
   start: Date;
   end: Date;
@@ -9,6 +9,7 @@ export type ScheduleItem = {
   uid: number;
   calendarID: number;
   color: string;
+  type: "event" | "task";
 } & (ScheduleEvent | ScheduleTask);
 
 export type ScheduleEvent = {

@@ -42,9 +42,9 @@ export async function createItem(
   return data;
 }
 
-export async function updateEvent(event: EventFormData) {
+export async function updateEvent(event: EventFormData, eventId: number) {
   try {
-    const response = await fetch(`http://localhost:8000/events/${event.id}`, {
+    const response = await fetch(`http://localhost:8000/events/${eventId}`, {
       method: "PUT",
       body: JSON.stringify(event),
       headers: {

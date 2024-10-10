@@ -25,6 +25,7 @@ import {
   isWithinInterval,
   isBefore,
   isAfter,
+  set,
 } from "date-fns";
 
 import {
@@ -51,6 +52,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { EventFormData } from "@/lib/types";
 import EventCard from "./EventCard";
 import { Edit } from "lucide-react";
+import EditEventForm from "../forms/EditEventForm";
 
 export type ScheduleProps = {
   items: ScheduleItem[];
@@ -73,6 +75,8 @@ export const Schedule: React.FC<ScheduleProps> = ({
   const [newItem, setNewItem] = useState<Partial<ScheduleItem> | null>(null);
   const [selectedItem, setSelectedItem] = useState<ScheduleItem | null>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
+  const [edittingItem, setEdittingItem] = useState<EventFormData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const scrollToCurrentTime = useCallback(() => {
     if (scheduleRef.current && (view === "day" || view === "week")) {
@@ -198,6 +202,50 @@ export const Schedule: React.FC<ScheduleProps> = ({
     },
     [items, onItemUpdate]
   );
+
+  const handleEditItem = (item: EventFormData) => {
+    console.log("Editing item:", item);
+    // Open dialog with item data
+
+    setEdittingItem({
+      title: item.title,
+      start: item.start,
+      end: item.end,
+      description: item.description,
+      category: item.category,
+      frequency: item.frequency,
+      uid: item.uid,
+      calendarID: item.calendarID,
+      location: item.location,
+      siid: item.siid,
+      type: "event",
+    });
+    console.log("Editing event: ", edittingItem);
+
+    // if (item.type === "task") {
+    //   setEdittingItem({
+    //     title: item.title,
+    //     start: item.start,
+    //     end: item.end,
+    //     description: item.description,
+    //     category: item.category,
+    //     frequency: item.frequency,
+    //     due: item.due,
+    //     priority: item.priority,
+    //     difficulty: item.difficulty,
+    //     duration: item.duration,
+    //     flexible: item.flexible,
+    //     auto: item.auto,
+    //     uid: item.uid,
+    //     calendarID: item.calendarID,
+    //     siid: item.siid,
+    //   });
+    // }
+    setIsEditing(true);
+  };
+  useEffect(() => {
+    console.log("Editing event: ", edittingItem);
+  }, [edittingItem]);
 
   const handleScheduleClick = (day: Date, yPosition: number) => {
     if (scheduleRef.current) {
@@ -363,6 +411,23 @@ export const Schedule: React.FC<ScheduleProps> = ({
             e.stopPropagation();
             onItemClick(item);
             console.log("item clicked, item:", item);
+
+            // Log the item structure for debugging
+            console.log("Item Structure: ", item);
+
+            // ignore error lol
+            const eventFormData: EventFormData = {
+              ...item, // Spread properties from the original item
+              type: "event", // Ensure type is always "event"
+              siid: item.siid,
+              uid: item.uid,
+            };
+
+            // Log the final event form data to check everything
+            console.log("Final EventFormData: ", eventFormData);
+
+            handleEditItem(eventFormData);
+            console.log("Editing event");
           }}
           className="scale-95 rounded-sm transition-transform p-2 text-white"
         >
@@ -632,6 +697,32 @@ export const Schedule: React.FC<ScheduleProps> = ({
           </PopoverContent>
         </Popover>
       </div>
+      {/* Render the EditEventForm when editing an item */}
+      {isEditing && edittingItem && (
+        <Dialog open={isEditing} onOpenChange={setIsEditing}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Event</DialogTitle>
+              <DialogDescription>
+                Edit the details of the selected event.
+              </DialogDescription>
+            </DialogHeader>
+            <EditEventForm
+              eventData={edittingItem as EventFormData}
+              onClose={() => setIsEditing(false)}
+              onSubmit={(updatedEvent: EventFormData) => {
+                const updatedItem: ScheduleItem = {
+                  ...updatedEvent,
+                  color: "#800080", // Provide a default color if missing
+                };
+                onItemUpdate(updatedItem); // Call the update function
+                setIsEditing(false); // Close the dialog
+              }}
+              eventId={edittingItem.siid}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </DndContext>
   );
 };

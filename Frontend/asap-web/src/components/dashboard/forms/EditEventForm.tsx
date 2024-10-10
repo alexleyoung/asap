@@ -3,7 +3,7 @@ import React, { use, useEffect, useState } from "react";
 import { updateEvent } from "@/lib/scheduleCrud";
 
 interface EditEventFormProps {
-  eventId: string;
+  eventId: number;
   onClose: () => void;
   eventData: EventFormData;
   onSubmit: (updatedEvent: EventFormData) => void;
@@ -33,7 +33,7 @@ export function EditEventForm({
       end,
       location,
     };
-    onSubmit(updatedEvent); // call the submit handler
+    handleUpdate(updatedEvent); // call the update handler
   };
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export function EditEventForm({
   const handleUpdate = async (updatedEvent: EventFormData) => {
     try {
       setLoading(true);
-      await updateEvent(updatedEvent);
+      await updateEvent(updatedEvent, eventId);
       onSubmit(updatedEvent);
     } catch (error) {
       console.error("Failed to update event:", error);
