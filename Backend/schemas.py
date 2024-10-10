@@ -83,9 +83,9 @@ class EventUpdate(EventBase):
     title: Optional[str] = None
     start: Optional[datetime] = None
     end: Optional[datetime] = None
-    description: Optional[datetime] = None
-    category: Optional[datetime] = None
-    frequency: Optional[datetime] = None
+    description: Optional[str] = None
+    category: Optional[str] = None
+    frequency: Optional[str] = None
     location: Optional[str] = None
 
 #main class
