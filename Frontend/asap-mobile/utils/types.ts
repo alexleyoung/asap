@@ -12,19 +12,19 @@ export type Event = {
 };
 
 export type Task = {
-  id: string;
+  id: number;
   title: string;
   start: Date;
   end: Date;
   description: string;
   category: string;
   frequency: string;
-  uid: string;
-  cid: string;
-  due: Date;
+  userID: number;
+  calendarID: number;
+  dueDate: Date;
   priority: string;
   difficulty: string;
-  duration: string;
+  duration: number;
   flexible: boolean;
   auto: boolean;
   completed: boolean;
@@ -45,17 +45,18 @@ export type EventPost = {
 };
 export type TaskPost = {
   title: string;
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
   description: string;
   category: string;
   frequency: string;
-  due: string;
+  dueDate: Date;
   priority: string;
   difficulty: string;
-  duration: string;
-  flexible: string;
+  duration: number;
+  flexible: boolean;
   auto: boolean;
-  uid: string;
-  cid: string;
+  completed: boolean;
+  userID: number;
+  calendarID: number;
 };

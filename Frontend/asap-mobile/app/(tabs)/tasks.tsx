@@ -1,133 +1,117 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   FlatList,
   TouchableOpacity,
   Modal,
-  ScrollView,
   TextInput,
-  SafeAreaView,
+  ScrollView,
+  Switch,
+  Alert,
 } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 
-import { Task } from '~/utils/types';
-
-// Dummy data for demonstration
-const dummyTasks: Task[] = [
-  {
-    id: '1',
-    title: 'Complete Project Proposal',
-    start: new Date('2023-06-10T09:00:00'),
-    end: new Date('2023-06-10T11:00:00'),
-    description: 'Finish the project proposal for the client',
-    category: 'Work',
-    frequency: 'Once',
-    uid: 'user1',
-    cid: 'calendar1',
-    due: new Date('2023-06-11T17:00:00'),
-    priority: 'High',
-    difficulty: 'Medium',
-    duration: '2 hours',
-    flexible: true,
-    auto: true,
-    completed: false, // Added completed: false
-  },
-  {
-    id: '2',
-    title: 'Team Meeting',
-    start: new Date('2023-06-12T10:00:00'),
-    end: new Date('2023-06-12T11:00:00'),
-    description: 'Discuss project updates with the team',
-    category: 'Work',
-    frequency: 'Weekly',
-    uid: 'user1',
-    cid: 'calendar1',
-    due: new Date('2023-06-12T17:00:00'),
-    priority: 'Medium',
-    difficulty: 'Easy',
-    duration: '1 hour',
-    flexible: false,
-    auto: true,
-    completed: false, // Added completed: false
-  },
-  {
-    id: '3',
-    title: 'Grocery Shopping',
-    start: new Date('2023-06-13T15:00:00'),
-    end: new Date('2023-06-13T16:00:00'),
-    description: 'Buy groceries for the week',
-    category: 'Personal',
-    frequency: 'Weekly',
-    uid: 'user1',
-    cid: 'calendar2',
-    due: new Date('2023-06-13T18:00:00'),
-    priority: 'Low',
-    difficulty: 'Easy',
-    duration: '1 hour',
-    flexible: true,
-    auto: false,
-    completed: false, // Added completed: false
-  },
-  {
-    id: '4',
-    title: 'Doctor Appointment',
-    start: new Date('2023-06-14T09:30:00'),
-    end: new Date('2023-06-14T10:00:00'),
-    description: 'Annual checkup with the doctor',
-    category: 'Health',
-    frequency: 'Once',
-    uid: 'user2',
-    cid: 'calendar3',
-    due: new Date('2023-06-14T12:00:00'),
-    priority: 'Medium',
-    difficulty: 'Easy',
-    duration: '30 minutes',
-    flexible: false,
-    auto: true,
-    completed: false, // Added completed: false
-  },
-  {
-    id: '5',
-    title: 'Finish Reading Book',
-    start: new Date('2023-06-15T20:00:00'),
-    end: new Date('2023-06-15T22:00:00'),
-    description: 'Finish reading the current book for the month',
-    category: 'Personal',
-    frequency: 'Monthly',
-    uid: 'user1',
-    cid: 'calendar1',
-    due: new Date('2023-06-15T23:59:00'),
-    priority: 'Low',
-    difficulty: 'Medium',
-    duration: '2 hours',
-    flexible: true,
-    auto: false,
-    completed: false, // Added completed: false
-  },
-  // Add more dummy tasks as needed
-];
+import { fetchTasks, createTask, updateTask, deleteTask } from '~/api/tasks';
+import { Task, TaskPost } from '~/utils/types';
 
 const TasksPage = () => {
-  const [tasks, setTasks] = useState(dummyTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [newTask, setNewTask] = useState<Partial<Task>>({
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [newTask, setNewTask] = useState<Partial<TaskPost>>({
     title: '',
     description: '',
-    due: new Date(),
+    category: '',
+    frequency: 'Once',
+    dueDate: new Date(),
     priority: 'Medium',
     difficulty: 'Medium',
-    duration: '',
+    duration: 0,
     flexible: false,
     auto: false,
+    userID: 1, // Replace with actual user ID
+    calendarID: 1, // Replace with actual calendar ID
   });
 
-  const toggleComplete = (id: string) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task))
-    );
+  useEffect(() => {
+    loadTasks();
+  }, []);
+
+  const loadTasks = async () => {
+    try {
+      const fetchedTasks = await fetchTasks(1); // Replace with actual user ID
+      setTasks(fetchedTasks);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      Alert.alert('Error', 'Failed to load tasks. Please try again.');
+    }
+  };
+
+  const handleCreateTask = async () => {
+    try {
+      const createdTask = await createTask(newTask as TaskPost);
+      setTasks([...tasks, createdTask]);
+      setModalVisible(false);
+      resetNewTask();
+    } catch (error) {
+      console.error('Error creating task:', error);
+      Alert.alert('Error', 'Failed to create task. Please try again.');
+    }
+  };
+
+  const handleUpdateTask = async () => {
+    if (!editingTask) return;
+    try {
+      const updatedTask = await updateTask(editingTask.id, newTask);
+      setTasks(tasks.map((task) => (task.id === updatedTask.id ? updatedTask : task)));
+      setModalVisible(false);
+      setEditingTask(null);
+      resetNewTask();
+    } catch (error) {
+      console.error('Error updating task:', error);
+      Alert.alert('Error', 'Failed to update task. Please try again.');
+    }
+  };
+
+  const handleDeleteTask = async (taskId: number) => {
+    try {
+      await deleteTask(taskId);
+      setTasks(tasks.filter((task) => task.id !== taskId));
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      Alert.alert('Error', 'Failed to delete task. Please try again.');
+    }
+  };
+
+  const resetNewTask = () => {
+    setNewTask({
+      title: '',
+      description: '',
+      category: '',
+      frequency: 'Once',
+      dueDate: new Date(),
+      priority: 'Medium',
+      difficulty: 'Medium',
+      completed: false,
+      duration: 0,
+      flexible: false,
+      auto: false,
+      userID: 1, // Replace with actual user ID
+      calendarID: 1, // Replace with actual calendar ID
+    });
+  };
+
+  const toggleComplete = async (task: Task) => {
+    try {
+      const updatedTask = await updateTask(task.id, { ...task, completed: !task.completed });
+      setTasks(tasks.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+    } catch (error) {
+      console.error('Error toggling task completion:', error);
+      Alert.alert('Error', 'Failed to update task. Please try again.');
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -149,7 +133,7 @@ const TasksPage = () => {
         <Text className="font-semibold">{item.title}</Text>
       </View>
       <View className="w-20 items-center">
-        <Text className="text-sm text-gray-600">{format(item.due, 'MMM d')}</Text>
+        <Text className="text-sm text-gray-600">{format(new Date(item.dueDate), 'MMM d')}</Text>
       </View>
       <View className="w-20 items-center">
         <View className={`rounded-full px-2 py-1 ${getPriorityColor(item.priority)}`}>
@@ -159,84 +143,110 @@ const TasksPage = () => {
       <View className="w-12 items-center">
         <Checkbox
           status={item.completed ? 'checked' : 'unchecked'}
-          onPress={() => toggleComplete(item.id)}
+          onPress={() => toggleComplete(item)}
         />
       </View>
+      <TouchableOpacity
+        onPress={() => {
+          setEditingTask(item);
+          setNewTask({ ...item, dueDate: item.dueDate });
+          setModalVisible(true);
+        }}>
+        <Text className="mr-2 text-blue-500">Edit</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => handleDeleteTask(item.id)}>
+        <Text className="text-red-500">Delete</Text>
+      </TouchableOpacity>
     </View>
   );
 
-  const addTask = () => {
-    const task: Task = {
-      ...newTask,
-      id: Date.now().toString(),
-      start: new Date(),
-      end: new Date(),
-      category: 'Default',
-      frequency: 'Once',
-      uid: 'user1',
-      cid: 'calendar1',
-      color: '#000000',
-    } as Task;
-
-    setTasks([...tasks, task]);
-    setModalVisible(false);
-    setNewTask({
-      title: '',
-      description: '',
-      due: new Date(),
-      priority: 'Medium',
-      difficulty: 'Medium',
-      duration: '',
-      flexible: false,
-      auto: false,
-    });
-  };
-
   return (
-    <SafeAreaView className="mx-3 my-2 flex-1 p-4">
+    <View className="flex-1 bg-white p-4">
       <Text className="mb-4 text-2xl font-bold">Tasks</Text>
       <View className="flex-row items-center bg-gray-100 py-2 font-bold">
         <Text className="flex-1 px-2">Task</Text>
         <Text className="w-20 text-center">Due</Text>
         <Text className="w-20 text-center">Priority</Text>
         <Text className="w-12 text-center">Done</Text>
+        <Text className="w-24 text-center">Actions</Text>
       </View>
-      <FlatList data={tasks} renderItem={renderItem} keyExtractor={(item) => item.id} />
+      <FlatList data={tasks} renderItem={renderItem} keyExtractor={(item) => String(item.id)} />
       <TouchableOpacity
         className="mt-4 items-center rounded-full bg-blue-500 px-4 py-2"
-        onPress={() => setModalVisible(true)}>
+        onPress={() => {
+          setEditingTask(null);
+          resetNewTask();
+          setModalVisible(true);
+        }}>
         <Text className="font-bold text-white">Add New Task</Text>
       </TouchableOpacity>
 
-      <Modal transparent visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
+      <Modal
+        animationType="slide"
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
         <View className="flex-1 items-center justify-center bg-black bg-opacity-50">
           <View className="max-h-5/6 w-5/6 rounded-lg bg-white p-4">
             <ScrollView>
-              <Text className="mb-4 text-xl font-bold">Add New Task</Text>
+              <Text className="mb-4 text-xl font-bold">
+                {editingTask ? 'Edit Task' : 'Add New Task'}
+              </Text>
+
+              <Text className="mb-1 font-medium">Title</Text>
               <TextInput
                 className="mb-2 rounded-md border border-gray-300 p-2"
-                placeholder="Title"
+                placeholder="Enter task title"
                 value={newTask.title}
                 onChangeText={(text) => setNewTask({ ...newTask, title: text })}
               />
+
+              <Text className="mb-1 font-medium">Description</Text>
               <TextInput
                 className="mb-2 rounded-md border border-gray-300 p-2"
-                placeholder="Description"
+                placeholder="Enter task description"
                 multiline
                 numberOfLines={3}
                 value={newTask.description}
                 onChangeText={(text) => setNewTask({ ...newTask, description: text })}
               />
-              <Text className="mb-2">Due Date:</Text>
+
+              <Text className="mb-1 font-medium">Category</Text>
+              <TextInput
+                className="mb-2 rounded-md border border-gray-300 p-2"
+                placeholder="Enter task category"
+                value={newTask.category}
+                onChangeText={(text) => setNewTask({ ...newTask, category: text })}
+              />
+
+              <Text className="mb-1 font-medium">Frequency</Text>
+              <View className="mb-2 flex-row justify-around">
+                {['Once', 'Daily', 'Weekly', 'Monthly'].map((freq) => (
+                  <TouchableOpacity
+                    key={freq}
+                    className={`rounded-full px-4 py-2 ${newTask.frequency === freq ? 'bg-blue-500' : 'bg-gray-200'}`}
+                    onPress={() => setNewTask({ ...newTask, frequency: freq })}>
+                    <Text className={`${newTask.frequency === freq ? 'text-white' : 'text-black'}`}>
+                      {freq}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text className="mb-1 font-medium">Due Date</Text>
               <DateTimePicker
-                value={newTask.due || new Date()}
+                value={new Date(newTask.dueDate || new Date())}
                 mode="date"
                 display="default"
                 onChange={(event, selectedDate) =>
-                  setNewTask({ ...newTask, due: selectedDate || newTask.due })
+                  setNewTask({
+                    ...newTask,
+                    dueDate: selectedDate || newTask.dueDate,
+                  })
                 }
               />
-              <Text className="mb-2 mt-4">Priority:</Text>
+
+              <Text className="mb-1 mt-4 font-medium">Priority</Text>
               <View className="mb-2 flex-row justify-around">
                 {['Low', 'Medium', 'High'].map((priority) => (
                   <TouchableOpacity
@@ -250,41 +260,64 @@ const TasksPage = () => {
                   </TouchableOpacity>
                 ))}
               </View>
+
+              <Text className="mb-1 font-medium">Difficulty</Text>
+              <View className="mb-2 flex-row justify-around">
+                {['Low', 'Medium', 'High'].map((difficulty) => (
+                  <TouchableOpacity
+                    key={difficulty}
+                    className={`rounded-full px-4 py-2 ${newTask.difficulty === difficulty ? 'bg-blue-500' : 'bg-gray-200'}`}
+                    onPress={() => setNewTask({ ...newTask, difficulty })}>
+                    <Text
+                      className={`${newTask.difficulty === difficulty ? 'text-white' : 'text-black'}`}>
+                      {difficulty}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Text className="mb-1 font-medium">Duration (in minutes)</Text>
               <TextInput
                 className="mb-2 rounded-md border border-gray-300 p-2"
-                placeholder="Duration (e.g., 2 hours)"
-                value={newTask.duration}
-                onChangeText={(text) => setNewTask({ ...newTask, duration: text })}
+                placeholder="Enter task duration"
+                keyboardType="numeric"
+                value={newTask.duration?.toString() || ''}
+                onChangeText={(num) => setNewTask({ ...newTask, duration: Number(num) })}
               />
-              <View className="mb-2 flex-row items-center">
-                <Text className="mr-2">Flexible:</Text>
-                <Checkbox
-                  status={newTask.flexible ? 'checked' : 'unchecked'}
-                  onPress={() => setNewTask({ ...newTask, flexible: !newTask.flexible })}
+
+              <View className="mb-2 flex-row items-center justify-between">
+                <Text className="font-medium">Flexible</Text>
+                <Switch
+                  value={newTask.flexible === true}
+                  onValueChange={(value) => setNewTask({ ...newTask, flexible: value })}
                 />
               </View>
-              <View className="mb-4 flex-row items-center">
-                <Text className="mr-2">Auto-schedule:</Text>
-                <Checkbox
-                  status={newTask.auto ? 'checked' : 'unchecked'}
-                  onPress={() => setNewTask({ ...newTask, auto: !newTask.auto })}
+
+              <View className="mb-4 flex-row items-center justify-between">
+                <Text className="font-medium">Auto-schedule</Text>
+                <Switch
+                  value={newTask.auto}
+                  onValueChange={(value) => setNewTask({ ...newTask, auto: value })}
                 />
               </View>
+
               <View className="flex-row justify-end">
                 <TouchableOpacity
                   className="mr-2 rounded-md bg-gray-300 px-4 py-2"
                   onPress={() => setModalVisible(false)}>
                   <Text>Cancel</Text>
                 </TouchableOpacity>
-                <TouchableOpacity className="rounded-md bg-blue-500 px-4 py-2" onPress={addTask}>
-                  <Text className="text-white">Add Task</Text>
+                <TouchableOpacity
+                  className="rounded-md bg-blue-500 px-4 py-2"
+                  onPress={editingTask ? handleUpdateTask : handleCreateTask}>
+                  <Text className="text-white">{editingTask ? 'Update' : 'Add'} Task</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
