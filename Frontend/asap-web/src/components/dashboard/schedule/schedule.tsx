@@ -49,7 +49,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CreateItemTabs from "../forms/CreateItemTabs";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
-type ScheduleProps = {
+export type ScheduleProps = {
   items: ScheduleItem[];
   onItemUpdate: (item: ScheduleItem) => void;
   onItemCreate: (item: ScheduleItem) => void;
@@ -331,7 +331,7 @@ const Schedule: React.FC<ScheduleProps> = ({
           height: `${heightPercentage}%`,
           left: `${columnOffset * columnWidth}%`,
           width: `${columnWidth}%`,
-          backgroundColor: item.color,
+          backgroundColor: "#800080", //chaange to item.color
           cursor: isDragging ? "grabbing" : "grab",
           zIndex: isDragging ? 20 : 10,
           opacity: isDragging ? 0.8 : 1,
@@ -381,7 +381,7 @@ const Schedule: React.FC<ScheduleProps> = ({
           <div
             key={item.siid}
             className="text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
-            style={{ backgroundColor: item.color }}
+            style={{ backgroundColor: "#800080" }} // change to item.color
             onClick={(e) => {
               e.stopPropagation();
               setSelectedItem(item);

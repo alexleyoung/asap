@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createItem } from "../../../lib/scheduleCrud";
 import { useEffect, useState } from "react";
 import { EventFormData } from "@/lib/types";
+import handleItemCreate from "@/app/dashboard/page";
 
 interface createItemTabsProps {}
 
@@ -72,14 +73,14 @@ export default function CreateItemTabs() {
         </TabsList>
       </DialogHeader>
       <TabsContent value="event">
-        <EventForm onSubmit={handleEventSubmit} />
+        <EventForm
+          onSubmit={handleEventSubmit}
+          onItemCreate={handleItemCreate}
+        />
       </TabsContent>
       <TabsContent value="task">
         <TaskForm onSubmit={() => {}} />
       </TabsContent>
     </Tabs>
   );
-}
-function setLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
 }

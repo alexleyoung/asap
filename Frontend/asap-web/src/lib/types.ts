@@ -6,8 +6,8 @@ export type ScheduleItem = {
   description: string;
   category: string;
   frequency: string;
-  uid: string;
-  cid: string;
+  uid: number;
+  calendarID: number;
   color: string;
 } & (ScheduleEvent | ScheduleTask);
 

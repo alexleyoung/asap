@@ -26,7 +26,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { EventFormData } from "@/lib/types";
+import { EventFormData, ScheduleEvent } from "@/lib/types";
+import Schedule from "@/components/dashboard/schedule";
+import { useScheduleItems } from "@/contexts/ScheduleContext";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -52,9 +54,10 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface EventFormProps {
   onSubmit: (data: EventFormData) => void;
+  onItemCreate: (newItem: ScheduleEvent) => void;
 }
 
-export function EventForm({ onSubmit }: EventFormProps) {
+export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
@@ -75,8 +78,8 @@ export function EventForm({ onSubmit }: EventFormProps) {
     const start = new Date(`${data.startDate}T${data.startTime}`);
     const end = new Date(`${data.endDate}T${data.endTime}`);
     const userData = JSON.parse(localStorage.getItem("User") || "{}");
-    const userId = userData.id; // Assuming user.id contains the user ID
-    onSubmit({
+    const userId = Number(userData.id); // Ensure user.id is converted to a number
+    const newEvent: EventFormData & ScheduleEvent = {
       title: data.title,
       start: start,
       end: end,
@@ -86,7 +89,11 @@ export function EventForm({ onSubmit }: EventFormProps) {
       frequency: data.frequency || "",
       uid: userId,
       calendarID: 1,
-    });
+    };
+    console.log("New event:", newEvent);
+    onSubmit(newEvent);
+    onItemCreate(newEvent);
+    window.location.reload();
   };
 
   const handleDateChange = (
