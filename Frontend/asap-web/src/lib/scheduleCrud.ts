@@ -1,5 +1,5 @@
 import { EventFormData } from "./types";
-import { OmittedEventFormData } from "@/components/dashboard/forms/EditEventForm";
+import { OrderedEventFormData } from "@/components/dashboard/forms/EditEventForm";
 
 export async function createItem(
   user: { id: string },
@@ -44,7 +44,7 @@ export async function createItem(
 }
 
 export async function updateEvent(
-  event: OmittedEventFormData,
+  event: OrderedEventFormData,
   eventId: number
 ) {
   try {
@@ -56,12 +56,14 @@ export async function updateEvent(
       },
     });
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || "Something went wrong");
-    }
+    // if (!response.ok) {
+    //   const data = await response.json();
+    //   console.log("Error updating event:", data);
+    //   throw new Error(data.error || "Something went wrong");
+    // }
 
-    return await response.json();
+    // return await response.json();
+    return await response;
   } catch (error) {
     console.error("Failed to update event:", error);
     throw error; // Re-throw the error after logging it

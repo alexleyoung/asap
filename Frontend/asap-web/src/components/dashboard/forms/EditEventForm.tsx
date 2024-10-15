@@ -13,6 +13,15 @@ export type OmittedEventFormData = Omit<
   EventFormData,
   "siid" | "uid" | "calendarID" | "type"
 >;
+export interface OrderedEventFormData {
+  title: string;
+  start: string; // Adjust this type as needed
+  end: string; // Adjust this type as needed
+  description: string;
+  category: string;
+  frequency: string;
+  location: string;
+}
 
 export function EditEventForm({
   eventId,
@@ -22,7 +31,7 @@ export function EditEventForm({
 }: EditEventFormProps) {
   const [title, setTitle] = useState(eventData.title);
   const [description, setDescription] = useState(eventData.description);
-  const [start, setStartDate] = useState(eventData.start);
+  const [start, setStartDate] = useState(new Date(eventData.start));
   const [end, setEndDate] = useState(new Date(eventData.end));
   const [location, setLocation] = useState(eventData.location);
   const [loading, setLoading] = useState(false);
@@ -46,15 +55,16 @@ export function EditEventForm({
     e.preventDefault();
 
     // Create the updated event object with the correct types
-    const updatedEvent: OmittedEventFormData = {
+    const updatedEvent: OrderedEventFormData = {
       title,
       description,
-      start,
-      end,
+      start: start.toISOString(),
+      end: end.toISOString(),
       location,
       category: eventData.category, // Ensure this is a string
       frequency: eventData.frequency, // Ensure this is a string
     };
+    console.log("Updated event before submission:", updatedEvent);
 
     // Call the update handler
     handleUpdate(updatedEvent);
@@ -79,7 +89,7 @@ export function EditEventForm({
     fetchEventData();
   }, [eventId, deleteEvent]);
 
-  const handleUpdate = async (updatedEvent: OmittedEventFormData) => {
+  const handleUpdate = async (updatedEvent: OrderedEventFormData) => {
     try {
       setLoading(true);
 
@@ -93,13 +103,19 @@ export function EditEventForm({
         frequency: updatedEvent.frequency,
         location: updatedEvent.location,
       };
+      console.log(
+        "Formatted event data being sent to backend:",
+        formattedEvent
+      );
+
       const response = await updateEvent(formattedEvent, eventId);
+      console.log("Response status from backend:", response.status);
 
       // Check if the response is OK
       if (!response.ok) {
         // Log detailed error information
         const errorDetails = await response.json(); // Assuming the backend returns JSON errors
-        console.error("Failed to update event:", errorDetails);
+        console.error("Failed to update event!:", errorDetails);
         throw new Error(`Error: ${errorDetails.message || "Unknown error"}`);
       }
 
@@ -112,7 +128,7 @@ export function EditEventForm({
       };
       onSubmit(fullEvent);
     } catch (error) {
-      console.error("Failed to update event:", error);
+      console.error("Failed to update eventP:", error);
     } finally {
       setLoading(false);
     }
