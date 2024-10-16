@@ -1,16 +1,31 @@
-from fastapi import FastAPI, HTTPException, Depends, status
 from pydantic import BaseModel
-from typing import Annotated
-from Backend import models
-from .database import engine, SessionLocal
-from sqlalchemy.orm import Session
 from typing import Optional
+from datetime import datetime
+
+
+# For JWT token response
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: str | None = None
+
+##### USER #####
+
 
 #create User schemas
 class UserBase(BaseModel):
-    firstName: str
-    lastName: str
+    firstname: str
+    lastname: str
     email: str
+
+class UserInDB(UserBase):
+    hashed_password: str
+
+class UserInDB(UserBase):
+    hashed_password: str
+
 
 #for creating a user
 class UserCreate(UserBase):
@@ -18,9 +33,10 @@ class UserCreate(UserBase):
 
 #for updating a user
 class UserUpdate(BaseModel):
-    firstName: Optional[str] = None
-    lastName: Optional[str] = None
+    firstname: Optional[str] = None
+    lastname: Optional[str] = None
     email: Optional[str] = None
+    avatar: Optional[str] = None
 
 #main class
 class User(UserBase):
@@ -41,35 +57,11 @@ class CalendarBase(BaseModel):
 
 #for creating a calendar
 class CalendarCreate(CalendarBase):
-    pass #nothing just to create that you cannot read
+    ownerID: int
 
 #main class
 class Calendar(BaseModel):
     id: int
-    ownerID: int
-
-    class Config:
-        from_attributes = True
-
-###
-#ScheduleItem
-class ScheduleItemBase(BaseModel):
-    title: str
-    start: int
-    end: int
-    description: str
-    category: str
-    frequency: str
-
-#to create
-class ScheduleItemCreate(ScheduleItemBase):
-    pass
-
-#main class
-class ScheduleItem(ScheduleItemBase):
-    id: int
-    userID: int
-    calendarID: int
 
     class Config:
         from_attributes = True
@@ -77,6 +69,12 @@ class ScheduleItem(ScheduleItemBase):
 ###
 #Event
 class EventBase(BaseModel):
+    title: str
+    start: datetime
+    end: datetime
+    description: str
+    category: str
+    frequency: str
     location: str
 
 #to create
@@ -93,15 +91,37 @@ class Event(EventBase):
 ###
 #Task
 class TaskBase(BaseModel):
-    dueDate: int
-    priority: int
-    difficulty: int
-    duration: int 
-    flexibility: int
+    title: str
+    start: datetime
+    end: datetime
+    description: str
+    category: str
+    frequency: str
+    dueDate: datetime
+    priority: str
+    difficulty: str
+    duration: int
+    auto: bool
+    completed: bool
+    flexible: bool
+    userID: int
+    calendarID: int
 
 #to create
-class TaskCreate(TaskBase):
-    pass
+class TaskCreate(BaseModel):
+    auto: bool
+    calendarID: int
+    category: str
+    description: str
+    difficulty: str
+    dueDate: datetime
+    duration: int
+    flexible: bool
+    frequency: str
+    completed: bool
+    priority: str
+    title: str
+    userID: int
 
 #main class
 class Task(TaskBase):
