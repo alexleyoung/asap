@@ -23,6 +23,39 @@ export default function Dashboard() {
     setItems((prevItems) => [...prevItems, newItem]);
   };
 
+  useEffect(() => {
+    const fetchScheduleItems = async () => {
+      try {
+        const storedUser = localStorage.getItem("User");
+        const userID = storedUser ? JSON.parse(storedUser).id : null;
+        console.log("Fetching schedule items...");
+        const response = await fetch(
+          `http://localhost:8000/users/${userID}/events`
+        );
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+          throw new Error("Failed to fetch schedule items");
+        }
+        const data = await response.json();
+        const itemsWithDates = data.map((item: any) => ({
+          ...item,
+          start: new Date(item.start), // Ensure start is a Date object
+          end: new Date(item.end), // Ensure end is a Date object
+          siid: item.id,
+          uid: item.userID,
+        }));
+        console.log("Fetched data:", data);
+        setItems(itemsWithDates);
+      } catch (error) {
+        console.error("Failed to fetch schedule items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchScheduleItems();
+  }, []);
+
   // useEffect(() => {
   //   const checkAuth = async () => {
   //     try {

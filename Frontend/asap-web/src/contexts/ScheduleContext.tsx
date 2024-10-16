@@ -35,7 +35,7 @@ const ScheduleItemsContext = createContext<
 export function ScheduleProvider({ children }: { children: React.ReactNode }) {
   const [view, setView] = useState("week");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [items, setItems] = useState<ScheduleItem[]>(testScheduleItems);
+  const [items, setItems] = useState<ScheduleItem[]>([]);
 
   return (
     <ViewContext.Provider value={{ view, setView }}>

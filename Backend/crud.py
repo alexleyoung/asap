@@ -19,8 +19,8 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 #delete user
-def delete_user(db: Session, user_id: int):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+def delete_user(db: Session, userID: int):
+    user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
     db.delete(user)
@@ -40,8 +40,8 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
 
 #to change password
-def change_user_password(db: Session, user_id: int, new_password: str):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+def change_user_password(db: Session, userID: int, new_password: str):
+    user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
     hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
@@ -51,8 +51,8 @@ def change_user_password(db: Session, user_id: int, new_password: str):
     return user
 
 #update info
-def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
+def update_user(db: Session, userID: int, user_update: schemas.UserUpdate):
+    user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
     for key, value in user_update.model_dump(exclude_unset=True).items():
@@ -64,16 +64,39 @@ def update_user(db: Session, user_id: int, user_update: schemas.UserUpdate):
 
 ##### EVENT CRUDS #####
 
-def create_schedule_item(db: Session, Event: schemas.EventCreate):
-    db_event = models.scheduleItem(title = Event.title, start = Event.start,
-                                   end = Event.end, description = Event.description,
-                                   category = Event.category, frequency = Event.frequency,
-                                   location = Event.location)
+def create_event(db: Session, event: schemas.EventCreate, userID: int):
+    db_event = models.Event(title = event.title, start = event.start,
+                                   end = event.end, description = event.description,
+                                   category = event.category, frequency = event.frequency,
+                                   location = event.location, userID=userID,
+                                   calendarID = event.calendarID)
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
     return db_event
 
+#get event
+def get_event(db: Session, eventID: int):
+    return db.query(models.Event).filter(models.Event.id == eventID).first()
+
+#delete event
+def delete_event(db: Session, eventID: int):
+    db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
+    if db_event is None:
+        return None
+    db.delete(db_event)
+    db.commit()
+    return db_event
+
+#get a user's events
+def get_events_by_user(db: Session, userID: int):
+    return db.query(models.Event).filter(models.Event.userID == userID).all()
+
+#edit event
+def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
+    db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
+    if db_event is None:
+        return None
 
 ##### TASK CRUDS #####
 
@@ -116,9 +139,14 @@ def update_task(db: Session, task_id: int, task_update: schemas.TaskCreate):
 
 ### CALENDARS ### 
 
-def create_calendar(db: Session, Calendar: schemas.CalendarCreate):
-    db_calendar = models.Calendar(name = Calendar.name, description = Calendar.description,
-                                  timezone = Calendar.timezone, ownerID = Calendar.ownerID)
+# CRUD operation to create a new calendar
+def create_calendar(db: Session, calendar: schemas.CalendarCreate, userID: int):
+    db_calendar = models.Calendar(
+        name=calendar.name,
+        description=calendar.description,
+        timezone=calendar.timezone,
+        userID=userID  # Linking the calendar to the user who owns it
+    )
     db.add(db_calendar)
     db.commit()
     db.refresh(db_calendar)
