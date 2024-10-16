@@ -111,11 +111,21 @@ class TaskBase(BaseModel):
     difficulty: str
     duration: int
     flexibility: bool
+    userID: int
+    calendarID: int
 
 
 
 #to create
-class TaskCreate(TaskBase):
+class TaskCreate(BaseModel):
+    title: str
+    description: str
+    category: str
+    dueDate: datetime
+    priority: str
+    difficulty: str
+    duration: int
+    flexibility: bool
     userID: int
     calendarID: int
 
