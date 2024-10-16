@@ -1,14 +1,15 @@
 export type ScheduleItem = {
-  siid: string;
+  siid: number;
   title: string;
   start: Date;
   end: Date;
   description: string;
   category: string;
   frequency: string;
-  uid: string;
-  cid: string;
+  uid: number;
+  calendarID: number;
   color: string;
+  type: "event" | "task";
 } & (ScheduleEvent | ScheduleTask);
 
 export type ScheduleEvent = {
@@ -35,7 +36,7 @@ export type EventPost = {
   frequency: string;
   location: string;
   uid: string;
-  cid: string;
+  calendarID: string;
 };
 export type TaskPost = {
   title: string;
@@ -52,4 +53,17 @@ export type TaskPost = {
   auto: boolean;
   uid: string;
   cid: string;
+};
+export type EventFormData = {
+  type: "event";
+  title: string;
+  start: Date;
+  end: Date;
+  description: string;
+  category: string;
+  frequency: string;
+  location: string;
+  uid: number;
+  calendarID: number;
+  siid: number;
 };

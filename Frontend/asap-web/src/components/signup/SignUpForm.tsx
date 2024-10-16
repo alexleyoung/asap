@@ -18,21 +18,32 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useRouter } from "next/navigation";
 
-const formSchema = z.object({
-  email: z.string().email().min(1, "Email is required"),
-  password: z.string().min(1, "Password is required"),
-  firstname: z.string().min(1, "First Name is required"),
-  lastname: z.string().min(1, "Last Name is required"),
-});
+const formSchema = z
+  .object({
+    email: z.string().email().min(1, "Email is required"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(
+        /[!@#$%^&*(),.?":{}|<>]/,
+        "Password must contain a special character"
+      ),
+    confirmpassword: z.string().min(1, "Confirm Password is required"),
+    firstname: z.string().min(1, "First Name is required"),
+    lastname: z.string().min(1, "Last Name is required"),
+  })
+  .refine((data) => data.password === data.confirmpassword, {
+    path: ["confirmpassword"],
+    message: "Passwords do not match",
+  });
 
 export default function SignUpForm() {
-  const [email] = useState("");
-  const [password] = useState("");
-  const [firstname] = useState("");
-  const [lastname] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,6 +51,7 @@ export default function SignUpForm() {
       lastname: "",
       email: "",
       password: "",
+      confirmpassword: "",
     },
   });
 
@@ -56,17 +68,19 @@ export default function SignUpForm() {
         data.email,
         data.password
       );
-      if (response.ok) {
+
+      if (response) {
+        // Check if the response is valid, change the condition
         setError("");
         setSuccess("Account created successfully");
+        router.push("/dashboard");
       } else {
-        setError(
-          response.message || "Invalid email or password. Please try again."
-        );
+        setError("Invalid email or password. Please try again.");
       }
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      setError("HI CAITI");
       setSuccess("");
+      console.error(error); // Log the actual error
     }
   };
 
@@ -82,10 +96,6 @@ export default function SignUpForm() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignUp)}
-            // {(e) => {
-            //   e.preventDefault();
-            //   handleSignUp({ firstname, lastname, email, password });
-            // }}
             className="space-y-8"
           >
             <FormField
@@ -145,19 +155,23 @@ export default function SignUpForm() {
                 </FormItem>
               )}
             />
-            {/* <FormField
+            <FormField
               control={form.control}
               name="confirmpassword"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input {...field} type="password" />
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="confirm password"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}  
-            /> */}
+              )}
+            />
             {error && <p className="text-red-500 text-sm">{error}</p>}
             {success && <p className="text-green-500 text-sm">{success}</p>}
             <Button type="submit" className="w-full">
@@ -177,6 +191,5 @@ export default function SignUpForm() {
         </Button>
       </div>
     </div>
-    // </div>
   );
 }
