@@ -88,8 +88,8 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
       title: data.title,
       due: due.toISOString(),
       description: data.description || "",
-      user_id: "default-user-id", // This would be replaced with actual user ID
-      calendar_id: "default-calendar-id", // This would be replaced with actual calendar ID
+      uid: "default-user-id", // This would be replaced with actual user ID
+      cid: "default-calendar-id", // This would be replaced with actual calendar ID
     });
   };
   const handleDateChange = (field: "dueDate", date: Date | undefined) => {
@@ -103,29 +103,28 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="space-y-8 w-full max-w-md mx-auto"
-      >
+        className='space-y-8 w-full max-w-md mx-auto'>
         <FormField
           control={form.control}
-          name="title"
+          name='title'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Event title" {...field} />
+                <Input placeholder='Event title' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex space-x-4">
+        <div className='flex space-x-4'>
           <FormField
             control={form.control}
-            name="dueDate"
+            name='dueDate'
             render={({ field }) => (
-              <FormItem className="flex-1">
+              <FormItem className='flex-1'>
                 <FormLabel>Due Date</FormLabel>
-                <div className="flex items-center">
+                <div className='flex items-center'>
                   <FormControl>
                     <Input
                       {...field}
@@ -143,7 +142,7 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
                         field.onChange(format(date, "yyyy-MM-dd"));
                         setDueDate(date);
                       }}
-                      placeholder="MMM. DD, YYYY"
+                      placeholder='MMM. DD, YYYY'
                     />
                   </FormControl>
                   <Popover>
@@ -153,19 +152,18 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
                         className={cn(
                           "ml-2 w-10 p-0",
                           !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="h-4 w-4" />
+                        )}>
+                        <CalendarIcon className='h-4 w-4' />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className='w-auto p-0' align='start'>
                       <Calendar
-                        mode="single"
+                        mode='single'
                         selected={dueDate}
                         onSelect={(date) => {
                           handleDateChange("dueDate", date);
                         }}
-                        className="rounded-md border"
+                        className='rounded-md border'
                       />
                     </PopoverContent>
                   </Popover>
@@ -176,12 +174,12 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
           />
           <FormField
             control={form.control}
-            name="dueTime"
+            name='dueTime'
             render={({ field }) => (
-              <FormItem className="flex-1">
+              <FormItem className='flex-1'>
                 <FormLabel>Due Time</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <Input type='time' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -190,33 +188,33 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
         </div>
         <FormField
           control={form.control}
-          name="duration"
+          name='duration'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Duration (in minutes)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="Duration" {...field} />
+                <Input type='number' placeholder='Duration' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex space-x-[5.5rem] ">
+        <div className='flex space-x-[5.5rem] '>
           <FormField
             control={form.control}
-            name="difficulty"
+            name='difficulty'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Difficulty</FormLabel>
                 <FormControl>
                   <Select>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Difficulty" />
+                    <SelectTrigger className='w-[180px]'>
+                      <SelectValue placeholder='Difficulty' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="easy">Easy</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="hard">Hard</SelectItem>
+                      <SelectItem value='easy'>Easy</SelectItem>
+                      <SelectItem value='medium'>Medium</SelectItem>
+                      <SelectItem value='hard'>Hard</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -226,20 +224,20 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
           />
           <FormField
             control={form.control}
-            name="priority"
+            name='priority'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Priority</FormLabel>
                 <FormControl>
                   <Select>
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Priority" />
+                    <SelectTrigger className='w-[180px]'>
+                      <SelectValue placeholder='Priority' />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="low">Low</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="asap">ASAP</SelectItem>
+                      <SelectItem value='low'>Low</SelectItem>
+                      <SelectItem value='medium'>Medium</SelectItem>
+                      <SelectItem value='high'>High</SelectItem>
+                      <SelectItem value='asap'>ASAP</SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>
@@ -251,14 +249,14 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
 
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Event description (optional)"
-                  className="resize-none"
+                  placeholder='Event description (optional)'
+                  className='resize-none'
                   {...field}
                 />
               </FormControl>
@@ -269,14 +267,14 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
             </FormItem>
           )}
         />
-        <div className="flex items-center space-x-64">
+        <div className='flex items-center space-x-64'>
           <FormField
             control={form.control}
-            name="flexible"
+            name='flexible'
             render={({ field }) => (
               <FormItem>
-                <div className="flex items-center space-x-2">
-                  <FormLabel className="m-0">Flexible?</FormLabel>
+                <div className='flex items-center space-x-2'>
+                  <FormLabel className='m-0'>Flexible?</FormLabel>
                   <FormControl>
                     <Checkbox />
                   </FormControl>
@@ -286,8 +284,8 @@ export function TaskForm({ onSubmit }: TaskFormProps) {
             )}
           />
 
-          <div className="flex justify-end">
-            <Button type="submit" variant="secondary">
+          <div className='flex justify-end'>
+            <Button type='submit' variant='secondary'>
               Create Task
             </Button>
           </div>

@@ -11,6 +11,7 @@ import {
   ScrollView,
   Switch,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import { Checkbox } from 'react-native-paper';
 
@@ -161,7 +162,7 @@ const TasksPage = () => {
   );
 
   return (
-    <View className="flex-1 bg-white p-4">
+    <SafeAreaView className="mx-3 flex-1 p-4">
       <Text className="mb-4 text-2xl font-bold">Tasks</Text>
       <View className="flex-row items-center bg-gray-100 py-2 font-bold">
         <Text className="flex-1 px-2">Task</Text>
@@ -182,8 +183,7 @@ const TasksPage = () => {
       </TouchableOpacity>
 
       <Modal
-        animationType="slide"
-        transparent
+        animationType="none"
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}>
         <View className="flex-1 items-center justify-center bg-black bg-opacity-50">
@@ -317,7 +317,7 @@ const TasksPage = () => {
           </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 
