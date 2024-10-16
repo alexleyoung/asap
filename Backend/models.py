@@ -40,6 +40,8 @@ class Calendar(Base):
     events = relationship("Event", back_populates="calendar")
     tasks = relationship("Task", back_populates="calendar")
     
+    #owner = relationship("User", back_populates="calendars")
+    
 # Events table
 class Event(Base):
     __tablename__ = "events"
@@ -50,6 +52,8 @@ class Event(Base):
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String)
+    userID = Column("userID", Integer, ForeignKey('users.id'))
+    calendarID = Column("calendarID", Integer, ForeignKey('calendars.id'))
     location = Column("location", String)
 
     #foreign keys 
@@ -72,9 +76,11 @@ class Task(Base):
     frequency = Column("frequency", String)
     dueDate = Column("dueDate", DateTime)
     priority = Column("priority", String)
+    auto = Column("auto", Boolean)
+    completed = Column("completed", Boolean)
     difficulty = Column("difficulty", String)
     duration = Column("duration", Integer)
-    flexibility = Column("flexibility", Boolean)
+    flexible = Column("flexible", Boolean)
 
     #foreign keys
     userID = Column("userID", Integer, ForeignKey('users.id'))

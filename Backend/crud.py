@@ -111,10 +111,10 @@ def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
 def create_task(db: Session, Task: schemas.TaskCreate):
     db_task = models.Task(title = Task.title, start = date.today(),
                           end = date.today(), description = Task.description,
-                          category = Task.category, frequency = "",
-                          dueDate = Task.dueDate, priority = Task.priority,
-                          difficulty = Task.difficulty, duration = Task.duration,
-                          flexibility = Task.flexibility, userID=Task.userID, calendarID=Task.calendarID) # calendar TBD
+                          category = Task.category, frequency = Task.frequency,
+                          dueDate = Task.dueDate, auto = Task.auto, priority = Task.priority,
+                          difficulty = Task.difficulty, duration = Task.duration, completed=Task.completed,
+                          flexible = Task.flexible, userID=Task.userID, calendarID=Task.calendarID)
     db.add(db_task)
     db.commit()
     db.refresh(db_task)

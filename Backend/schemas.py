@@ -110,24 +110,27 @@ class TaskBase(BaseModel):
     priority: str
     difficulty: str
     duration: int
-    flexibility: bool
+    auto: bool
+    completed: bool
+    flexible: bool
     userID: int
     calendarID: int
-
-
 
 #to create
 class TaskCreate(BaseModel):
-    title: str
-    description: str
-    category: str
-    dueDate: datetime
-    priority: str
-    difficulty: str
-    duration: int
-    flexibility: bool
-    userID: int
+    auto: bool
     calendarID: int
+    category: str
+    description: str
+    difficulty: str
+    dueDate: datetime
+    duration: int
+    flexible: bool
+    frequency: str
+    completed: bool
+    priority: str
+    title: str
+    userID: int
 
 #main class
 class Task(TaskBase):
