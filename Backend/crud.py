@@ -92,11 +92,19 @@ def delete_event(db: Session, eventID: int):
 def get_events_by_user(db: Session, userID: int):
     return db.query(models.Event).filter(models.Event.userID == userID).all()
 
+
 #edit event
 def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
     if db_event is None:
         return None
+
+    for key, value in event_update.model_dump(exclude_unset=True).items():
+        setattr(db_event, key, value)
+
+    db.commit()
+    db.refresh(db_event)
+    return db_event
 
 ##### TASK CRUDS #####
 
