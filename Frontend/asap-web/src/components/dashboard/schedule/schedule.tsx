@@ -25,6 +25,7 @@ import {
   isWithinInterval,
   isBefore,
   isAfter,
+  set,
 } from "date-fns";
 
 import {
@@ -48,14 +49,18 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CreateItemTabs from "../forms/CreateItemTabs";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { EventFormData } from "@/lib/types";
+import EventCard from "./EventCard";
+import { Edit } from "lucide-react";
+import EditEventForm from "../forms/EditEventForm";
 
-type ScheduleProps = {
+export type ScheduleProps = {
   items: ScheduleItem[];
   onItemUpdate: (item: ScheduleItem) => void;
   onItemCreate: (item: ScheduleItem) => void;
 };
 
-const Schedule: React.FC<ScheduleProps> = ({
+export const Schedule: React.FC<ScheduleProps> = ({
   items,
   onItemUpdate,
   onItemCreate,
@@ -70,6 +75,8 @@ const Schedule: React.FC<ScheduleProps> = ({
   const [newItem, setNewItem] = useState<Partial<ScheduleItem> | null>(null);
   const [selectedItem, setSelectedItem] = useState<ScheduleItem | null>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
+  const [edittingItem, setEdittingItem] = useState<EventFormData | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const scrollToCurrentTime = useCallback(() => {
     if (scheduleRef.current && (view === "day" || view === "week")) {
@@ -196,6 +203,50 @@ const Schedule: React.FC<ScheduleProps> = ({
     [items, onItemUpdate]
   );
 
+  const handleEditItem = (item: EventFormData) => {
+    console.log("Editing item:", item);
+    // Open dialog with item data
+
+    setEdittingItem({
+      title: item.title,
+      start: item.start,
+      end: item.end,
+      description: item.description,
+      category: item.category,
+      frequency: item.frequency,
+      uid: item.uid,
+      calendarID: item.calendarID,
+      location: item.location,
+      siid: item.siid,
+      type: "event",
+    });
+    console.log("Editing event: ", edittingItem);
+
+    // if (item.type === "task") {
+    //   setEdittingItem({
+    //     title: item.title,
+    //     start: item.start,
+    //     end: item.end,
+    //     description: item.description,
+    //     category: item.category,
+    //     frequency: item.frequency,
+    //     due: item.due,
+    //     priority: item.priority,
+    //     difficulty: item.difficulty,
+    //     duration: item.duration,
+    //     flexible: item.flexible,
+    //     auto: item.auto,
+    //     uid: item.uid,
+    //     calendarID: item.calendarID,
+    //     siid: item.siid,
+    //   });
+    // }
+    setIsEditing(true);
+  };
+  useEffect(() => {
+    console.log("Editing event: ", edittingItem);
+  }, [edittingItem]);
+
   const handleScheduleClick = (day: Date, yPosition: number) => {
     if (scheduleRef.current) {
       const totalMinutes = Math.floor(
@@ -230,9 +281,10 @@ const Schedule: React.FC<ScheduleProps> = ({
         ref={setNodeRef}
         className={`h-[15px] ${
           isHourMark ? "border-t border-border" : ""
-        } relative`}>
+        } relative`}
+      >
         {showLabel && isHourMark && (
-          <span className='absolute bg-background -top-2 left-0 text-xs text-accent-foreground'>
+          <span className="absolute bg-background -top-2 left-0 text-xs text-accent-foreground">
             {format(setHours(setMinutes(day, minute), hour), "h a")}
           </span>
         )}
@@ -330,7 +382,7 @@ const Schedule: React.FC<ScheduleProps> = ({
           height: `${heightPercentage}%`,
           left: `${columnOffset * columnWidth}%`,
           width: `${columnWidth}%`,
-          backgroundColor: item.color,
+          backgroundColor: "#800080", //chaange to item.color
           cursor: isDragging ? "grabbing" : "grab",
           zIndex: isDragging ? 20 : 10,
           opacity: isDragging ? 0.8 : 1,
@@ -358,10 +410,29 @@ const Schedule: React.FC<ScheduleProps> = ({
           onClick={(e) => {
             e.stopPropagation();
             onItemClick(item);
+            console.log("item clicked, item:", item);
+
+            // Log the item structure for debugging
+            console.log("Item Structure: ", item);
+
+            // ignore error lol
+            const eventFormData: EventFormData = {
+              ...item, // Spread properties from the original item
+              type: "event", // Ensure type is always "event"
+              siid: item.siid,
+              uid: item.uid,
+            };
+
+            // Log the final event form data to check everything
+            console.log("Final EventFormData: ", eventFormData);
+
+            handleEditItem(eventFormData);
+            console.log("Editing event");
           }}
-          className='scale-95 rounded-sm transition-transform p-2 text-white'>
-          <h1 className='font-medium truncate'>{item.title}</h1>
-          <p className='text-xs'>
+          className="scale-95 rounded-sm transition-transform p-2 text-white"
+        >
+          <h1 className="font-medium truncate">{item.title}</h1>
+          <p className="text-xs">
             {format(item.start, "h:mm a")} - {format(item.end, "h:mm a")}
           </p>
         </div>
@@ -378,12 +449,14 @@ const Schedule: React.FC<ScheduleProps> = ({
         return dayItems.map((item) => (
           <div
             key={item.siid}
-            className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
-            style={{ backgroundColor: item.color }}
+            className="text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap"
+            style={{ backgroundColor: "#800080" }} // change to item.color
             onClick={(e) => {
               e.stopPropagation();
               setSelectedItem(item);
-            }}>
+              console.log("item clicked");
+            }}
+          >
             {item.title}
           </div>
         ));
@@ -425,26 +498,27 @@ const Schedule: React.FC<ScheduleProps> = ({
 
   const renderDayView = useCallback(() => {
     return (
-      <div className='flex flex-col h-full'>
-        <div className='flex'>
-          <div className='w-16' />
-          <div className='flex-1 py-2'>{format(currentDate, "EEE d")}</div>
+      <div className="flex flex-col h-full">
+        <div className="flex">
+          <div className="w-16" />
+          <div className="flex-1 py-2">{format(currentDate, "EEE d")}</div>
         </div>
-        <div className='flex flex-col h-full'>
-          <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
-            <div className='flex h-[1440px]'>
-              <div className='w-16 flex-shrink-0 bg-background z-10'>
+        <div className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto relative" ref={scheduleRef}>
+            <div className="flex h-[1440px]">
+              <div className="w-16 flex-shrink-0 bg-background z-10">
                 {renderTimeSlots(true, currentDate)}
               </div>
               <div
-                className='flex-1 relative'
+                className="flex-1 relative"
                 onMouseMove={(e) => handleMouseMove(e, currentDate)}
                 onMouseLeave={handleMouseLeave}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const yPosition = e.clientY - rect.top;
                   handleScheduleClick(currentDate, yPosition);
-                }}>
+                }}
+              >
                 {renderTimeSlots(false, currentDate)}
                 {scheduleRef.current &&
                   renderItems(currentDate, scheduleRef.current.scrollHeight)}
@@ -452,17 +526,19 @@ const Schedule: React.FC<ScheduleProps> = ({
                   ghostLineDay &&
                   isSameDay(ghostLineDay, currentDate) && (
                     <div
-                      className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
-                      style={{ top: `${ghostLinePosition.top}px` }}>
-                      <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
+                      className="absolute left-0 right-0 border-t border-blue-300 pointer-events-none"
+                      style={{ top: `${ghostLinePosition.top}px` }}
+                    >
+                      <span className="absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl">
                         {format(ghostLinePosition.time, "h:mm a")}
                       </span>
                     </div>
                   )}
                 <div
-                  id='current-time-line'
-                  className='absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'>
-                  <div className='size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                  id="current-time-line"
+                  className="absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center"
+                >
+                  <div className="size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1"></div>
                 </div>
               </div>
             </div>
@@ -485,31 +561,32 @@ const Schedule: React.FC<ScheduleProps> = ({
     const now = new Date();
 
     return (
-      <div className='flex flex-col'>
-        <div className='flex'>
-          <div className='w-16' />
+      <div className="flex flex-col">
+        <div className="flex">
+          <div className="w-16" />
           {days.map((day) => (
-            <div key={day.toISOString()} className='flex-1 text-center py-2'>
+            <div key={day.toISOString()} className="flex-1 text-center py-2">
               {format(day, "EEE d")}
             </div>
           ))}
         </div>
-        <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
-          <div className='flex h-[1440px] relative'>
-            <div className='w-16 flex-shrink-0 bg-background z-10'>
+        <div className="flex-1 overflow-y-auto relative" ref={scheduleRef}>
+          <div className="flex h-[1440px] relative">
+            <div className="w-16 flex-shrink-0 bg-background z-10">
               {renderTimeSlots(true, days[0])}
             </div>
             {days.map((day) => (
               <div
                 key={day.toISOString()}
-                className='flex-1 border-l border-border relative'
+                className="flex-1 border-l border-border relative"
                 onMouseMove={(e) => handleMouseMove(e, day)}
                 onMouseLeave={handleMouseLeave}
                 onClick={(e) => {
                   const rect = e.currentTarget.getBoundingClientRect();
                   const yPosition = e.clientY - rect.top;
                   handleScheduleClick(day, yPosition);
-                }}>
+                }}
+              >
                 {renderTimeSlots(false, day)}
                 {scheduleRef.current &&
                   renderItems(day, scheduleRef.current.scrollHeight)}
@@ -517,23 +594,25 @@ const Schedule: React.FC<ScheduleProps> = ({
                   ghostLineDay &&
                   isSameDay(ghostLineDay, day) && (
                     <div
-                      className='absolute left-0 right-0 border-t border-blue-300 pointer-events-none'
-                      style={{ top: `${ghostLinePosition.top}px` }}>
-                      <span className='absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl'>
+                      className="absolute left-0 right-0 border-t border-blue-300 pointer-events-none"
+                      style={{ top: `${ghostLinePosition.top}px` }}
+                    >
+                      <span className="absolute left-0 top-0 bg-blue-300 text-xs px-1 rounded-bl">
                         {format(ghostLinePosition.time, "h:mm a")}
                       </span>
                     </div>
                   )}
                 {isSameDay(now, day) && (
                   <div
-                    id='current-time-line'
-                    className='absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center'
+                    id="current-time-line"
+                    className="absolute z-10 left-0 right-0 border-t border-red-500 pointer-events-none flex items-center"
                     style={{
                       top: `${
                         ((now.getHours() * 60 + now.getMinutes()) / 1440) * 100
                       }%`,
-                    }}>
-                    <div className='size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1'></div>
+                    }}
+                  >
+                    <div className="size-2 z-10 rounded-full bg-red-500 -my-1 -ml-1"></div>
                   </div>
                 )}
               </div>
@@ -556,9 +635,9 @@ const Schedule: React.FC<ScheduleProps> = ({
     const days = eachDayOfInterval({ start: startDate, end: endDate });
 
     return (
-      <div className='grid grid-cols-7 gap-1 h-full'>
+      <div className="grid grid-cols-7 gap-1 h-full">
         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-          <div key={day} className='text-center font-semibold py-2'>
+          <div key={day} className="text-center font-semibold py-2">
             {day}
           </div>
         ))}
@@ -567,9 +646,10 @@ const Schedule: React.FC<ScheduleProps> = ({
             key={day.toISOString()}
             className={`border border-border p-1 ${
               isSameMonth(day, currentDate) ? "bg-background" : "bg-accent"
-            }`}>
-            <div className='text-right text-sm'>{format(day, "d")}</div>
-            <div className='overflow-y-auto h-24'>
+            }`}
+          >
+            <div className="text-right text-sm">{format(day, "d")}</div>
+            <div className="overflow-y-auto h-24">
               {renderItems(day, 96, true)}
             </div>
           </div>
@@ -583,17 +663,18 @@ const Schedule: React.FC<ScheduleProps> = ({
       onDragEnd={handleDragEnd}
       modifiers={[snapToTimeSlot]}
       sensors={[pointerSensor]}
-      autoScroll={false}>
-      <div className='flex-grow h-full flex flex-col p-4 bg-background text-foreground'>
-        <ScrollArea className='h-full'>
+      autoScroll={false}
+    >
+      <div className="flex-grow h-full flex flex-col p-4 bg-background text-foreground">
+        <ScrollArea className="h-full">
           {view === "day" && renderDayView()}
           {view === "week" && renderWeekView()}
           {view === "month" && renderMonthView()}
         </ScrollArea>
         <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
           <DialogHeader>
-            <DialogTitle className='sr-only'>Create New Item</DialogTitle>
-            <DialogDescription className='sr-only'>
+            <DialogTitle className="sr-only">Create New Item</DialogTitle>
+            <DialogDescription className="sr-only">
               Create a new item
             </DialogDescription>
           </DialogHeader>
@@ -603,11 +684,12 @@ const Schedule: React.FC<ScheduleProps> = ({
         </Dialog>
         <Popover
           open={selectedItem !== null}
-          onOpenChange={() => setSelectedItem(null)}>
+          onOpenChange={() => setSelectedItem(null)}
+        >
           <PopoverContent>
             {selectedItem && (
               <div>
-                <h3 className='font-semibold'>{selectedItem.title}</h3>
+                <h3 className="font-semibold">{selectedItem.title}</h3>
                 <p>Start: {format(selectedItem.start, "PPp")}</p>
                 <p>End: {format(selectedItem.end, "PPp")}</p>
               </div>
@@ -615,6 +697,32 @@ const Schedule: React.FC<ScheduleProps> = ({
           </PopoverContent>
         </Popover>
       </div>
+      {/* Render the EditEventForm when editing an item */}
+      {isEditing && edittingItem && (
+        <Dialog open={isEditing} onOpenChange={setIsEditing}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Event</DialogTitle>
+              <DialogDescription>
+                Edit the details of the selected event.
+              </DialogDescription>
+            </DialogHeader>
+            <EditEventForm
+              eventData={edittingItem as EventFormData}
+              onClose={() => setIsEditing(false)}
+              onSubmit={(updatedEvent: EventFormData) => {
+                const updatedItem: ScheduleItem = {
+                  ...updatedEvent,
+                  color: "#800080", // Provide a default color if missing
+                };
+                onItemUpdate(updatedItem); // Call the update function
+                setIsEditing(false); // Close the dialog
+              }}
+              eventId={edittingItem.siid}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </DndContext>
   );
 };

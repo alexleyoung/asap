@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -26,6 +26,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { EventFormData, ScheduleEvent } from "@/lib/types";
+import Schedule from "@/components/dashboard/schedule";
+import { useScheduleItems } from "@/contexts/ScheduleContext";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -50,10 +53,11 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface EventFormProps {
-  onSubmit: (data: EventPost) => void;
+  onSubmit: (data: EventFormData) => void;
+  onItemCreate: (newItem: ScheduleEvent) => void;
 }
 
-export function EventForm({ onSubmit }: EventFormProps) {
+export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
@@ -73,17 +77,26 @@ export function EventForm({ onSubmit }: EventFormProps) {
   const handleSubmit = (data: FormValues) => {
     const start = new Date(`${data.startDate}T${data.startTime}`);
     const end = new Date(`${data.endDate}T${data.endTime}`);
-    onSubmit({
+    const userData = JSON.parse(localStorage.getItem("User") || "{}");
+    const userId = Number(userData.id); // Ensure user.id is converted to a number
+    const eventID = Math.floor(Math.random() * 1000); // Generate a random event ID
+    const newEvent: EventFormData & ScheduleEvent = {
+      type: "event",
       title: data.title,
-      start: start.toISOString(),
-      end: end.toISOString(),
+      start: start,
+      end: end,
       location: data.location || "",
       description: data.description || "",
       category: data.category || "",
       frequency: data.frequency || "",
-      uid: "default-user-id", // This would be replaced with actual user ID
-      cid: "default-calendar-id", // This would be replaced with actual calendar ID
-    });
+      uid: userId,
+      calendarID: 1,
+      siid: eventID,
+    };
+    console.log("New event:", newEvent);
+    onSubmit(newEvent);
+    onItemCreate(newEvent);
+    window.location.reload();
   };
 
   const handleDateChange = (
@@ -101,28 +114,29 @@ export function EventForm({ onSubmit }: EventFormProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className='space-y-8 w-full max-w-md mx-auto'>
+        className="space-y-8 w-full max-w-md mx-auto"
+      >
         <FormField
           control={form.control}
-          name='title'
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder='Event title' {...field} />
+                <Input placeholder="Event title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className='flex space-x-4'>
+        <div className="flex space-x-4">
           <FormField
             control={form.control}
-            name='startDate'
+            name="startDate"
             render={({ field }) => (
-              <FormItem className='flex-1'>
+              <FormItem className="flex-1">
                 <FormLabel>Start Date</FormLabel>
-                <div className='flex items-center'>
+                <div className="flex items-center">
                   <FormControl>
                     <Input
                       {...field}
@@ -140,7 +154,7 @@ export function EventForm({ onSubmit }: EventFormProps) {
                         field.onChange(format(date, "yyyy-MM-dd"));
                         setStartDate(date);
                       }}
-                      placeholder='MMM. DD, YYYY'
+                      placeholder="MMM. DD, YYYY"
                     />
                   </FormControl>
                   <Popover>
@@ -150,13 +164,14 @@ export function EventForm({ onSubmit }: EventFormProps) {
                         className={cn(
                           "ml-2 w-10 p-0",
                           !field.value && "text-muted-foreground"
-                        )}>
-                        <CalendarIcon className='h-4 w-4' />
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
-                        mode='single'
+                        mode="single"
                         selected={startDate}
                         onSelect={(date) => handleDateChange("startDate", date)}
                         disabled={(date) =>
@@ -173,26 +188,26 @@ export function EventForm({ onSubmit }: EventFormProps) {
           />
           <FormField
             control={form.control}
-            name='startTime'
+            name="startTime"
             render={({ field }) => (
-              <FormItem className='flex-1'>
+              <FormItem className="flex-1">
                 <FormLabel>Start Time</FormLabel>
                 <FormControl>
-                  <Input type='time' {...field} />
+                  <Input type="time" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <div className='flex space-x-4'>
+        <div className="flex space-x-4">
           <FormField
             control={form.control}
-            name='endDate'
+            name="endDate"
             render={({ field }) => (
-              <FormItem className='flex-1'>
+              <FormItem className="flex-1">
                 <FormLabel>End Date</FormLabel>
-                <div className='flex items-center'>
+                <div className="flex items-center">
                   <FormControl>
                     <Input
                       {...field}
@@ -210,7 +225,7 @@ export function EventForm({ onSubmit }: EventFormProps) {
                         field.onChange(format(date, "yyyy-MM-dd"));
                         setEndDate(date);
                       }}
-                      placeholder='MMM. DD, YYYY'
+                      placeholder="MMM. DD, YYYY"
                     />
                   </FormControl>
                   <Popover>
@@ -220,13 +235,14 @@ export function EventForm({ onSubmit }: EventFormProps) {
                         className={cn(
                           "ml-2 w-10 p-0",
                           !field.value && "text-muted-foreground"
-                        )}>
-                        <CalendarIcon className='h-4 w-4' />
+                        )}
+                      >
+                        <CalendarIcon className="h-4 w-4" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-auto p-0' align='start'>
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
-                        mode='single'
+                        mode="single"
                         selected={endDate}
                         onSelect={(date) => handleDateChange("endDate", date)}
                         disabled={(date) => {
@@ -249,12 +265,12 @@ export function EventForm({ onSubmit }: EventFormProps) {
           />
           <FormField
             control={form.control}
-            name='endTime'
+            name="endTime"
             render={({ field }) => (
-              <FormItem className='flex-1'>
+              <FormItem className="flex-1">
                 <FormLabel>End Time</FormLabel>
                 <FormControl>
-                  <Input type='time' {...field} />
+                  <Input type="time" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -263,12 +279,12 @@ export function EventForm({ onSubmit }: EventFormProps) {
         </div>
         <FormField
           control={form.control}
-          name='location'
+          name="location"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl>
-                <Input placeholder='Event location' {...field} />
+                <Input placeholder="Event location" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -276,14 +292,14 @@ export function EventForm({ onSubmit }: EventFormProps) {
         />
         <FormField
           control={form.control}
-          name='description'
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder='Event description (optional)'
-                  className='resize-none'
+                  placeholder="Event description (optional)"
+                  className="resize-none"
                   {...field}
                 />
               </FormControl>
@@ -294,8 +310,8 @@ export function EventForm({ onSubmit }: EventFormProps) {
             </FormItem>
           )}
         />
-        <div className='flex justify-end'>
-          <Button type='submit' variant='secondary'>
+        <div className="flex justify-end">
+          <Button type="submit" variant="secondary">
             Create Event
           </Button>
         </div>

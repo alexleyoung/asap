@@ -1,4 +1,10 @@
-export async function createItem(itemData: EventFormData | TaskFormData) {
+import { EventFormData } from "./types";
+import { OrderedEventFormData } from "@/components/dashboard/forms/EditEventForm";
+
+export async function createItem(
+  user: { id: string },
+  itemData: EventFormData | TaskFormData
+) {
   const isEvent = "location" in itemData;
   const isTask = "priority" in itemData;
 
@@ -9,7 +15,7 @@ export async function createItem(itemData: EventFormData | TaskFormData) {
   let data;
   let response;
   if (isEvent) {
-    response = await fetch("/api/events", {
+    response = await fetch(`http://localhost:8000/users/${user.id}/events`, {
       method: "POST",
       body: JSON.stringify(itemData),
       headers: {
@@ -37,10 +43,36 @@ export async function createItem(itemData: EventFormData | TaskFormData) {
   return data;
 }
 
-export async function deleteEvent(event: CalendarEvent) {
+export async function updateEvent(
+  event: OrderedEventFormData,
+  eventId: number
+) {
+  try {
+    const response = await fetch(`http://localhost:8000/events/${eventId}`, {
+      method: "PUT",
+      body: JSON.stringify(event),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // if (!response.ok) {
+    //   const data = await response.json();
+    //   console.log("Error updating event:", data);
+    //   throw new Error(data.error || "Something went wrong");
+    // }
+
+    // return await response.json();
+    return await response;
+  } catch (error) {
+    console.error("Failed to update event:", error);
+    throw error; // Re-throw the error after logging it
+  }
+}
+export async function deleteEvent(eventId: number) {
   try {
     const response = await fetch(
-      `/api/events/${event.id}?userId=${event.user_id}`,
+      `http://localhost:8000/events/${eventId}/delete`,
       {
         method: "DELETE",
       }
