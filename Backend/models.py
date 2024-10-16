@@ -40,8 +40,6 @@ class Calendar(Base):
     events = relationship("Event", back_populates="calendar")
     tasks = relationship("Task", back_populates="calendar")
     
-    #owner = relationship("User", back_populates="calendars")
-    
 # Events table
 class Event(Base):
     __tablename__ = "events"
