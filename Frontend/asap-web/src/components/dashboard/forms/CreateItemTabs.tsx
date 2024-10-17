@@ -9,7 +9,11 @@ import handleItemCreate from "@/app/dashboard/page";
 
 interface createItemTabsProps {}
 
-export default function CreateItemTabs() {
+interface CreateItemTabsProps {
+  onFormSubmit: () => void;
+}
+
+export default function CreateItemTabs({ onFormSubmit }: CreateItemTabsProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false); // Define loading state
 
@@ -53,6 +57,7 @@ export default function CreateItemTabs() {
         throw new Error("User ID is null");
       }
       console.log("Event created successfully:", response);
+      onFormSubmit();
     } catch (error) {
       console.error("Failed to create event:", error);
     } finally {

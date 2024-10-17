@@ -679,7 +679,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
             </DialogDescription>
           </DialogHeader>
           <DialogContent>
-            <CreateItemTabs />
+            <CreateItemTabs onFormSubmit={() => {}} />
           </DialogContent>
         </Dialog>
         <Popover
