@@ -3,8 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-from .database import models, schemas
-from .database.db import engine
+from .database import schemas
 
 from .routers import users, events, tasks, calendars
 
@@ -12,11 +11,9 @@ from .routers import users, events, tasks, calendars
 app = FastAPI()
 
 app.include_router(users.router)
-# app.include_router(events.router)
-# app.include_router(tasks.router)
-# app.include_router(calendars.router)
-
-models.Base.metadata.create_all(bind=engine)
+app.include_router(events.router)
+app.include_router(tasks.router)
+app.include_router(calendars.router)
 
 #allows cross origin resource sharing (stuff is on dif ports)
 app.add_middleware(
@@ -51,110 +48,3 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-##### EVENT ENDPOINTS #####
-
-#to create an event
-@app.post("/users/{userID}/events", response_model=schemas.Event)
-def create_event_endpoint(userID: int, event: schemas.EventCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, userID=userID)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    db_event = crud.create_event(db=db, event=event, userID=userID)
-    return db_event
-
-#edit event
-@app.put("/events/{eventID}", response_model=schemas.Event)
-def edit_event_endpoint(eventID: int, event_update: schemas.EventUpdate, db: Session = Depends(get_db)):
-    db_event = crud.edit_event(db=db, eventID=eventID, event_update=event_update)
-    if db_event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-    return db_event
-
-#get event
-@app.get("/events/{eventID}", response_model=schemas.Event)
-def get_event_endpoint(eventID: int, db: Session = Depends(get_db)):
-    db_event = crud.get_event(db=db, eventID=eventID)
-    if db_event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-
-    return db_event
-
-#delete event
-@app.delete("/events/{eventID}/delete", response_model=schemas.Event)
-def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
-    db_event = crud.delete_event(db=db, eventID=eventID)
-    if db_event is None:
-        raise HTTPException(status_code=404, detail="Event not found")
-    return db_event
-
-#get a user's events
-@app.get("/users/{userID}/events", response_model=list[schemas.Event])
-def get_user_events(userID: int, db: Session = Depends(get_db)):
-    events = crud.get_events_by_user(db, userID)
-    if not events:
-        raise HTTPException(status_code=404, detail="No events found for this user")
-    return events
-
-
-# Endpoint to create a new calendar
-@app.post("/users/{userID}/calendars", response_model=schemas.Calendar)
-def create_calendar_endpoint(userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, userID=userID)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    db_calendar = crud.create_calendar(db=db, calendar=calendar, userID=userID)
-
-
-
-
-##### TASK ENDPOINTS #####
-
-@app.post("/tasks/", response_model=schemas.Task)
-def create_task_endpoint(task: schemas.TaskCreate, db: Session = Depends(get_db)):
-    db_task = crud.create_task(db, task)
-    if not db_task:
-        raise HTTPException(status_code=400, detail="Task creation failed")
-    return db_task
-
-@app.delete("/tasks/{task_id}", response_model=schemas.Task)
-def delete_task_endpoint(task_id: int, db: Session = Depends(get_db)):
-    task = crud.delete_task(db, task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    return task
-
-@app.get("/tasks/{task_id}", response_model=schemas.Task)
-def read_task_endpoint(task_id: int, db: Session = Depends(get_db)):
-    task = crud.get_task(db, task_id)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    return task
-
-@app.get("/tasks/", response_model=list[schemas.Task])
-def read_user_tasks_endpoint(userID: int, db: Session = Depends(get_db), limit: int = 10):
-    if not userID:
-        raise HTTPException(status_code=400, detail="User ID is required")
-    tasks = crud.get_tasks(db, userID, limit)
-    # handle errors here ...
-    return tasks
-
-# takes entire TaskCreate instead of partial
-@app.put("/tasks/{task_id}", response_model=schemas.Task)
-def update_task_endpoint(task_id: int, task_update: schemas.TaskCreate, db: Session = Depends(get_db)):
-    task = crud.update_task(db, task_id, task_update)
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    return task
-
-
-##### CALENDAR ENDPOINTS #####
-
-@app.post("/calendars/", response_model=schemas.Calendar)
-def create_calendar( Calendar: schemas.CalendarCreate, db: Session = Depends(get_db)):
-    db_calendar = crud.create_calendar(db, Calendar)
-    if not db_calendar:
-        raise HTTPException(status_code=400, detail="Calendar creation failed")
-    return db_calendar

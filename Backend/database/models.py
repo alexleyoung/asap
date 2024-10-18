@@ -4,7 +4,6 @@ from .db import Base
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
-
 #users table
 class User(Base):
     __tablename__ = 'users'

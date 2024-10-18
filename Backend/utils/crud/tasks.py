@@ -1,3 +1,6 @@
+from sqlalchemy.orm import Session
+from ...database import schemas, models
+
 def create_task(db: Session, Task: schemas.TaskCreate):
     db_task = models.Task(title = Task.title, start = date.today(),
                           end = date.today(), description = Task.description,
