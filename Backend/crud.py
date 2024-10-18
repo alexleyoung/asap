@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 import bcrypt
-from Backend import models, schemas, auth
+from Backend import auth
+from .database import models, schemas
 from datetime import date
 
 

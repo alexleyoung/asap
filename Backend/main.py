@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-from Backend import crud, models, schemas, auth
-from .database import SessionLocal, engine
+from Backend import crud, auth
+from .database import models, schemas
+from .database.db import engine
 
 
 
