@@ -3,14 +3,18 @@ from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-from Backend import crud, auth
 from .database import models, schemas
 from .database.db import engine
 
-
+from .routers import users, events, tasks, calendars
 
 #create app
 app = FastAPI()
+
+app.include_router(users.router)
+# app.include_router(events.router)
+# app.include_router(tasks.router)
+# app.include_router(calendars.router)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -31,7 +35,6 @@ def get_db():
     finally:
         db.close()
 
-
 ##### TOKEN ENDPOINT #####
 
 @app.post("/token", response_model=schemas.Token)
@@ -48,64 +51,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-##### USER ENDPOINTS #####
-
-#to create user (doesn't need to be protected)
-@app.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="email taken!")
-    return crud.create_user(db=db, user=user)
-
-#to delete user
-@app.delete("/users/{userID}/delete", response_model=schemas.User)
-def delete_user_endpoint(userID: int, db: Session = Depends(get_db)):
-    user = crud.delete_user(db, userID)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
-#to get users
-@app.get("/users/", response_model=list[schemas.User])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    users = crud.get_users(db, skip=skip, limit=limit)
-    return users
-
-#to get user by user id
-@app.get("/users/{userID}", response_model=schemas.User)
-def read_user(userID: int, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, userID=userID)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return db_user
-
-#to get user by email
-@app.get("/users/email/{email}", response_model=schemas.User)
-def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
-    user = crud.get_user_by_email(db, email=email)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
-#change password
-@app.put("/users/{userID}/password", response_model=schemas.User)
-def change_user_password_endpoint(userID: int, new_password: str, db: Session = Depends(get_db)):
-    user = crud.change_user_password(db, userID, new_password)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
-#to update user
-@app.put("/users/{userID}", response_model=schemas.User)
-def update_user_endpoint(userID: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
-    user = crud. update_user(db, userID, user_update)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
-
 
 ##### EVENT ENDPOINTS #####
 
