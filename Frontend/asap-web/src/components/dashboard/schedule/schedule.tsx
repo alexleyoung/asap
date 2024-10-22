@@ -244,7 +244,9 @@ export const Schedule: React.FC<ScheduleProps> = ({
     setIsEditing(true);
   };
   useEffect(() => {
-    console.log("Editing event: ", edittingItem);
+    if (edittingItem) {
+      console.log("Editing event hi: ", edittingItem);
+    }
   }, [edittingItem]);
 
   const handleScheduleClick = (day: Date, yPosition: number) => {
@@ -682,7 +684,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
             <CreateItemTabs onFormSubmit={() => {}} />
           </DialogContent>
         </Dialog>
-        <Popover
+        {/* <Popover
           open={selectedItem !== null}
           onOpenChange={() => setSelectedItem(null)}
         >
@@ -695,7 +697,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
               </div>
             )}
           </PopoverContent>
-        </Popover>
+        </Popover> */}
       </div>
       {/* Render the EditEventForm when editing an item */}
       {isEditing && edittingItem && (
@@ -715,8 +717,8 @@ export const Schedule: React.FC<ScheduleProps> = ({
                   ...updatedEvent,
                   color: "#800080", // Provide a default color if missing
                 };
-                onItemUpdate(updatedItem); // Call the update function
                 setIsEditing(false); // Close the dialog
+                onItemUpdate(updatedItem); // Call the update function
               }}
               eventId={edittingItem.siid}
             />
