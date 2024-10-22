@@ -4,7 +4,9 @@ from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import tasks as controller
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
 
 @router.post("/tasks/", response_model=schemas.Task)
 def create_task_endpoint(task: schemas.TaskCreate, db: Session = Depends(get_db)):

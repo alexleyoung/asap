@@ -4,7 +4,9 @@ from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import events as controller
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
 
 #to create an event
 @router.post("/users/{userID}/events", response_model=schemas.Event)

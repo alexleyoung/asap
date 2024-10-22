@@ -4,7 +4,9 @@ from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import users as controller
 
-router = APIRouter()
+router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
 
 #to create user (doesn't need to be protected)
 @router.post("/users/", response_model=schemas.User)
