@@ -8,7 +8,7 @@ import {
   useReducer,
   useState,
 } from "react";
-import { testScheduleItems } from "@/lib/consts";
+// import { testScheduleItems } from "@/lib/consts";
 
 interface ViewContextType {
   view: string;

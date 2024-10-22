@@ -5,17 +5,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createItem } from "../../../lib/scheduleCrud";
 import { useEffect, useState } from "react";
 import { EventFormData } from "@/lib/types";
-import handleItemCreate from "@/app/dashboard/page";
 
 interface createItemTabsProps {}
 
 interface CreateItemTabsProps {
-  onFormSubmit: () => void;
+  onFormSubmit: (data: EventFormData) => void;
+  onItemCreate: (item: ScheduleItem) => void;
 }
 
-export default function CreateItemTabs({ onFormSubmit }: CreateItemTabsProps) {
+export default function CreateItemTabs({
+  onFormSubmit,
+  onItemCreate,
+}: CreateItemTabsProps) {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false); // Define loading state
+  const [items, setItems] = useState<ScheduleItem[]>([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("User");
@@ -53,11 +57,22 @@ export default function CreateItemTabs({ onFormSubmit }: CreateItemTabsProps) {
       let response;
       if (userId) {
         response = await createItem({ id: userId }, dataToSend); // Call createItem with event data
+        console.log("Response:", response);
+        const scheduleItem: ScheduleItem = {
+          ...eventData,
+          siid: 0, // or generate a unique id
+          uid: userId ? parseInt(userId) : 0,
+          color: "", // or assign a default color
+          type: "event",
+        };
+        console.log("calling onItemCreate with:", scheduleItem);
+        onItemCreate(scheduleItem);
       } else {
         throw new Error("User ID is null");
       }
       console.log("Event created successfully:", response);
-      onFormSubmit();
+
+      onFormSubmit(eventData);
     } catch (error) {
       console.error("Failed to create event:", error);
     } finally {
@@ -78,10 +93,7 @@ export default function CreateItemTabs({ onFormSubmit }: CreateItemTabsProps) {
         </TabsList>
       </DialogHeader>
       <TabsContent value="event">
-        <EventForm
-          onSubmit={handleEventSubmit}
-          onItemCreate={handleItemCreate}
-        />
+        <EventForm onSubmit={handleEventSubmit} onItemCreate={onItemCreate} />
       </TabsContent>
       <TabsContent value="task">
         <TaskForm onSubmit={() => {}} />

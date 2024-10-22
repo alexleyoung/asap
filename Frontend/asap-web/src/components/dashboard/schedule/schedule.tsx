@@ -57,14 +57,9 @@ import EditEventForm from "../forms/EditEventForm";
 export type ScheduleProps = {
   items: ScheduleItem[];
   onItemUpdate: (item: ScheduleItem) => void;
-  onItemCreate: (item: ScheduleItem) => void;
 };
 
-export const Schedule: React.FC<ScheduleProps> = ({
-  items,
-  onItemUpdate,
-  onItemCreate,
-}) => {
+export const Schedule: React.FC<ScheduleProps> = ({ items, onItemUpdate }) => {
   const { view } = useView();
   const { currentDate } = useCurrentDate();
   const [ghostLinePosition, setGhostLinePosition] = useState<{
@@ -77,6 +72,11 @@ export const Schedule: React.FC<ScheduleProps> = ({
   const scheduleRef = useRef<HTMLDivElement>(null);
   const [edittingItem, setEdittingItem] = useState<EventFormData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>(items);
+
+  useEffect(() => {
+    setScheduleItems(items);
+  }, [items]);
 
   const scrollToCurrentTime = useCallback(() => {
     if (scheduleRef.current && (view === "day" || view === "week")) {
@@ -202,6 +202,11 @@ export const Schedule: React.FC<ScheduleProps> = ({
     },
     [items, onItemUpdate]
   );
+
+  const handleItemCreate = (newItem: ScheduleItem) => {
+    console.log("Creating new item:", newItem);
+    setScheduleItems((prevItems) => [...prevItems, newItem]);
+  };
 
   const handleEditItem = (item: EventFormData) => {
     console.log("Editing item:", item);
@@ -445,7 +450,9 @@ export const Schedule: React.FC<ScheduleProps> = ({
   const renderItems = useCallback(
     (day: Date, containerHeight: number, isMonthView: boolean = false) => {
       const dayStart = startOfDay(day);
-      const dayItems = items.filter((item) => isSameDay(item.start, day));
+      const dayItems = scheduleItems.filter((item) =>
+        isSameDay(item.start, day)
+      );
 
       if (isMonthView) {
         return dayItems.map((item) => (
@@ -495,7 +502,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
         }
       });
     },
-    [items]
+    [items, scheduleItems]
   );
 
   const renderDayView = useCallback(() => {
@@ -681,7 +688,10 @@ export const Schedule: React.FC<ScheduleProps> = ({
             </DialogDescription>
           </DialogHeader>
           <DialogContent>
-            <CreateItemTabs onFormSubmit={() => {}} />
+            <CreateItemTabs
+              onFormSubmit={() => {}}
+              onItemCreate={handleItemCreate}
+            />
           </DialogContent>
         </Dialog>
         {/* <Popover

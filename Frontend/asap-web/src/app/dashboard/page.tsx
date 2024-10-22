@@ -19,10 +19,6 @@ export default function Dashboard() {
     );
   };
 
-  const handleItemCreate = (newItem: ScheduleItem) => {
-    setItems((prevItems) => [...prevItems, newItem]);
-  };
-
   useEffect(() => {
     const fetchScheduleItems = async () => {
       try {
@@ -80,11 +76,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <Schedule
-        items={items}
-        onItemUpdate={handleItemUpdate}
-        onItemCreate={handleItemCreate}
-      />
+      <Schedule items={items} onItemUpdate={handleItemUpdate} />
     </>
   );
 }
