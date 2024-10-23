@@ -1,11 +1,6 @@
 from sqlalchemy.orm import Session
 from ...database import schemas, models
 from .. import auth
-from datetime import datetime, timedelta
-from jose import jwt, JWTError
-from passlib.context import CryptContext
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-import bcrypt
 
 
 # create user
