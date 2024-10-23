@@ -54,7 +54,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface EventFormProps {
   onSubmit: (data: EventFormData) => void;
-  onItemCreate: (newItem: ScheduleEvent) => void;
+  onItemCreate: (newItem: ScheduleItem) => void;
 }
 
 export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
@@ -80,7 +80,7 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
     const userData = JSON.parse(localStorage.getItem("User") || "{}");
     const userId = Number(userData.id); // Ensure user.id is converted to a number
     const eventID = Math.floor(Math.random() * 1000); // Generate a random event ID
-    const newEvent: EventFormData & ScheduleEvent = {
+    const newEvent: EventFormData & ScheduleEvent & { color: string } = {
       type: "event",
       title: data.title,
       start: start,
@@ -92,11 +92,12 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
       uid: userId,
       calendarID: 1,
       siid: eventID,
+      color: "#000000", // Add a default color or modify as needed
     };
     console.log("New event:", newEvent);
     onSubmit(newEvent);
+    console.log("onitem creating in eventform");
     onItemCreate(newEvent);
-    window.location.reload();
   };
 
   const handleDateChange = (

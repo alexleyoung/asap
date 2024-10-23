@@ -2,6 +2,19 @@ import { EventFormData } from "@/lib/types";
 import React, { use, useEffect, useState } from "react";
 import { updateEvent } from "@/lib/scheduleCrud";
 import { deleteEvent } from "@/lib/scheduleCrud";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 
 interface EditEventFormProps {
   eventId: number;
@@ -15,13 +28,25 @@ export type OmittedEventFormData = Omit<
 >;
 export interface OrderedEventFormData {
   title: string;
-  start: string; // Adjust this type as needed
-  end: string; // Adjust this type as needed
+  start: Date; // Adjust this type as needed
+  end: Date; // Adjust this type as needed
   description: string;
   category: string;
   frequency: string;
   location: string;
 }
+
+const eventSchema = z.object({
+  title: z.string().min(1, "title is required"),
+  start: z.date(),
+  end: z.date(),
+  description: z.string(),
+  category: z.string(),
+  frequency: z.string(),
+  location: z.string(),
+});
+
+type EventFormValues = z.infer<typeof eventSchema>;
 
 export function EditEventForm({
   eventId,
@@ -29,6 +54,18 @@ export function EditEventForm({
   eventData,
   onSubmit,
 }: EditEventFormProps) {
+  const form = useForm<EventFormValues>({
+    resolver: zodResolver(eventSchema),
+    defaultValues: {
+      title: eventData.title,
+      start: eventData.start,
+      end: eventData.end,
+      description: eventData.description,
+      category: eventData.category,
+      frequency: eventData.frequency,
+      location: eventData.location,
+    },
+  });
   const [title, setTitle] = useState(eventData.title);
   const [description, setDescription] = useState(eventData.description);
   const [start, setStartDate] = useState(new Date(eventData.start));
@@ -36,6 +73,14 @@ export function EditEventForm({
   const [location, setLocation] = useState(eventData.location);
   const [loading, setLoading] = useState(false);
   const [newEventData, setEventData] = useState<EventFormData | null>(null);
+
+  useEffect(() => {
+    form.reset({
+      ...eventData,
+      start: eventData.start,
+      end: eventData.end,
+    });
+  }, [eventData]);
 
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this event?")) {
@@ -51,23 +96,19 @@ export function EditEventForm({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (data: OrderedEventFormData) => {
+    try {
+      // Create the updated event object with the correct types
+      const updatedEvent = {
+        ...data,
+      };
+      console.log("Updated event before submission:", updatedEvent);
 
-    // Create the updated event object with the correct types
-    const updatedEvent: OrderedEventFormData = {
-      title,
-      description,
-      start: start.toISOString(),
-      end: end.toISOString(),
-      location,
-      category: eventData.category, // Ensure this is a string
-      frequency: eventData.frequency, // Ensure this is a string
-    };
-    console.log("Updated event before submission:", updatedEvent);
-
-    // Call the update handler
-    handleUpdate(updatedEvent);
+      // Call the update handler
+      handleUpdate(updatedEvent);
+    } catch (error) {
+      console.error("Failed to update event:", error);
+    }
   };
 
   useEffect(() => {
@@ -96,8 +137,8 @@ export function EditEventForm({
       // Format start and end to ISO string if required by the backend
       const formattedEvent = {
         title: updatedEvent.title,
-        start: updatedEvent.start,
-        end: updatedEvent.end,
+        start: new Date(updatedEvent.start),
+        end: new Date(updatedEvent.end),
         description: updatedEvent.description,
         category: updatedEvent.category,
         frequency: updatedEvent.frequency,
@@ -126,7 +167,12 @@ export function EditEventForm({
         type: eventData.type,
         calendarID: eventData.calendarID,
       };
-      onSubmit(fullEvent);
+      onSubmit({
+        ...fullEvent,
+        start: new Date(fullEvent.start),
+        end: new Date(fullEvent.end),
+      });
+      console.log("Event updated successfully:", fullEvent);
     } catch (error) {
       console.error("Failed to update eventP:", error);
     } finally {
@@ -135,52 +181,95 @@ export function EditEventForm({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Title</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Event title" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <label>Description</label>
-        <input
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Event Description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <label>Date</label>
-        <input
-          type="date"
-          value={start.toISOString().split("T")[0]}
-          onChange={(e) => setStartDate(new Date(e.target.value))}
+        <FormField
+          control={form.control}
+          name="start"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Start Date</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Event Start Date"
+                  {...field}
+                  value={field.value.toISOString().split("T")[0]}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <label>End Date</label>
-        <input
-          type="date"
-          value={end.toISOString().split("T")[0]}
-          onChange={(e) => setEndDate(new Date(e.target.value))}
+
+        <FormField
+          control={form.control}
+          name="end"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>End Date</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Event End Date"
+                  {...field}
+                  value={field.value.toISOString().split("T")[0]}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <div>
-        <label>Location</label>
-        <input
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location</FormLabel>
+              <FormControl>
+                <Input placeholder="Event Location" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-      </div>
-      <button type="submit">Save Changes</button>
-      <button type="button" onClick={handleDelete} disabled={loading}>
-        Delete Event
-      </button>
-    </form>
+        <Button type="submit" variant="secondary" className="mr-2">
+          Save Changes
+        </Button>
+        <Button
+          type="button"
+          onClick={handleDelete}
+          disabled={loading}
+          variant="destructive"
+        >
+          Delete Event
+        </Button>
+      </form>
+    </Form>
   );
 }
 
