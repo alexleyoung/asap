@@ -10,9 +10,14 @@ from datetime import timedelta
 
 router = APIRouter()
 
+
 @router.post("/token", response_model=schemas.Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = controller.get_user_by_email(db, email=form_data.username)  # Use form_data.username for email
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+):
+    user = controller.get_user_by_email(
+        db, email=form_data.username
+    )  # Use form_data.username for email
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

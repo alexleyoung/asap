@@ -4,9 +4,7 @@ from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import users as controller
 
-router = APIRouter(
-    dependencies=[Depends(get_current_user)]
-)
+router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 # to create user (doesn't need to be protected)
@@ -54,7 +52,9 @@ def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
 
 # change password
 @router.put("/users/{userID}/password", response_model=schemas.User)
-def change_user_password_endpoint(userID: int, new_password: str, db: Session = Depends(get_db)):
+def change_user_password_endpoint(
+    userID: int, new_password: str, db: Session = Depends(get_db)
+):
     user = controller.change_user_password(db, userID, new_password)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -63,7 +63,9 @@ def change_user_password_endpoint(userID: int, new_password: str, db: Session = 
 
 # to update user
 @router.put("/users/{userID}", response_model=schemas.User)
-def update_user_endpoint(userID: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)):
+def update_user_endpoint(
+    userID: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)
+):
     user = controller.update_user(db, userID, user_update)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

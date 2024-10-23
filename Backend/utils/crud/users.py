@@ -7,10 +7,12 @@ import bcrypt
 # create user
 def create_user(db: Session, user: schemas.UserCreate):
     hashed_password = auth.get_password_hash(user.password)
-    db_user = models.User(firstname=user.firstname,
-                          lastname=user.lastname,
-                          email=user.email,
-                          hashed_password=hashed_password.decode('utf-8'))
+    db_user = models.User(
+        firstname=user.firstname,
+        lastname=user.lastname,
+        email=user.email,
+        hashed_password=hashed_password.decode("utf-8"),
+    )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
@@ -47,8 +49,8 @@ def change_user_password(db: Session, userID: int, new_password: str):
     user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
-    hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
-    user.hashedPassword = hashed_password.decode('utf-8')
+    hashed_password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+    user.hashedPassword = hashed_password.decode("utf-8")
     db.commit()
     db.refresh(user)
     return user
