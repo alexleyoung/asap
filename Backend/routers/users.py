@@ -3,12 +3,17 @@ from sqlalchemy.orm import Session
 from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import users as controller
+from ..utils.auth import get_current_user
 
-router = APIRouter(dependencies=[Depends(get_current_user)])
+router = APIRouter(
+    dependencies=[Depends(get_current_user)],
+    prefix="/users",
+    tags=["users"],
+)
 
 
 # to create user (doesn't need to be protected)
-@router.post("/users/", response_model=schemas.User)
+@router.post("/", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db_user = controller.get_user_by_email(db, email=user.email)
     if db_user:
@@ -17,7 +22,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 # to delete user
-@router.delete("/users/{userID}/delete", response_model=schemas.User)
+@router.delete("/{userID}/delete", response_model=schemas.User)
 def delete_user_endpoint(userID: int, db: Session = Depends(get_db)):
     user = controller.delete_user(db, userID)
     if not user:
@@ -26,14 +31,14 @@ def delete_user_endpoint(userID: int, db: Session = Depends(get_db)):
 
 
 # to get users
-@router.get("/users/", response_model=list[schemas.User])
+@router.get("/", response_model=list[schemas.User])
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = controller.get_users(db, skip=skip, limit=limit)
     return users
 
 
 # to get user by user id
-@router.get("/users/{userID}", response_model=schemas.User)
+@router.get("/{userID}", response_model=schemas.User)
 def read_user(userID: int, db: Session = Depends(get_db)):
     db_user = controller.get_user(db, userID=userID)
     if db_user is None:
@@ -42,7 +47,7 @@ def read_user(userID: int, db: Session = Depends(get_db)):
 
 
 # to get user by email
-@router.get("/users/email/{email}", response_model=schemas.User)
+@router.get("/email/{email}", response_model=schemas.User)
 def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
     user = controller.get_user_by_email(db, email=email)
     if not user:
@@ -51,7 +56,7 @@ def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
 
 
 # change password
-@router.put("/users/{userID}/password", response_model=schemas.User)
+@router.put("/{userID}/password", response_model=schemas.User)
 def change_user_password_endpoint(
     userID: int, new_password: str, db: Session = Depends(get_db)
 ):
@@ -62,7 +67,7 @@ def change_user_password_endpoint(
 
 
 # to update user
-@router.put("/users/{userID}", response_model=schemas.User)
+@router.put("/{userID}", response_model=schemas.User)
 def update_user_endpoint(
     userID: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db)
 ):

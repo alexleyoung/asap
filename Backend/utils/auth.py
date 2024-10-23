@@ -1,23 +1,35 @@
 from typing import Annotated
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-import bcrypt
+from passlib.context import CryptContext
+from datetime import timedelta, datetime, timezone
+from .crud import users
+import jwt
+from jwt.exceptions import InvalidTokenError
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+SECRET_KEY = "a38272605b0a04c4611d40465ccca814b136156707f32eb593fd60f46b7b219f"
+ALGORITHM = "HS256"
+
+bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    user = fake_decode_token(token)
+def authenticate_user(email: str, password: str, db):
+    user = users.get_user_by_email(db, email)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        return False
+    if not bcrypt_context.verify(password, user.hashed_password):
+        return False
     return user
 
 
-def hash_password(pwd: str):
-    if isinstance(pwd, str):
-        pwd = pwd.encode()
-    return bcrypt.hashpw(pwd, bcrypt.gensalt(12)).decode()
+def create_access_token(email: str, id: int):
+    encode = {"sub": email, "id": id}
+    expires = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    encode.update({"exp": expires})
+    return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def get_current_user():
+    return 1
