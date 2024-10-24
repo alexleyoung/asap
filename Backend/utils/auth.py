@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from ..database.db import get_db
 from passlib.context import CryptContext
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from .crud import users
 import jwt
 from jwt.exceptions import InvalidTokenError
@@ -30,7 +30,9 @@ def authenticate_user(email: str, password: str, db):
 
 def create_access_token(email: str, id: int):
     encode = {"sub": email, "id": id}
-    expires = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expires = datetime.now(timezone.utc) + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
     encode.update({"exp": expires})
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 

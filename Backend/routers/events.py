@@ -70,3 +70,4 @@ def create_calendar_endpoint(
         raise HTTPException(status_code=404, detail="User not found")
 
     db_calendar = controller.create_calendar(db=db, calendar=calendar, userID=userID)
+    return db_calendar

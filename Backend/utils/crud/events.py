@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from ...database import schemas, models
-from fastapi import HTTPException
 
 
 def create_event(db: Session, event: schemas.EventCreate, userID: int):
