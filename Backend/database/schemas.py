@@ -8,33 +8,39 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
     email: str | None = None
+
 
 ##### USER #####
 
 
-#create User schemas
+# create User schemas
 class UserBase(BaseModel):
     firstname: str
     lastname: str
     email: str
 
+
 class UserInDB(UserBase):
     hashed_password: str
 
-#for creating a user
+
+# for creating a user
 class UserCreate(UserBase):
     password: str
 
-#for updating a user
+
+# for updating a user
 class UserUpdate(BaseModel):
     firstname: Optional[str] = None
     lastname: Optional[str] = None
     email: Optional[str] = None
     avatar: Optional[str] = None
 
-#main class
+
+# main class
 class User(UserBase):
     id: int
 
@@ -42,20 +48,20 @@ class User(UserBase):
         from_attributes = True
 
 
-
-
 ###
-#create Calendar schemas
+# create Calendar schemas
 class CalendarBase(BaseModel):
     name: str
     description: str
     timezone: str
 
-#for creating a calendar
+
+# for creating a calendar
 class CalendarCreate(CalendarBase):
     pass
 
-#main class
+
+# main class
 class Calendar(BaseModel):
     id: int
     userID: int
@@ -63,8 +69,9 @@ class Calendar(BaseModel):
     class Config:
         from_attributes = True
 
+
 ###
-#Event
+# Event
 class EventBase(BaseModel):
     title: str
     start: datetime
@@ -74,11 +81,13 @@ class EventBase(BaseModel):
     frequency: str
     location: str
 
-#to create
+
+# to create
 class EventCreate(EventBase):
     calendarID: int  # Foreign key
 
-#to update
+
+# to update
 class EventUpdate(EventBase):
     title: Optional[str] = None
     start: Optional[datetime] = None
@@ -88,7 +97,8 @@ class EventUpdate(EventBase):
     frequency: Optional[str] = None
     location: Optional[str] = None
 
-#main class
+
+# main class
 class Event(EventBase):
     id: int
     userID: int  # Foreign key
@@ -97,8 +107,9 @@ class Event(EventBase):
     class Config:
         from_attributes = True
 
+
 ###
-#Task
+# Task
 class TaskBase(BaseModel):
     title: str
     start: datetime
@@ -116,7 +127,8 @@ class TaskBase(BaseModel):
     userID: int
     calendarID: int
 
-#to create
+
+# to create
 class TaskCreate(BaseModel):
     auto: bool
     calendarID: int
@@ -132,10 +144,10 @@ class TaskCreate(BaseModel):
     title: str
     userID: int
 
-#main class
+
+# main class
 class Task(TaskBase):
     id: int
 
     class Config:
         from_attributes = True
-
