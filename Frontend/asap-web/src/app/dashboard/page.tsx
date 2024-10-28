@@ -26,7 +26,12 @@ export default function Dashboard() {
         const userID = storedUser ? JSON.parse(storedUser).id : null;
         console.log("Fetching schedule items...");
         const response = await fetch(
-          `http://localhost:8000/users/${userID}/events`
+          `http://localhost:8000/users/${userID}/events`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         console.log("Response status:", response.status);
         if (!response.ok) {

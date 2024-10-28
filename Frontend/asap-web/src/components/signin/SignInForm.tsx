@@ -38,12 +38,11 @@ export default function SignInForm() {
     },
   });
 
-  const handleSignIn = async (data: { email: string }) => {
+  const handleSignIn = async (data: z.infer<typeof formSchema>) => {
     try {
-      const response = await signIn(data.email);
-      if (response) {
-        // const { token } = await response.json();
-        // localStorage.setItem("token", token);
+      const token = await signIn(data.email, data.password);
+      if (token) {
+        localStorage.setItem("token", token);
         setSuccess("Signed in successfully");
         setError("");
         router.push("/dashboard");
@@ -57,27 +56,26 @@ export default function SignInForm() {
   };
 
   return (
-    <div className="grid h-full place-items-center py-12 border-r">
-      <div className="mx-auto grid w-[350px] gap-6">
-        <div className="grid gap-2 text-center">
-          <h1 className="text-3xl font-bold">Sign In</h1>
-          <p className="text-balance text-muted-foreground">
+    <div className='grid h-full place-items-center py-12 border-r'>
+      <div className='mx-auto grid w-[350px] gap-6'>
+        <div className='grid gap-2 text-center'>
+          <h1 className='text-3xl font-bold'>Sign In</h1>
+          <p className='text-balance text-muted-foreground'>
             Enter your email below to login to your account
           </p>
         </div>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignIn)}
-            className="space-y-6"
-          >
+            className='space-y-6'>
             <FormField
               control={form.control}
-              name="email"
+              name='email'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="m@email.com" {...field} />
+                    <Input placeholder='m@email.com' {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -86,18 +84,17 @@ export default function SignInForm() {
             />
             <FormField
               control={form.control}
-              name="password"
+              name='password'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="create a password" {...field} />
+                    <Input placeholder='create a password' {...field} />
                   </FormControl>
 
                   <Link
-                    href="/forgot-password"
-                    className="ml-auto inline-block text-sm underline"
-                  >
+                    href='/forgot-password'
+                    className='ml-auto inline-block text-sm underline'>
                     Forgot your password?
                   </Link>
                   <FormMessage />
@@ -105,21 +102,21 @@ export default function SignInForm() {
               )}
             />
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            {success && <p className="text-green-500 text-sm">{success}</p>}
-            <Button type="submit" className="w-full">
+            {error && <p className='text-red-500 text-sm'>{error}</p>}
+            {success && <p className='text-green-500 text-sm'>{success}</p>}
+            <Button type='submit' className='w-full'>
               Sign In
             </Button>
           </form>
         </Form>
-        <Separator className="relative my-2">
-          <span className="absolute px-2 py-1 bg-background left-[45%] -top-4 text-primary/60">
+        <Separator className='relative my-2'>
+          <span className='absolute px-2 py-1 bg-background left-[45%] -top-4 text-primary/60'>
             or
           </span>
         </Separator>
-        <Button variant="outline" className="w-full flex gap-2">
+        <Button variant='outline' className='w-full flex gap-2'>
           <FcGoogle size={20} />
-          <Link href="/dashboard">Sign In with Google</Link>
+          <Link href='/dashboard'>Sign In with Google</Link>
         </Button>
       </div>
     </div>
