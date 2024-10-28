@@ -25,6 +25,9 @@ export default function Dashboard() {
         const storedUser = localStorage.getItem("User");
         const userID = storedUser ? JSON.parse(storedUser).id : null;
         console.log("Fetching schedule items...");
+        let token = JSON.stringify(localStorage.getItem("token"));
+        console.log("Token:", token);
+
         const response = await fetch(
           `http://localhost:8000/users/${userID}/events`,
           {

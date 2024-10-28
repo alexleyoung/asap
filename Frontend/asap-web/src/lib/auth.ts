@@ -50,6 +50,7 @@ export const signIn = async (email: string, password: string) => {
     }
 
     const data = await response.json();
+    console.log("Data:", data);
     return data;
     // Redirect or perform further actions after successful authentication
   } catch (error) {

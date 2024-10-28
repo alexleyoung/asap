@@ -40,9 +40,12 @@ export default function SignInForm() {
 
   const handleSignIn = async (data: z.infer<typeof formSchema>) => {
     try {
-      const token = await signIn(data.email, data.password);
+      const token: { access_token: string; token_type: string } = await signIn(
+        data.email,
+        data.password
+      );
       if (token) {
-        localStorage.setItem("token", token);
+        localStorage.setItem("token", token.access_token);
         setSuccess("Signed in successfully");
         setError("");
         router.push("/dashboard");

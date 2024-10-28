@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import events as controller
+from ..utils.crud import users
 from ..utils.auth import get_current_user
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
@@ -13,7 +14,7 @@ router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
 def create_event_endpoint(
     userID: int, event: schemas.EventCreate, db: Session = Depends(get_db)
 ):
-    db_user = controller.get_user(db, userID=userID)
+    db_user = users.get_user(db, userID=userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -65,7 +66,7 @@ def get_user_events(userID: int, db: Session = Depends(get_db)):
 def create_calendar_endpoint(
     userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)
 ):
-    db_user = controller.get_user(db, userID=userID)
+    db_user = users.get_user(db, userID=userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
