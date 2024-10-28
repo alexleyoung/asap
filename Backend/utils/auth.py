@@ -19,6 +19,10 @@ oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
+def hash_password(password: str):
+    return bcrypt_context.hash(password)
+
+
 def authenticate_user(email: str, password: str, db):
     user = users.get_user_by_email(db, email)
     if not user:
