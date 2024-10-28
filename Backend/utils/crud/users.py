@@ -47,7 +47,7 @@ def change_user_password(db: Session, userID: int, new_password: str):
     user = db.query(models.User).filter(models.User.id == userID).first()
     if not user:
         return None
-    user.hashedPassword = auth.bcrypt_context.hash(new_password)
+    user.hashedPassword = auth.hash_password(new_password)
     db.commit()
     db.refresh(user)
     return user

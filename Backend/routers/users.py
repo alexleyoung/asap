@@ -3,10 +3,8 @@ from sqlalchemy.orm import Session
 from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import users as controller
-from ..utils.auth import get_current_user
 
 router = APIRouter(
-    dependencies=[Depends(get_current_user)],
     prefix="/users",
     tags=["users"],
 )
