@@ -67,3 +67,8 @@ export type EventFormData = {
   calendarID: number;
   siid: number;
 };
+
+export type Calendar = {
+  id: number;
+  name: string;
+};
