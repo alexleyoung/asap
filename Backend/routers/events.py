@@ -6,6 +6,8 @@ from ..database.db import get_db
 from ..utils.crud import events as controller
 from ..utils.crud import users
 from ..utils.auth import get_current_user
+import json
+
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
 
@@ -41,17 +43,15 @@ async def websocket_endpoint(websocket: WebSocket):
 # to create an event
 @router.post("/users/{userID}/events", response_model=schemas.Event)
 async def create_event_endpoint(
-    userID: int, event: schemas.EventCreate, notify: bool = Query(False), db: Session = Depends(get_db)
+    userID: int, event: schemas.EventCreate, db: Session = Depends(get_db)
 ):
     db_user = users.get_user(db, userID=userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
     db_event = controller.create_event(db=db, event=event, userID=userID)
-
-    # Broadcast only if notify is True
-    if notify:
-        await manager.broadcast(f"New event created: {db_event.title}")
+    
+    await manager.broadcast(f"New event created: {db_event.title}")
 
     return db_event
 
