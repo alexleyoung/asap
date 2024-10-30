@@ -20,7 +20,7 @@ export async function createItem(
       body: JSON.stringify(itemData),
       headers: {
         "Content-Type": "application/json",
-        Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
@@ -31,6 +31,7 @@ export async function createItem(
       body: JSON.stringify(itemData),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
@@ -54,7 +55,7 @@ export async function updateEvent(
       body: JSON.stringify(event),
       headers: {
         "Content-Type": "application/json",
-        Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
@@ -78,8 +79,7 @@ export async function deleteEvent(eventId: number) {
       {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
-          Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
@@ -103,8 +103,7 @@ export async function deleteTask(task: Task) {
       {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json",
-          Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
@@ -131,6 +130,7 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
     body: JSON.stringify({ events, tasks }),
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   });
 

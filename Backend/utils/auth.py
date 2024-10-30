@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from datetime import timedelta, datetime, timezone
 from .crud import users
 import jwt
-from jwt.exceptions import InvalidTokenError
+from jwt import InvalidTokenError
 
 
 SECRET_KEY = "a38272605b0a04c4611d40465ccca814b136156707f32eb593fd60f46b7b219f"
@@ -17,6 +17,10 @@ ALGORITHM = "HS256"
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+
+def hash_password(password: str):
+    return bcrypt_context.hash(password)
 
 
 def authenticate_user(email: str, password: str, db):

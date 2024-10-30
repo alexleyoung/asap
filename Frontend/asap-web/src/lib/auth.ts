@@ -5,6 +5,7 @@ export const signUp = async (
   password: string
 ) => {
   try {
+    // Create user
     const response = await fetch("http://localhost:8000/users/", {
       method: "POST",
       headers: {
@@ -13,19 +14,30 @@ export const signUp = async (
       body: JSON.stringify({ firstname, lastname, email, password }),
     });
 
-    const data = await response.json();
-    console.log("Data:", data);
-
     if (!response.ok) {
       throw new Error("Error during sign-up");
     }
 
-    // localStorage.setItem("token", data.token);
-    console.log("User data before storing in localStorage:", data);
-    localStorage.setItem("User", JSON.stringify(data));
-    console.log("User data after storing in localStorage:", data);
-    const tokenResponse = await signIn(email, password); // Sign in the user after successful sign-up
-    return tokenResponse; // Return the raw response
+    const user = await response.json();
+
+    // Get JWT
+    const tokenRes = await fetch("http://localhost:8000/auth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded", // Required for OAuth2PasswordRequestForm
+      },
+      body: new URLSearchParams({
+        username: email,
+        password,
+      }),
+    });
+
+    const token = (await tokenRes.json()).access_token;
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("User", JSON.stringify(user));
+
+    return response; // Return the raw response
   } catch (error) {
     console.error("Error during sign-up:", error);
     throw error;
@@ -34,33 +46,25 @@ export const signUp = async (
 
 export const signIn = async (email: string, password: string) => {
   try {
-    const response = await fetch(`http://localhost:8000/users/email/${email}`, {
-      method: "GET",
+    const response = await fetch("http://localhost:8000/auth/token", {
+      method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded", // Required for OAuth2PasswordRequestForm
       },
-      // body: new URLSearchParams({
-      //   username: email,
-      //   password: password,
-      // }).toString(),
+      body: new URLSearchParams({
+        username: email,
+        password,
+      }),
     });
 
     if (!response.ok) {
-      throw new Error("User not found or error during sign-in");
+      throw new Error("Could not validate user");
     }
 
-    const user = await response.json();
-    const { token } = user;
-
-    if (token) {
-      localStorage.setItem("token", token);
-      console.log("Token stored in localStorage:", token);
-    }
-
-    // Store user details in localStorage
-    localStorage.setItem("User", JSON.stringify(user));
-
-    return user;
+    const data = await response.json();
+    console.log("Data:", data);
+    return data;
+    // Redirect or perform further actions after successful authentication
   } catch (error) {
     console.error("Error during sign-in:", error);
     throw error;
