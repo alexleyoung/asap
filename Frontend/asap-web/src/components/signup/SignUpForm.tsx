@@ -78,7 +78,7 @@ export default function SignUpForm() {
         setError("Invalid email or password. Please try again.");
       }
     } catch (error) {
-      setError("HI CAITI");
+      setError("An error occurred. Please try again.");
       setSuccess("");
       console.error(error); // Log the actual error
     }

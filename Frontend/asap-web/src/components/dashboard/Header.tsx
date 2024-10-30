@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
+import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
 
 interface User {
   id: string;
@@ -46,8 +47,11 @@ export default function Header() {
   const { view, setView } = useView();
   const { currentDate, setCurrentDate } = useCurrentDate();
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenProfile, setIsOpenProfile] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [isOpenManageCalendars, setIsOpenManageCalendars] = useState(false);
+  const [calendar, setCalendar] = useState<any>(null);
+  const [calendars, setCalendars] = useState<any>([]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("User");
@@ -69,6 +73,19 @@ export default function Header() {
     } else {
       router.push("/");
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      try {
+        const response = await fetch("/api/calendars");
+        const data = await response.json();
+        setCalendars(data);
+      } catch (error) {
+        console.error("Failed to fetch calendars:", error);
+      }
+    };
+    fetchCalendars();
   }, []);
 
   const handleViewChange = (newView: string) => {
@@ -180,6 +197,13 @@ export default function Header() {
                 onClick={() => setIsOpen(true)}>
                 View Profile
               </Button>
+              <Button
+                variant="ghost"
+                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                onClick={() => setIsOpenManageCalendars(true)}
+              >
+                Manage Calendars
+              </Button>
 
               <AlertDialog>
                 <AlertDialogTrigger>
@@ -209,12 +233,24 @@ export default function Header() {
           </Popover>
         )}
 
-        {isOpen && user && (
+        {isOpenProfile && user && (
           <ViewProfileDialog
             user={user}
-            onClose={() => setIsOpen(false)}
+            onClose={() => setIsOpenProfile(false)}
             onUpdate={(updatedUser) => setUser(updatedUser)}
             onDelete={handleDelete}
+          />
+        )}
+        {isOpenManageCalendars && (
+          <ManageCalendarsDialog
+            calendars={calendars} // Pass the actual calendars here
+            onClose={() => setIsOpenManageCalendars(false)}
+            onUpdate={(updatedCalendar) => {
+              setCalendar(updatedCalendar);
+            }}
+            onDelete={() => {
+              // Handle calendar delete
+            }}
           />
         )}
       </div>
