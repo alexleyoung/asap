@@ -6,29 +6,12 @@ from ..database.db import get_db
 from ..utils.crud import events as controller
 from ..utils.crud import users
 from ..utils.auth import get_current_user
+from ..utils.websocket_manager import manager
 import json
 
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
 
-# connection mamnger for websocket
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
-
-# create manager
-manager = ConnectionManager()
 
 # websocket endpoint for real-time notifications
 @router.websocket("/ws/notifications")
