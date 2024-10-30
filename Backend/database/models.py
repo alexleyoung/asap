@@ -85,3 +85,13 @@ class Task(Base):
     # Relationships with User and Calendar
     user = relationship("User", back_populates="tasks")
     calendar = relationship("Calendar", back_populates="tasks")
+
+#Groups table
+class Group(Base):
+    __tablename__ = "groups"
+    id = Column("id", Integer, primary_key=True, index=True, unique=True)
+    title = Column("title", String)
+
+
+    #foreign keys
+    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"))
