@@ -27,7 +27,12 @@ export default function Dashboard() {
         const userID = storedUser ? JSON.parse(storedUser).id : null;
         console.log("Fetching schedule items...");
         const response = await fetch(
-          `http://localhost:8000/users/${userID}/events`
+          `http://localhost:8000/users/${userID}/events`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         console.log("Response status:", response.status);
         if (!response.ok) {
@@ -56,7 +61,11 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchCalendars = async () => {
       try {
-        const response = await fetch("http://localhost:8000/calendars");
+        const response = await fetch("http://localhost:8000/calendars", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch calendars");
         }

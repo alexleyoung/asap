@@ -53,10 +53,11 @@ export default function CalendarsCollapsible() {
     const newCalendar = { name: newCalendarName };
 
     try {
-      const response = await fetch("/api/calendars", {
+      const response = await fetch("http://localhost:8000/calendars/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorizaton: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({ name: newCalendarName }),
       });

@@ -20,6 +20,7 @@ export async function createItem(
       body: JSON.stringify(itemData),
       headers: {
         "Content-Type": "application/json",
+        Authorizaton: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
@@ -53,6 +54,7 @@ export async function updateEvent(
       body: JSON.stringify(event),
       headers: {
         "Content-Type": "application/json",
+        Authorizaton: `Bearer ${localStorage.getItem("token")}`,
       },
     });
 
@@ -75,6 +77,10 @@ export async function deleteEvent(eventId: number) {
       `http://localhost:8000/events/${eventId}/delete`,
       {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+        },
       }
     );
 
@@ -96,6 +102,10 @@ export async function deleteTask(task: Task) {
       `/api/tasks/${task.id}?userId=${task.user_id}`,
       {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+        },
       }
     );
 
@@ -134,7 +144,14 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
 
 export async function fetchCalendars(userId: string) {
   const response = await fetch(
-    `http://localhost:8000/users/${userId}/calendars`
+    `http://localhost:8000/users/${userId}/calendars`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
   );
 
   if (!response.ok) {
