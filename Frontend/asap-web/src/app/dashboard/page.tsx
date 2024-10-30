@@ -79,28 +79,6 @@ export default function Dashboard() {
     fetchCalendars();
   }, []);
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     try {
-  //       const data = await getProtectedData("token");
-  //       if (data) {
-  //         setLoading(false);
-  //       } else {
-  //         router.back();
-  //         console.log("Not authenticated");
-  //       }
-  //     } catch (error) {
-  //       router.back();
-  //       console.log("An error occurred. Please try again.");
-  //     }
-  //   };
-  //   checkAuth();
-  // }, [router]);
-
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-
   return (
     <>
       <Schedule
