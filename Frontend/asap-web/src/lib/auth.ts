@@ -5,6 +5,7 @@ export const signUp = async (
   password: string
 ) => {
   try {
+    // Create user
     const response = await fetch("http://localhost:8000/users/", {
       method: "POST",
       headers: {
@@ -13,19 +14,30 @@ export const signUp = async (
       body: JSON.stringify({ firstname, lastname, email, password }),
     });
 
-    const data = await response.json();
-    console.log("Data:", data);
-
     if (!response.ok) {
       throw new Error("Error during sign-up");
     }
 
-    // localStorage.setItem("token", data.token);
-    console.log("User data before storing in localStorage:", data);
-    localStorage.setItem("User", JSON.stringify(data));
-    console.log("User data after storing in localStorage:", data);
-    const tokenResponse = await signIn(email, password); // Sign in the user after successful sign-up
-    return tokenResponse; // Return the raw response
+    const user = await response.json();
+
+    // Get JWT
+    const tokenRes = await fetch("http://localhost:8000/auth/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded", // Required for OAuth2PasswordRequestForm
+      },
+      body: new URLSearchParams({
+        username: email,
+        password,
+      }),
+    });
+
+    const token = (await tokenRes.json()).access_token;
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("User", JSON.stringify(user));
+
+    return response; // Return the raw response
   } catch (error) {
     console.error("Error during sign-up:", error);
     throw error;
