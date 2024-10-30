@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from datetime import timedelta, datetime, timezone
 from .crud import users
 import jwt
-from jwt.exceptions import InvalidTokenError
+from jwt import InvalidTokenError
 
 
 SECRET_KEY = "a38272605b0a04c4611d40465ccca814b136156707f32eb593fd60f46b7b219f"
