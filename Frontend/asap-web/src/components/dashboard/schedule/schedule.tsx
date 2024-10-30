@@ -57,9 +57,14 @@ import EditEventForm from "../forms/EditEventForm";
 export type ScheduleProps = {
   items: ScheduleItem[];
   onItemUpdate: (item: ScheduleItem) => void;
+  selectedCalenders: number[];
 };
 
-export const Schedule: React.FC<ScheduleProps> = ({ items, onItemUpdate }) => {
+export const Schedule: React.FC<ScheduleProps> = ({
+  items,
+  onItemUpdate,
+  selectedCalenders,
+}) => {
   const { view } = useView();
   const { currentDate } = useCurrentDate();
   const [ghostLinePosition, setGhostLinePosition] = useState<{
@@ -450,8 +455,10 @@ export const Schedule: React.FC<ScheduleProps> = ({ items, onItemUpdate }) => {
   const renderItems = useCallback(
     (day: Date, containerHeight: number, isMonthView: boolean = false) => {
       const dayStart = startOfDay(day);
-      const dayItems = scheduleItems.filter((item) =>
-        isSameDay(item.start, day)
+      const dayItems = scheduleItems.filter(
+        (item) =>
+          isSameDay(item.start, day) &&
+          selectedCalenders.includes(item.calendarID)
       );
 
       if (isMonthView) {
@@ -502,7 +509,7 @@ export const Schedule: React.FC<ScheduleProps> = ({ items, onItemUpdate }) => {
         }
       });
     },
-    [items, scheduleItems]
+    [items, scheduleItems, selectedCalenders]
   );
 
   const renderDayView = useCallback(() => {

@@ -15,6 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EditEventFormProps {
   eventId: number;
@@ -22,6 +29,7 @@ interface EditEventFormProps {
   eventData: EventFormData;
   onSubmit: (updatedEvent: EventFormData) => void;
 }
+
 export type OmittedEventFormData = Omit<
   EventFormData,
   "siid" | "uid" | "calendarID" | "type"
@@ -34,6 +42,7 @@ export interface OrderedEventFormData {
   category: string;
   frequency: string;
   location: string;
+  calendarID: number; // Adjust this type as needed
 }
 
 const eventSchema = z.object({
@@ -44,6 +53,7 @@ const eventSchema = z.object({
   category: z.string(),
   frequency: z.string(),
   location: z.string(),
+  calendarID: z.number(),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -64,6 +74,7 @@ export function EditEventForm({
       category: eventData.category,
       frequency: eventData.frequency,
       location: eventData.location,
+      calendarID: eventData.calendarID,
     },
   });
   const [title, setTitle] = useState(eventData.title);
@@ -73,6 +84,24 @@ export function EditEventForm({
   const [location, setLocation] = useState(eventData.location);
   const [loading, setLoading] = useState(false);
   const [newEventData, setEventData] = useState<EventFormData | null>(null);
+  const [calendars, setCalendars] = useState<any[]>([]); // Adjust type as needed
+
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/calendars");
+        if (!response.ok) {
+          throw new Error("Failed to fetch calendars");
+        }
+        const data = await response.json();
+        setCalendars(data);
+      } catch (error) {
+        console.error("Failed to fetch calendars:", error);
+      }
+    };
+
+    fetchCalendars();
+  }, []);
 
   useEffect(() => {
     form.reset({
@@ -143,6 +172,7 @@ export function EditEventForm({
         category: updatedEvent.category,
         frequency: updatedEvent.frequency,
         location: updatedEvent.location,
+        calendarID: updatedEvent.calendarID,
       };
       console.log(
         "Formatted event data being sent to backend:",
@@ -165,7 +195,7 @@ export function EditEventForm({
         siid: eventId,
         uid: eventData.uid,
         type: eventData.type,
-        calendarID: eventData.calendarID,
+        // calendarID: eventData.calendarID,
       };
       onSubmit({
         ...fullEvent,
@@ -257,6 +287,34 @@ export function EditEventForm({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="calendarID"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Select Calendar</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a calendar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {calendars.map((calendar) => (
+                      <SelectItem
+                        key={calendar.id}
+                        value={calendar.id.toString()}
+                      >
+                        {calendar.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button type="submit" variant="secondary" className="mr-2">
           Save Changes
         </Button>

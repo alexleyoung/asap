@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Collapsible,
@@ -12,26 +12,85 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-
-const calendars = ["Personal", "CSE Officers", "CS Nerds"];
+import { set } from "date-fns";
+import { Calendar } from "@/lib/types";
+import { Input } from "@/components/ui/input";
+import { Plus } from "lucide-react";
 
 export default function CalendarsCollapsible() {
   const [open, setOpen] = useState(true);
+  const [calendars, setCalendars] = useState<Calendar[]>([]);
+  const [selectedCalendars, setSelectedCalendars] = useState<number[]>([]);
+  const [isAddingCalendar, setIsAddingCalendar] = useState(false);
+  const [newCalendarName, setNewCalendarName] = useState("");
+
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      try {
+        const response = await fetch("/api/calendars");
+        const data = await response.json();
+        setCalendars(data);
+      } catch (error) {
+        console.error("Failed to fetch calendars:", error);
+      }
+    };
+    fetchCalendars();
+  }, []);
+
+  const handleBoxChange = (calendarId: number) => {
+    setSelectedCalendars((prevSelected) => {
+      if (prevSelected.includes(calendarId)) {
+        return prevSelected.filter((id) => id !== calendarId);
+      } else {
+        return [...prevSelected, calendarId];
+      }
+    });
+  };
+
+  const handleAddCalendar = async () => {
+    if (!newCalendarName) return;
+
+    const newCalendar = { name: newCalendarName };
+
+    try {
+      const response = await fetch("/api/calendars", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: newCalendarName }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add calendar");
+      }
+
+      const addedCalendar: Calendar = await response.json();
+      setCalendars((prevCalendars) => [...prevCalendars, addedCalendar]);
+      setNewCalendarName("");
+      setIsAddingCalendar(false);
+    } catch (error) {
+      console.error("Failed to add calendar:", error);
+    }
+  };
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger asChild>
-        <Button variant='ghost' className='w-full justify-between'>
-          <span className='font-semibold'>Calendars</span>
+        <Button variant="ghost" className="w-full justify-between">
+          <span className="font-semibold">Calendars</span>
           {open ? <ChevronUp /> : <ChevronDown />}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent className='w-[240px] mt-3 px-2 space-y-2'>
+
+      <CollapsibleContent className="w-[240px] mt-3 px-2 space-y-2">
         {calendars.map((calendar, i) => (
-          <Label htmlFor={calendar} key={i}>
-            <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md'>
+          <Label htmlFor={calendar.id.toString()} key={calendar.id}>
+            <div className="flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md">
               <Checkbox
-                id={calendar}
+                id={calendar.id.toString()}
+                checked={selectedCalendars.includes(calendar.id)}
+                onChange={() => handleBoxChange(calendar.id)}
                 className={cn(
                   "rounded-full",
                   i === 0
@@ -42,10 +101,32 @@ export default function CalendarsCollapsible() {
                 )}
                 checkmark={false}
               />
-              <span>{calendar}</span>
+              <span>{calendar.name}</span>
             </div>
           </Label>
         ))}
+        <Button
+          variant="ghost"
+          className="w-full flex items-center gap-2 mt-2"
+          onClick={() => setIsAddingCalendar((prev) => !prev)}
+        >
+          <Plus className="text-gray-500" /> Add Calendar
+        </Button>
+
+        {/* New Calendar Input */}
+        {isAddingCalendar && (
+          <div className="flex gap-2 items-center mt-2">
+            <Input
+              placeholder="New Calendar Name"
+              value={newCalendarName}
+              onChange={(e) => setNewCalendarName(e.target.value)}
+              className="flex-1"
+            />
+            <Button onClick={handleAddCalendar} variant="default">
+              Add
+            </Button>
+          </div>
+        )}
       </CollapsibleContent>
     </Collapsible>
   );

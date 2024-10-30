@@ -24,8 +24,8 @@ export const signUp = async (
     console.log("User data before storing in localStorage:", data);
     localStorage.setItem("User", JSON.stringify(data));
     console.log("User data after storing in localStorage:", data);
-
-    return response; // Return the raw response
+    const tokenResponse = await signIn(email, password); // Sign in the user after successful sign-up
+    return tokenResponse; // Return the raw response
   } catch (error) {
     console.error("Error during sign-up:", error);
     throw error;
