@@ -26,9 +26,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { EventFormData, ScheduleEvent } from "@/lib/types";
+import {
+  Calendar as CalendarType,
+  EventFormData,
+  ScheduleEvent,
+} from "@/lib/types";
 import Schedule from "@/components/dashboard/schedule";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -48,6 +59,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   category: z.string().optional(),
   frequency: z.string().optional(),
+  calendarID: z.number(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -60,6 +72,7 @@ interface EventFormProps {
 export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [calendars, setCalendars] = useState<CalendarType[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -71,8 +84,22 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
       startTime: format(new Date(), "HH:mm"),
       endDate: format(new Date(), "yyyy-MM-dd"),
       endTime: format(new Date(), "HH:mm"),
+      calendarID: 1,
     },
   });
+
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      try {
+        const response = await fetch("/api/calendars");
+        const data = await response.json();
+        setCalendars(data);
+      } catch (error) {
+        console.error("Failed to fetch calendars:", error);
+      }
+    };
+    fetchCalendars();
+  }, []);
 
   const handleSubmit = (data: FormValues) => {
     const start = new Date(`${data.startDate}T${data.startTime}`);
@@ -90,7 +117,7 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
       category: data.category || "",
       frequency: data.frequency || "",
       uid: userId,
-      calendarID: 1,
+      calendarID: data.calendarID,
       siid: eventID,
       color: "#000000", // Add a default color or modify as needed
     };
@@ -307,6 +334,33 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
               <FormDescription>
                 You can provide additional details about the event here.
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="calendarID"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Select Calendar</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a calendar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {calendars.map((calendar) => (
+                      <SelectItem
+                        key={calendar.id}
+                        value={calendar.id.toString()}
+                      >
+                        {calendar.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
