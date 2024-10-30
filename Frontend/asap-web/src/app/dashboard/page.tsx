@@ -10,6 +10,7 @@ export default function Dashboard() {
   const { items, setItems } = useScheduleItems();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [calendars, setCalendars] = useState([]);
 
   const handleItemUpdate = (updatedItem: ScheduleItem) => {
     setItems((prevItems) =>
@@ -52,6 +53,23 @@ export default function Dashboard() {
     fetchScheduleItems();
   }, []);
 
+  useEffect(() => {
+    const fetchCalendars = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/calendars");
+        if (!response.ok) {
+          throw new Error("Failed to fetch calendars");
+        }
+        const data = await response.json();
+        setCalendars(data);
+      } catch (error) {
+        console.error("Failed to fetch calendars:", error);
+      }
+    };
+
+    fetchCalendars();
+  }, []);
+
   // useEffect(() => {
   //   const checkAuth = async () => {
   //     try {
@@ -76,7 +94,11 @@ export default function Dashboard() {
 
   return (
     <>
-      <Schedule items={items} onItemUpdate={handleItemUpdate} />
+      <Schedule
+        items={items}
+        onItemUpdate={handleItemUpdate}
+        selectedCalenders={calendars}
+      />
     </>
   );
 }
