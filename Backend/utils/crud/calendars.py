@@ -14,3 +14,24 @@ def create_calendar(db: Session, calendar: schemas.CalendarCreate, userID: int):
     db.commit()
     db.refresh(db_calendar)
     return db_calendar
+
+# Get calendar by ID
+def get_calendar(db: Session, calendar_id: int) -> models.Calendar:
+    return db.query(models.Calendar).filter(models.Calendar.id == calendar_id).first()
+
+# Edit calendar details
+def edit_calendar(db: Session, calendar_id: int, calendar_update: schemas.CalendarUpdate) -> models.Calendar:
+    calendar = db.query(models.Calendar).filter(models.Calendar.id == calendar_id).first()
+    if not calendar:
+        return None
+    
+    # Update calendar fields
+    if calendar_update.name is not None:
+        calendar.name = calendar_update.name
+    if calendar_update.description is not None:
+        calendar.description = calendar_update.description
+
+    db.commit()
+    db.refresh(calendar)
+    return calendar
+
