@@ -24,21 +24,25 @@ export const signUp = async (
     console.log("User data before storing in localStorage:", data);
     localStorage.setItem("User", JSON.stringify(data));
     console.log("User data after storing in localStorage:", data);
-
-    return response; // Return the raw response
+    const tokenResponse = await signIn(email, password); // Sign in the user after successful sign-up
+    return tokenResponse; // Return the raw response
   } catch (error) {
     console.error("Error during sign-up:", error);
     throw error;
   }
 };
 
-export const signIn = async (email: string) => {
+export const signIn = async (email: string, password: string) => {
   try {
     const response = await fetch(`http://localhost:8000/users/email/${email}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
+      // body: new URLSearchParams({
+      //   username: email,
+      //   password: password,
+      // }).toString(),
     });
 
     if (!response.ok) {
@@ -46,6 +50,12 @@ export const signIn = async (email: string) => {
     }
 
     const user = await response.json();
+    const { token } = user;
+
+    if (token) {
+      localStorage.setItem("token", token);
+      console.log("Token stored in localStorage:", token);
+    }
 
     // Store user details in localStorage
     localStorage.setItem("User", JSON.stringify(user));
