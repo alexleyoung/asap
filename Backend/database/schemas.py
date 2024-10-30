@@ -9,13 +9,6 @@ class Token(BaseModel):
     token_type: str
 
 
-class TokenData(BaseModel):
-    email: str | None = None
-
-
-##### USER #####
-
-
 # create User schemas
 class UserBase(BaseModel):
     firstname: str
@@ -49,7 +42,7 @@ class User(UserBase):
 
 
 ###
-# create Calendar schemas
+# Calendar
 class CalendarBase(BaseModel):
     name: str
     description: str
@@ -60,6 +53,10 @@ class CalendarBase(BaseModel):
 class CalendarCreate(CalendarBase):
     pass
 
+# for editing a calendar 
+class CalendarUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
 
 # main class
 class Calendar(BaseModel):

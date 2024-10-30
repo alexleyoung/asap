@@ -34,33 +34,25 @@ export const signUp = async (
 
 export const signIn = async (email: string, password: string) => {
   try {
-    const response = await fetch(`http://localhost:8000/users/email/${email}`, {
-      method: "GET",
+    const response = await fetch("http://localhost:8000/auth/token", {
+      method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded", // Required for OAuth2PasswordRequestForm
       },
-      // body: new URLSearchParams({
-      //   username: email,
-      //   password: password,
-      // }).toString(),
+      body: new URLSearchParams({
+        username: email,
+        password,
+      }),
     });
 
     if (!response.ok) {
-      throw new Error("User not found or error during sign-in");
+      throw new Error("Could not validate user");
     }
 
-    const user = await response.json();
-    const { token } = user;
-
-    if (token) {
-      localStorage.setItem("token", token);
-      console.log("Token stored in localStorage:", token);
-    }
-
-    // Store user details in localStorage
-    localStorage.setItem("User", JSON.stringify(user));
-
-    return user;
+    const data = await response.json();
+    console.log("Data:", data);
+    return data;
+    // Redirect or perform further actions after successful authentication
   } catch (error) {
     console.error("Error during sign-in:", error);
     throw error;
