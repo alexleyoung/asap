@@ -47,8 +47,6 @@ class Event(Base):
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String)
-    userID = Column("userID", Integer, ForeignKey("users.id"))
-    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"))
     location = Column("location", String)
 
     # foreign keys
