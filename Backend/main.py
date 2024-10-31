@@ -1,14 +1,32 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
-
 from .routers import users, events, tasks, calendars, auth
+from .database import models
+from .database.db import init_db  # Import init_db from database module
+from contextlib import asynccontextmanager  # Import asynccontextmanager
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# Define lifespan event for setup tasks
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Perform setup tasks on startup
+    init_db()  # Create tables if they don't exist
+    yield  # Let the app run
+    # Perform teardown tasks on shutdown, if needed
 
-# create app
-app = FastAPI()
+# Initialize FastAPI app with lifespan
+app = FastAPI(lifespan=lifespan)
+
+
+
+
+
+
+
+
+
 
 app.include_router(auth.router)
 app.include_router(users.router)
