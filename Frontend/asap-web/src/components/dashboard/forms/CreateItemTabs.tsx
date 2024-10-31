@@ -4,12 +4,12 @@ import { TaskForm } from "../forms/TaskForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createItem } from "../../../lib/scheduleCrud";
 import { useEffect, useState } from "react";
-import { EventFormData } from "@/lib/types";
+import { EventPost } from "@/lib/types";
 
 interface createItemTabsProps {}
 
 interface CreateItemTabsProps {
-  onFormSubmit: (data: EventFormData) => void;
+  onFormSubmit: (data: EventPost) => void;
   onItemCreate: (item: ScheduleItem) => void;
 }
 
@@ -27,9 +27,7 @@ export default function CreateItemTabs({
     setUserId(storedUserId);
   }, []);
 
-  type EventDataToSend = Omit<EventFormData, "uid" | "siid" | "type">;
-
-  const handleEventSubmit = async (eventData: EventFormData) => {
+  const handleEventSubmit = async (eventData: EventPost) => {
     const {
       title,
       start,
@@ -38,9 +36,10 @@ export default function CreateItemTabs({
       description,
       category,
       frequency,
+      userID,
       calendarID,
     } = eventData;
-    const dataToSend: EventDataToSend = {
+    const dataToSend: EventPost = {
       title,
       start,
       end,
@@ -48,6 +47,7 @@ export default function CreateItemTabs({
       description: description || "",
       category: category || "",
       frequency: frequency || "",
+      userID: typeof userID === "number" ? userID : 0,
       calendarID: typeof calendarID === "number" ? calendarID : 0,
     };
     console.log("Event data:", dataToSend);
@@ -81,21 +81,21 @@ export default function CreateItemTabs({
   };
 
   return (
-    <Tabs defaultValue="event" className="w-full">
+    <Tabs defaultValue='event' className='w-full'>
       <DialogHeader>
-        <TabsList className="w-full flex mt-6">
-          <TabsTrigger value="event" className="flex-1">
+        <TabsList className='w-full flex mt-6'>
+          <TabsTrigger value='event' className='flex-1'>
             <span>Event</span>
           </TabsTrigger>
-          <TabsTrigger value="task" className="flex-1">
+          <TabsTrigger value='task' className='flex-1'>
             <span>Task</span>
           </TabsTrigger>
         </TabsList>
       </DialogHeader>
-      <TabsContent value="event">
+      <TabsContent value='event'>
         <EventForm onSubmit={handleEventSubmit} onItemCreate={onItemCreate} />
       </TabsContent>
-      <TabsContent value="task">
+      <TabsContent value='task'>
         <TaskForm onSubmit={() => {}} />
       </TabsContent>
     </Tabs>

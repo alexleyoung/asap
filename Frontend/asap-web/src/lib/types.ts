@@ -1,31 +1,18 @@
-export type ScheduleItem = {
-  siid: number;
+export type ViewType = "day" | "week" | "month";
+
+// Events
+export type Event = {
+  id: number;
   title: string;
   start: Date;
   end: Date;
   description: string;
   category: string;
   frequency: string;
-  uid: number;
+  userID: number;
   calendarID: number;
-  color: string;
-  type: "event" | "task";
-} & (ScheduleEvent | ScheduleTask);
-
-export type ScheduleEvent = {
   location: string;
 };
-
-export type ScheduleTask = {
-  due: Date;
-  priority: string;
-  difficulty: string;
-  duration: string;
-  flexible: boolean;
-  auto: boolean;
-};
-
-export type ViewType = "day" | "week" | "month";
 
 export type EventPost = {
   title: string;
@@ -35,39 +22,47 @@ export type EventPost = {
   category: string;
   frequency: string;
   location: string;
-  uid: string;
-  calendarID: string;
+  userID: number;
+  calendarID: number;
 };
-export type TaskPost = {
-  title: string;
-  start: string;
-  end: string;
-  description: string;
-  category: string;
-  frequency: string;
-  due: string;
-  priority: string;
-  difficulty: string;
-  duration: string;
-  flexible: string;
-  auto: boolean;
-  uid: string;
-  cid: string;
-};
-export type EventFormData = {
-  type: "event";
+
+// Tasks
+export type Task = {
+  id: number;
   title: string;
   start: Date;
   end: Date;
   description: string;
   category: string;
   frequency: string;
-  location: string;
-  uid: number;
+  dueDate: Date;
+  priority: string;
+  auto: boolean;
+  completed: boolean;
+  difficulty: string;
+  duration: number;
+  flexible: boolean;
+  userID: number;
   calendarID: number;
-  siid: number;
 };
 
+export type TaskPost = {
+  auto: boolean;
+  calendarID: number;
+  category: string;
+  description: string;
+  difficulty: string;
+  dueDate: Date;
+  duration: number;
+  flexible: boolean;
+  frequency: string;
+  completed: boolean;
+  priority: string;
+  title: string;
+  userID: number;
+};
+
+// Calendars
 export type Calendar = {
   id: number;
   name: string;
