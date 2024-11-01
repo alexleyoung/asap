@@ -1,4 +1,20 @@
-import { Event, Task, EventPost, TaskPost } from "./types";
+import { User, Event, Task, EventPost, TaskPost } from "./types";
+
+// Users
+export async function getUserByEmail(email: string) {
+  try {
+    const response = await fetch(`http://localhost:8000/users/email/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return (await response.json()) as User;
+  } catch (error) {
+    console.error("Failed to get user:", error);
+    throw error; // Re-throw the error after logging it
+  }
+}
 
 // Events
 export async function getEvents(userID: number) {
@@ -9,11 +25,11 @@ export async function getEvents(userID: number) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
-    const data = await response.json();
-    return data;
+    return (await response.json()) as Event[];
   } catch (error) {
     console.error(error);
   }
@@ -90,28 +106,6 @@ export async function deleteEvent(eventId: number) {
   }
 }
 
-type ScheduleData = {
-  events: Event[];
-  tasks: Task[];
-};
-export async function generateSchedule({ events, tasks }: ScheduleData) {
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    body: JSON.stringify({ events, tasks }),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || "Something went wrong");
-  }
-
-  return await response.json();
-}
-
 // Tasks
 export async function getTasks(userID: number) {
   try {
@@ -121,6 +115,7 @@ export async function getTasks(userID: number) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       }
     );
@@ -199,6 +194,29 @@ export async function fetchCalendars(userId: string) {
   const response = await fetch(
     `http://localhost:8000/users/${userId}/calendars`
   );
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Something went wrong");
+  }
+
+  return await response.json();
+}
+
+// Schedule
+type ScheduleData = {
+  events: Event[];
+  tasks: Task[];
+};
+export async function generateSchedule({ events, tasks }: ScheduleData) {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({ events, tasks }),
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
 
   if (!response.ok) {
     const data = await response.json();

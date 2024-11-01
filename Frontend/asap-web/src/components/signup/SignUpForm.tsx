@@ -19,6 +19,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { User } from "@/lib/types";
+import { getUserByEmail } from "@/lib/scheduleCrud";
 
 const formSchema = z
   .object({
@@ -39,7 +41,11 @@ const formSchema = z
     message: "Passwords do not match",
   });
 
-export default function SignUpForm() {
+export default function SignUpForm({
+  setUser,
+}: {
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
@@ -73,6 +79,7 @@ export default function SignUpForm() {
         // Check if the response is valid, change the condition
         setError("");
         setSuccess("Account created successfully");
+        setUser(await getUserByEmail(data.email));
         router.push("/dashboard");
       } else {
         setError("Invalid email or password. Please try again.");

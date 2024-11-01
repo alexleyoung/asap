@@ -19,13 +19,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { getUserByEmail } from "@/lib/scheduleCrud";
+import { User } from "@/lib/types";
 
 const formSchema = z.object({
   email: z.string().email().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
-export default function SignInForm() {
+export default function SignInForm({
+  setUser,
+}: {
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
@@ -46,6 +52,7 @@ export default function SignInForm() {
       );
       if (token) {
         localStorage.setItem("token", token.access_token);
+        setUser(await getUserByEmail(data.email));
         setSuccess("Signed in successfully");
         setError("");
         router.push("/dashboard");

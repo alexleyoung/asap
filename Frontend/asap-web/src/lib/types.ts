@@ -1,5 +1,13 @@
 export type ViewType = "day" | "week" | "month";
 
+export type User = {
+  id: number;
+  firstname: string;
+  lastname: string;
+  email: string;
+  avatar: string;
+};
+
 // Events
 export type Event = {
   id: number;

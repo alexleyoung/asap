@@ -6,7 +6,7 @@ import { isEvent, isTask } from "@/lib/utils";
 
 type DraggableItemProps = {
   item: Event | Task;
-  dragID: number;
+  dragID: string;
   onItemClick: (item: Event | Task) => void;
   containerHeight: number;
   dayStart: Date;

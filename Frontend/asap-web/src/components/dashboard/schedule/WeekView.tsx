@@ -55,12 +55,8 @@ export default function WeekView({
           {dayEvents.map((event) => (
             <DraggableItem
               key={`event-${event.id}`}
-              item={{
-                ...event,
-                siid: event.id.toString(),
-                uid: event.userID.toString(),
-                type: "event",
-              }}
+              dragID={`event-${event.id}`}
+              item={event}
               onItemClick={() => onEditEvent(event)}
               containerHeight={containerHeight}
               dayStart={dayStart}
@@ -71,14 +67,8 @@ export default function WeekView({
           {dayTasks.map((task) => (
             <DraggableItem
               key={`task-${task.id}`}
-              item={{
-                ...task,
-                siid: task.id.toString(),
-                uid: task.userID.toString(),
-                type: "task",
-                start: task.dueDate,
-                end: addMinutes(task.dueDate, task.duration),
-              }}
+              dragID={`task-${task.id}`}
+              item={task}
               onItemClick={() => onEditTask(task)}
               containerHeight={containerHeight}
               dayStart={dayStart}
