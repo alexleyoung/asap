@@ -16,14 +16,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useCalendars } from "@/hooks/useCalendars";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
+// import { useCalendars } from "@/hooks/useCalendars";
 
 interface EditEventFormProps {
   onClose: () => void;
@@ -52,7 +52,7 @@ export function EditEventForm({
   onSubmit,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
-  const { calendars, isLoading: isLoadingCalendars } = useCalendars();
+  // const { calendars, isLoading: isLoadingCalendars } = useCalendars();
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -93,7 +93,7 @@ export function EditEventForm({
         start: new Date(data.start),
         end: new Date(data.end),
       };
-      const response = await updateEvent(updatedEvent, eventData.id);
+      const response = await updateEvent(updatedEvent);
       if (!response.ok) {
         const errorDetails = await response.json();
         throw new Error(`Error: ${errorDetails.message || "Unknown error"}`);
@@ -192,7 +192,7 @@ export function EditEventForm({
             </FormItem>
           )}
         />
-        <FormField
+        {/* <FormField
           control={form.control}
           name='calendarID'
           render={({ field }) => (
@@ -219,7 +219,7 @@ export function EditEventForm({
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <div className='flex justify-between'>
           <Button type='submit' variant='secondary' disabled={loading}>
             Save Changes

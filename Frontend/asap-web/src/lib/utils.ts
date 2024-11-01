@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Modifier } from "@dnd-kit/core";
+import { Event, Task } from "@/lib/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -23,4 +24,12 @@ export const snapToTimeSlot: Modifier = ({
     ...transform,
     y: snappedY,
   };
+};
+
+export const isEvent = (item: Event | Task): item is Event => {
+  return !("duration" in item);
+};
+
+export const isTask = (item: Event | Task): item is Task => {
+  return "duration" in item;
 };

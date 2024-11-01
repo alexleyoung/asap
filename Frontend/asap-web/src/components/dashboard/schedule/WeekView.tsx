@@ -6,25 +6,30 @@ import {
   eachDayOfInterval,
   isSameDay,
   startOfDay,
+  addMinutes,
 } from "date-fns";
-import { EventFormData, ScheduleItem } from "@/lib/types";
+import { Event, Task, Calendar } from "@/lib/types";
 import TimeSlots from "./TimeSlots";
 import DraggableItem from "./DraggableItem";
 import CurrentTimeLine from "./CurrentTimeLine";
 
 type WeekViewProps = {
   currentDate: Date;
-  scheduleItems: ScheduleItem[];
-  selectedCalendars: number[];
-  onEditItem: (item: EventFormData) => void;
+  events: Event[];
+  tasks: Task[];
+  selectedCalendars: Calendar[];
+  onEditEvent: (event: Event) => void;
+  onEditTask: (task: Task) => void;
   scheduleRef: React.RefObject<HTMLDivElement>;
 };
 
 export default function WeekView({
   currentDate,
-  scheduleItems,
+  events,
+  tasks,
   selectedCalendars,
-  onEditItem,
+  onEditEvent,
+  onEditTask,
   scheduleRef,
 }: WeekViewProps) {
   const startDate = startOfWeek(currentDate);
@@ -34,33 +39,57 @@ export default function WeekView({
   const renderItems = useCallback(
     (day: Date, containerHeight: number) => {
       const dayStart = startOfDay(day);
-      const dayItems = scheduleItems.filter(
-        (item) =>
-          isSameDay(item.start, day) &&
-          selectedCalendars.includes(item.calendarID)
+      const dayEvents = events.filter(
+        (event) =>
+          isSameDay(event.start, day) &&
+          selectedCalendars.some((cal) => cal.id === event.calendarID)
+      );
+      const dayTasks = tasks.filter(
+        (task) =>
+          isSameDay(task.dueDate, day) &&
+          selectedCalendars.some((cal) => cal.id === task.calendarID)
       );
 
-      return dayItems.map((item) => (
-        <DraggableItem
-          key={item.siid}
-          item={item}
-          onItemClick={() => {
-            const eventFormData: EventFormData = {
-              ...item,
-              type: "event",
-              siid: item.siid,
-              uid: item.uid,
-            };
-            onEditItem(eventFormData);
-          }}
-          containerHeight={containerHeight}
-          dayStart={dayStart}
-          columnWidth={100}
-          columnOffset={0}
-        />
-      ));
+      return (
+        <>
+          {dayEvents.map((event) => (
+            <DraggableItem
+              key={`event-${event.id}`}
+              item={{
+                ...event,
+                siid: event.id.toString(),
+                uid: event.userID.toString(),
+                type: "event",
+              }}
+              onItemClick={() => onEditEvent(event)}
+              containerHeight={containerHeight}
+              dayStart={dayStart}
+              columnWidth={100}
+              columnOffset={0}
+            />
+          ))}
+          {dayTasks.map((task) => (
+            <DraggableItem
+              key={`task-${task.id}`}
+              item={{
+                ...task,
+                siid: task.id.toString(),
+                uid: task.userID.toString(),
+                type: "task",
+                start: task.dueDate,
+                end: addMinutes(task.dueDate, task.duration),
+              }}
+              onItemClick={() => onEditTask(task)}
+              containerHeight={containerHeight}
+              dayStart={dayStart}
+              columnWidth={100}
+              columnOffset={0}
+            />
+          ))}
+        </>
+      );
     },
-    [scheduleItems, selectedCalendars, onEditItem]
+    [events, tasks, selectedCalendars, onEditEvent, onEditTask]
   );
 
   return (

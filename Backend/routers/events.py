@@ -1,4 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, Query
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    Query,
+)
 from sqlalchemy.orm import Session
 from typing import List
 from ..database import schemas
@@ -6,10 +13,10 @@ from ..database.db import get_db
 from ..utils.crud import events as controller
 from ..utils.crud import users
 from ..utils.auth import get_current_user
-import json
 
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
+
 
 # connection mamnger for websocket
 class ConnectionManager:
@@ -27,8 +34,10 @@ class ConnectionManager:
         for connection in self.active_connections:
             await connection.send_text(message)
 
+
 # create manager
 manager = ConnectionManager()
+
 
 # websocket endpoint for real-time notifications
 @router.websocket("/ws/notifications")
@@ -40,6 +49,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
+
 # to create an event
 @router.post("/users/{userID}/events", response_model=schemas.Event)
 async def create_event_endpoint(
@@ -50,7 +60,7 @@ async def create_event_endpoint(
         raise HTTPException(status_code=404, detail="User not found")
 
     db_event = controller.create_event(db=db, event=event, userID=userID)
-    
+
     await manager.broadcast(f"New event created: {db_event.title}")
 
     return db_event

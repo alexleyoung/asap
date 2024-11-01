@@ -5,10 +5,9 @@ import {
   SetStateAction,
   createContext,
   useContext,
-  useReducer,
   useState,
 } from "react";
-// import { testScheduleItems } from "@/lib/consts";
+import { Event, Task } from "@/lib/types";
 
 interface ViewContextType {
   view: string;
@@ -25,8 +24,10 @@ const CurrentDateContext = createContext<CurrentDateContextType | undefined>(
 );
 
 interface ScheduleItemsContextType {
-  items: ScheduleItem[];
-  setItems: Dispatch<SetStateAction<ScheduleItem[]>>;
+  events: Event[];
+  setEvents: Dispatch<SetStateAction<Event[]>>;
+  tasks: Task[];
+  setTasks: Dispatch<SetStateAction<Task[]>>;
 }
 const ScheduleItemsContext = createContext<
   ScheduleItemsContextType | undefined
@@ -35,12 +36,14 @@ const ScheduleItemsContext = createContext<
 export function ScheduleProvider({ children }: { children: React.ReactNode }) {
   const [view, setView] = useState("week");
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [items, setItems] = useState<ScheduleItem[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   return (
     <ViewContext.Provider value={{ view, setView }}>
       <CurrentDateContext.Provider value={{ currentDate, setCurrentDate }}>
-        <ScheduleItemsContext.Provider value={{ items, setItems }}>
+        <ScheduleItemsContext.Provider
+          value={{ events, setEvents, tasks, setTasks }}>
           {children}
         </ScheduleItemsContext.Provider>
       </CurrentDateContext.Provider>

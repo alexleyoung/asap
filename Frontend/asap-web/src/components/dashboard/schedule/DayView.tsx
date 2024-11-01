@@ -6,55 +6,73 @@ import {
   differenceInMinutes,
   addMinutes,
 } from "date-fns";
-import { EventFormData, ScheduleItem } from "@/lib/types";
+import { Event, Task, Calendar } from "@/lib/types";
 import TimeSlots from "./TimeSlots";
 import DraggableItem from "./DraggableItem";
 
 type DayViewProps = {
   currentDate: Date;
-  scheduleItems: ScheduleItem[];
-  selectedCalendars: number[];
-  onEditItem: (item: EventFormData) => void;
+  events: Event[];
+  tasks: Task[];
+  selectedCalendars: Calendar[];
+  onEditEvent: (event: Event) => void;
+  onEditTask: (task: Task) => void;
   scheduleRef: React.RefObject<HTMLDivElement>;
 };
 
 export default function DayView({
   currentDate,
-  scheduleItems,
+  events,
+  tasks,
   selectedCalendars,
-  onEditItem,
+  onEditEvent,
+  onEditTask,
   scheduleRef,
 }: DayViewProps) {
   const renderItems = useCallback(
     (containerHeight: number) => {
       const dayStart = startOfDay(currentDate);
-      const dayItems = scheduleItems.filter(
-        (item) =>
-          isSameDay(item.start, currentDate) &&
-          selectedCalendars.includes(item.calendarID)
+      const dayEvents = events.filter(
+        (event) =>
+          isSameDay(event.start, currentDate) &&
+          selectedCalendars.some((cal) => cal.id === event.calendarID)
+      );
+      const dayTasks = tasks.filter(
+        (task) =>
+          isSameDay(task.dueDate, currentDate) &&
+          selectedCalendars.some((cal) => cal.id === task.calendarID)
       );
 
-      return dayItems.map((item) => (
-        <DraggableItem
-          key={item.siid}
-          item={item}
-          onItemClick={() => {
-            const eventFormData: EventFormData = {
-              ...item,
-              type: "event",
-              siid: item.siid,
-              uid: item.uid,
-            };
-            onEditItem(eventFormData);
-          }}
-          containerHeight={containerHeight}
-          dayStart={dayStart}
-          columnWidth={100}
-          columnOffset={0}
-        />
-      ));
+      return (
+        <>
+          {dayEvents.map((event, i) => (
+            <DraggableItem
+              key={event.id}
+              dragID={i}
+              item={event}
+              onItemClick={() => onEditEvent(event)}
+              containerHeight={containerHeight}
+              dayStart={dayStart}
+              columnWidth={100}
+              columnOffset={0}
+            />
+          ))}
+          {dayTasks.map((task, i) => (
+            <DraggableItem
+              key={task.id}
+              dragID={i + dayEvents.length}
+              item={task}
+              onItemClick={() => onEditTask(task)}
+              containerHeight={containerHeight}
+              dayStart={dayStart}
+              columnWidth={100}
+              columnOffset={0}
+            />
+          ))}
+        </>
+      );
     },
-    [currentDate, scheduleItems, selectedCalendars, onEditItem]
+    [currentDate, events, tasks, selectedCalendars, onEditEvent, onEditTask]
   );
 
   return (

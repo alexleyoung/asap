@@ -57,6 +57,10 @@ export default function Schedule({
     setIsEditing(true);
   };
 
+  function handleEditTask(task: Task): void {
+    throw new Error("Function not implemented.");
+  }
+
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       // Implement drag end logic here
@@ -86,6 +90,7 @@ export default function Schedule({
               tasks={tasks}
               selectedCalendars={selectedCalendars}
               onEditEvent={handleEditEvent}
+              onEditTask={handleEditTask}
               scheduleRef={scheduleRef}
             />
           )}

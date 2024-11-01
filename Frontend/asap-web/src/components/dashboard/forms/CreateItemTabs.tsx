@@ -2,7 +2,7 @@ import { DialogHeader } from "@/components/ui/dialog";
 import { EventForm } from "../forms/EventForm";
 import { TaskForm } from "../forms/TaskForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createItem } from "../../../lib/scheduleCrud";
+import { createEvent, createTask } from "../../../lib/scheduleCrud";
 import { useEffect, useState } from "react";
 import { EventPost } from "@/lib/types";
 
@@ -27,58 +27,7 @@ export default function CreateItemTabs({
     setUserId(storedUserId);
   }, []);
 
-  const handleEventSubmit = async (eventData: EventPost) => {
-    const {
-      title,
-      start,
-      end,
-      location,
-      description,
-      category,
-      frequency,
-      userID,
-      calendarID,
-    } = eventData;
-    const dataToSend: EventPost = {
-      title,
-      start,
-      end,
-      location: location || "",
-      description: description || "",
-      category: category || "",
-      frequency: frequency || "",
-      userID: typeof userID === "number" ? userID : 0,
-      calendarID: typeof calendarID === "number" ? calendarID : 0,
-    };
-    console.log("Event data:", dataToSend);
-    console.log("User ID:", userId);
-    try {
-      setLoading(true);
-      let response;
-      if (userId) {
-        response = await createItem({ id: userId }, dataToSend); // Call createItem with event data
-        console.log("Response:", response);
-        const scheduleItem: ScheduleItem = {
-          ...eventData,
-          siid: 0, // or generate a unique id
-          uid: userId ? parseInt(userId) : 0,
-          color: "", // or assign a default color
-          type: "event",
-        };
-        console.log("calling onItemCreate with:", scheduleItem);
-        onItemCreate(scheduleItem);
-      } else {
-        throw new Error("User ID is null");
-      }
-      console.log("Event created successfully:", response);
-
-      onFormSubmit(eventData);
-    } catch (error) {
-      console.error("Failed to create event:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleEventSubmit = async (eventData: EventPost) => {};
 
   return (
     <Tabs defaultValue='event' className='w-full'>
@@ -93,7 +42,7 @@ export default function CreateItemTabs({
         </TabsList>
       </DialogHeader>
       <TabsContent value='event'>
-        <EventForm onSubmit={handleEventSubmit} onItemCreate={onItemCreate} />
+        <EventForm onSubmit={handleEventSubmit} onItemCreate={eventCreate} />
       </TabsContent>
       <TabsContent value='task'>
         <TaskForm onSubmit={() => {}} />
