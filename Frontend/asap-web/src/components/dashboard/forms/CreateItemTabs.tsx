@@ -9,12 +9,12 @@ import { createEvent, createTask } from "@/lib/scheduleCrud";
 import { Event, Task, EventPost, TaskPost } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
-
-interface CreateItemTabsProps {}
+import { useScheduleItems } from "@/contexts/ScheduleContext";
 
 export default function CreateItemTabs() {
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
+  const { setEvents, setTasks } = useScheduleItems();
   const { toast } = useToast();
 
   const handleEventSubmit = async (eventData: EventPost) => {
@@ -31,6 +31,7 @@ export default function CreateItemTabs() {
     setLoading(true);
     try {
       const createdEvent = await createEvent({ ...eventData, userID: user.id });
+      setEvents((prevEvents) => [...prevEvents, createdEvent]);
       toast({
         title: "Success",
         description: "Event created successfully",
@@ -60,6 +61,7 @@ export default function CreateItemTabs() {
     setLoading(true);
     try {
       const createdTask = await createTask({ ...taskData, userID: user.id });
+      setTasks((prevTasks) => [...prevTasks, createdTask]);
       toast({
         title: "Success",
         description: "Task created successfully",
