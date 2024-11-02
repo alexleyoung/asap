@@ -6,8 +6,8 @@ from ...database import schemas, models
 def create_task(db: Session, Task: schemas.TaskCreate):
     db_task = models.Task(
         title=Task.title,
-        start=date.today(),
-        end=date.today(),
+        start=Task.start,
+        end=Task.end,
         description=Task.description,
         category=Task.category,
         frequency=Task.frequency,

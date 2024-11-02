@@ -113,8 +113,8 @@ class Event(EventBase):
 # Task
 class TaskBase(BaseModel):
     title: str
-    start: Optional[datetime]
-    end: Optional[datetime]
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
     description: str
     category: str
     frequency: str
@@ -133,8 +133,8 @@ class TaskBase(BaseModel):
 class TaskCreate(BaseModel):
     title: str
     description: str
-    start: Optional[datetime]
-    end: Optional[datetime]
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
     duration: int
     dueDate: datetime
     category: str
