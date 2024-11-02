@@ -35,29 +35,34 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { TaskPost } from "@/lib/types";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
+  description: z.string(),
   duration: z.number().min(1, "Duration must be at least 1 minute"),
-  dueDate: z.date({
-    required_error: "Due date is required",
-  }),
+  dueDate: z
+    .date({
+      required_error: "Due date is required",
+    })
+    .default(new Date()),
   priority: z.enum(["low", "medium", "high"]),
-  category: z.string().min(1, "Category is required"),
-  auto: z.boolean().default(false),
+  frequency: z.string(),
+  category: z.string(),
+  auto: z.boolean(),
   difficulty: z.enum(["easy", "medium", "hard"]),
-  flexible: z.boolean().default(false),
+  completed: z.boolean(),
+  flexible: z.boolean(),
+  userID: z.number(),
+  calendarID: z.number(),
 });
-
-type TaskPost = z.infer<typeof formSchema>;
 
 interface TaskFormProps {
   onSubmit: (data: TaskPost) => void;
-  isLoading: boolean;
+  loading: boolean;
 }
 
-export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
+export function TaskForm({ onSubmit, loading }: TaskFormProps) {
   const form = useForm<TaskPost>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,15 +70,19 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
       description: "",
       duration: 30,
       priority: "medium",
+      frequency: "",
       category: "",
-      autoSchedule: false,
       difficulty: "medium",
+      auto: false,
       flexible: false,
+      completed: false,
+      userID: -1,
+      calendarID: 1, // temp default
     },
   });
 
   function onSubmitForm(values: TaskPost) {
-    onSubmit(values);
+    onSubmit({ ...values, completed: false });
   }
 
   return (
@@ -92,6 +101,7 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
             </FormItem>
           )}
         />
+
         <div className='grid grid-cols-2 gap-4'>
           <FormField
             control={form.control}
@@ -114,11 +124,12 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name='dueDate'
             render={({ field }) => (
-              <FormItem className='flex flex-col'>
+              <FormItem>
                 <FormLabel>Due Date</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -143,9 +154,6 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
                       mode='single'
                       selected={field.value}
                       onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date() || date < new Date("1900-01-01")
-                      }
                       initialFocus
                     />
                   </PopoverContent>
@@ -155,19 +163,31 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
             )}
           />
         </div>
+
         <FormField
           control={form.control}
           name='category'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
-              <FormControl>
-                <Input placeholder='Enter task category' {...field} />
-              </FormControl>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select a category' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value='work'>Work</SelectItem>
+                  <SelectItem value='personal'>Personal</SelectItem>
+                  <SelectItem value='family'>Family</SelectItem>
+                  <SelectItem value='other'>Other</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <div className='grid grid-cols-2 gap-4'>
           <FormField
             control={form.control}
@@ -193,6 +213,7 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
             name='difficulty'
@@ -218,20 +239,21 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
             )}
           />
         </div>
+
         <FormField
           control={form.control}
-          name='autoSchedule'
+          name='auto'
           render={({ field }) => (
             <FormItem className='flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4'>
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
-                  id='autoSchedule'
+                  id='auto'
                 />
               </FormControl>
               <Label
-                htmlFor='autoSchedule'
+                htmlFor='auto'
                 className='flex flex-col space-y-1 leading-none cursor-pointer'>
                 <span>Auto Schedule</span>
                 <span className='text-sm text-muted-foreground'>
@@ -241,6 +263,7 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='flexible'
@@ -265,6 +288,7 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name='description'
@@ -279,8 +303,8 @@ export function TaskForm({ onSubmit, isLoading }: TaskFormProps) {
           )}
         />
         <div className='flex justify-end mt-6'>
-          <Button type='submit' disabled={isLoading}>
-            {isLoading ? "Creating..." : "Create Task"}
+          <Button type='submit' disabled={loading}>
+            {loading ? "Creating..." : "Create Task"}
           </Button>
         </div>
       </form>

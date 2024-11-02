@@ -24,8 +24,8 @@ export type Event = {
 
 export type EventPost = {
   title: string;
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
   description: string;
   category: string;
   frequency: string;

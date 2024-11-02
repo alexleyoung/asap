@@ -8,24 +8,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createEvent, createTask } from "@/lib/scheduleCrud";
 import { Event, Task, EventPost, TaskPost } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/contexts/UserContext";
 
-interface CreateItemTabsProps {
-  onItemCreate: (item: Event | Task) => void;
-}
+interface CreateItemTabsProps {}
 
-export default function CreateItemTabs({ onItemCreate }: CreateItemTabsProps) {
-  const [userId, setUserId] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+export default function CreateItemTabs() {
+  const [loading, setLoading] = useState(false);
+  const { user } = useUser();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("User");
-    const storedUserId = storedUser ? JSON.parse(storedUser).id : null;
-    setUserId(storedUserId);
-  }, []);
-
   const handleEventSubmit = async (eventData: EventPost) => {
-    if (!userId) {
+    if (!user) {
+      console.log("user not found");
       toast({
         title: "Error",
         description: "User ID not found. Please log in again.",
@@ -36,26 +30,25 @@ export default function CreateItemTabs({ onItemCreate }: CreateItemTabsProps) {
 
     setLoading(true);
     try {
-      const createdEvent = await createEvent({ ...eventData, userID: userId });
-      onItemCreate(createdEvent);
+      const createdEvent = await createEvent({ ...eventData, userID: user.id });
       toast({
         title: "Success",
         description: "Event created successfully",
       });
     } catch (error) {
-      console.error("Failed to create event:", error);
       toast({
         title: "Error",
         description: "Failed to create event. Please try again.",
         variant: "destructive",
       });
+      console.error("Failed to create event:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleTaskSubmit = async (taskData: TaskPost) => {
-    if (!userId) {
+    if (!user) {
       toast({
         title: "Error",
         description: "User ID not found. Please log in again.",
@@ -66,8 +59,7 @@ export default function CreateItemTabs({ onItemCreate }: CreateItemTabsProps) {
 
     setLoading(true);
     try {
-      const createdTask = await createTask({ ...taskData, userID: userId });
-      onItemCreate(createdTask);
+      const createdTask = await createTask({ ...taskData, userID: user.id });
       toast({
         title: "Success",
         description: "Task created successfully",
@@ -87,7 +79,7 @@ export default function CreateItemTabs({ onItemCreate }: CreateItemTabsProps) {
   return (
     <Tabs defaultValue='event' className='w-full'>
       <DialogHeader>
-        <TabsList className='w-full flex mt-6'>
+        <TabsList className='w-full flex mt-4'>
           <TabsTrigger value='event' className='flex-1'>
             <span>Event</span>
           </TabsTrigger>
@@ -97,10 +89,14 @@ export default function CreateItemTabs({ onItemCreate }: CreateItemTabsProps) {
         </TabsList>
       </DialogHeader>
       <TabsContent value='event'>
-        <EventForm onSubmit={handleEventSubmit} isLoading={loading} />
+        <EventForm
+          onSubmit={handleEventSubmit}
+          loading={loading}
+          calendars={[]}
+        />
       </TabsContent>
       <TabsContent value='task'>
-        <TaskForm onSubmit={handleTaskSubmit} isLoading={loading} />
+        <TaskForm onSubmit={handleTaskSubmit} loading={loading} />
       </TabsContent>
     </Tabs>
   );

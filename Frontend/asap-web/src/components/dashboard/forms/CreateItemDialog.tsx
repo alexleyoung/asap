@@ -27,17 +27,14 @@ export default function CreateItemDialog() {
             Create (T)
           </Button>
         </DialogTrigger>
-        <DialogContent className='w-full'>
+        <DialogContent className='md:max-w-[80%] min-w-fit'>
           <DialogHeader>
             <DialogTitle className='sr-only'>Create New Item</DialogTitle>
             <DialogDescription className='sr-only'>
               Create a new item
             </DialogDescription>
           </DialogHeader>
-          <CreateItemTabs
-            onFormSubmit={() => setOpen(false)}
-            onItemCreate={() => {}}
-          />
+          <CreateItemTabs />
         </DialogContent>
       </Dialog>
     </div>

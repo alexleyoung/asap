@@ -1,19 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, parse } from "date-fns";
-
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,126 +16,68 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar as CalendarType, Event, EventPost } from "@/lib/types";
-import { useToast } from "@/hooks/use-toast";
+import DatePicker from "@/components/ui/date-picker";
+import TimePicker from "@/components/ui/time-picker";
+import { Calendar, EventPost } from "@/lib/types";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  startDate: z.string({
-    required_error: "Start date is required",
-  }),
-  startTime: z.string({
-    required_error: "Start time is required",
-  }),
-  endDate: z.string({
-    required_error: "End date is required",
-  }),
-  endTime: z.string({
-    required_error: "End time is required",
-  }),
-  location: z.string().optional(),
-  description: z.string().optional(),
-  category: z.string().optional(),
-  frequency: z.string().optional(),
+  start: z.date(),
+  end: z.date(),
+  description: z.string(),
+  category: z.string(),
+  frequency: z.string(),
+  location: z.string(),
+  userID: z.number(),
   calendarID: z.number(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-interface EventFormProps {
+type EventFormProps = {
   onSubmit: (data: EventPost) => void;
-  isLoading: boolean;
-}
+  calendars: Calendar[];
+  loading: boolean;
+};
 
-export function EventForm({ onSubmit, isLoading }: EventFormProps) {
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
-  const [calendars, setCalendars] = useState<CalendarType[]>([]);
-  const { toast } = useToast();
+export function EventForm({
+  onSubmit,
+  calendars,
+  loading = false,
+}: EventFormProps) {
+  const [startDate, setStartDate] = useState<Date>(new Date());
+  const [endDate, setEndDate] = useState<Date>(
+    new Date(Date.now() + 60 * 60 * 1000)
+  );
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      location: "",
+      start: startDate,
+      end: endDate,
       description: "",
-      startDate: format(new Date(), "yyyy-MM-dd"),
-      startTime: format(new Date(), "HH:mm"),
-      endDate: format(new Date(), "yyyy-MM-dd"),
-      endTime: format(new Date(), "HH:mm"),
-      calendarID: 1,
+      category: "",
+      frequency: "",
+      location: "",
+      userID: -1,
+      calendarID: 1, // temp default
     },
   });
 
-  useEffect(() => {
-    const fetchCalendars = async () => {
-      try {
-        const response = await fetch("/api/calendars");
-        if (!response.ok) {
-          throw new Error("Failed to fetch calendars");
-        }
-        const data = await response.json();
-        setCalendars(data);
-      } catch (error) {
-        console.error("Failed to fetch calendars:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load calendars. Please try again.",
-          variant: "destructive",
-        });
-      }
-    };
-    fetchCalendars();
-  }, [toast]);
-
-  const handleSubmit = (data: FormValues) => {
-    const start = new Date(`${data.startDate}T${data.startTime}`);
-    const end = new Date(`${data.endDate}T${data.endTime}`);
-    const userData = JSON.parse(localStorage.getItem("User") || "{}");
-    const userId = Number(userData.id);
-
-    const newEvent: EventPost = {
-      title: data.title,
-      start: start.toISOString(),
-      end: end.toISOString(),
-      location: data.location || "",
-      description: data.description || "",
-      category: data.category || "",
-      frequency: data.frequency || "",
-      userID: userId,
-      calendarID: data.calendarID,
-    };
-
-    onSubmit(newEvent);
-  };
-
-  const handleDateChange = (
-    field: "startDate" | "endDate",
-    date: Date | undefined
-  ) => {
-    if (date) {
-      form.setValue(field, format(date, "yyyy-MM-dd"));
-      if (field === "startDate") setStartDate(date);
-      if (field === "endDate") setEndDate(date);
-    }
+  const handleSubmit = (values: FormValues) => {
+    onSubmit(values);
   };
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        className='space-y-6 w-full max-w-md mx-auto'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
           name='title'
@@ -155,119 +91,140 @@ export function EventForm({ onSubmit, isLoading }: EventFormProps) {
             </FormItem>
           )}
         />
-        <div className='flex space-x-4'>
+
+        <div className='flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0'>
           <FormField
             control={form.control}
-            name='startDate'
+            name='start'
             render={({ field }) => (
               <FormItem className='flex-1'>
-                <FormLabel>Start Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}>
-                        {field.value ? (
-                          format(new Date(field.value), "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      selected={startDate}
-                      onSelect={(date) => handleDateChange("startDate", date)}
-                      disabled={(date) =>
-                        date < new Date(new Date().setHours(0, 0, 0, 0))
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
+                <FormLabel>Start</FormLabel>
+                <div className='flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0'>
+                  <DatePicker
+                    date={field.value}
+                    onDateChange={(date) => {
+                      const newDate = new Date(date);
+                      newDate.setHours(
+                        field.value.getHours(),
+                        field.value.getMinutes()
+                      );
+                      field.onChange(newDate);
+                      setStartDate(newDate);
+                    }}
+                  />
+                  <TimePicker
+                    date={field.value}
+                    onTimeChange={(date) => {
+                      const newDate = new Date(field.value);
+                      newDate.setHours(date.getHours(), date.getMinutes());
+                      field.onChange(newDate);
+                      setStartDate(newDate);
+                    }}
+                  />
+                </div>
                 <FormMessage />
               </FormItem>
             )}
           />
+
           <FormField
             control={form.control}
-            name='startTime'
+            name='end'
             render={({ field }) => (
               <FormItem className='flex-1'>
-                <FormLabel>Start Time</FormLabel>
-                <FormControl>
-                  <Input type='time' {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className='flex space-x-4'>
-          <FormField
-            control={form.control}
-            name='endDate'
-            render={({ field }) => (
-              <FormItem className='flex-1'>
-                <FormLabel>End Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}>
-                        {field.value ? (
-                          format(new Date(field.value), "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      selected={endDate}
-                      onSelect={(date) => handleDateChange("endDate", date)}
-                      disabled={(date) => {
-                        const today = new Date(new Date().setHours(0, 0, 0, 0));
-                        return (
-                          date < today || (startDate ? date < startDate : false)
-                        );
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='endTime'
-            render={({ field }) => (
-              <FormItem className='flex-1'>
-                <FormLabel>End Time</FormLabel>
-                <FormControl>
-                  <Input type='time' {...field} />
-                </FormControl>
+                <FormLabel>End</FormLabel>
+                <div className='flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0'>
+                  <DatePicker
+                    date={field.value}
+                    onDateChange={(date) => {
+                      const newDate = new Date(date);
+                      newDate.setHours(
+                        field.value.getHours(),
+                        field.value.getMinutes()
+                      );
+                      field.onChange(newDate);
+                      setEndDate(newDate);
+                    }}
+                  />
+                  <TimePicker
+                    date={field.value}
+                    onTimeChange={(date) => {
+                      const newDate = new Date(field.value);
+                      newDate.setHours(date.getHours(), date.getMinutes());
+                      field.onChange(newDate);
+                      setEndDate(newDate);
+                    }}
+                  />
+                </div>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
+
+        <FormField
+          control={form.control}
+          name='description'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Textarea placeholder='Event description' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='category'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select a category' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value='work'>Work</SelectItem>
+                  <SelectItem value='personal'>Personal</SelectItem>
+                  <SelectItem value='family'>Family</SelectItem>
+                  <SelectItem value='other'>Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='frequency'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Frequency</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select a frequency' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value='once'>Once</SelectItem>
+                  <SelectItem value='daily'>Daily</SelectItem>
+                  <SelectItem value='weekly'>Weekly</SelectItem>
+                  <SelectItem value='monthly'>Monthly</SelectItem>
+                  <SelectItem value='yearly'>Yearly</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name='location'
@@ -281,35 +238,16 @@ export function EventForm({ onSubmit, isLoading }: EventFormProps) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='description'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder='Event description (optional)'
-                  className='resize-none'
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                You can provide additional details about the event here.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+
         <FormField
           control={form.control}
           name='calendarID'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Select Calendar</FormLabel>
+              <FormLabel>Calendar</FormLabel>
               <Select
-                onValueChange={(value) => field.onChange(Number(value))}
-                value={field.value.toString()}>
+                onValueChange={(value) => field.onChange(parseInt(value))}
+                defaultValue={field.value.toString()}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder='Select a calendar' />
@@ -329,9 +267,10 @@ export function EventForm({ onSubmit, isLoading }: EventFormProps) {
             </FormItem>
           )}
         />
+
         <div className='flex justify-end'>
-          <Button type='submit' disabled={isLoading}>
-            {isLoading ? "Creating..." : "Create Event"}
+          <Button type='submit' disabled={loading}>
+            {loading ? "Creating Event..." : "Create Event"}
           </Button>
         </div>
       </form>

@@ -65,7 +65,7 @@ export default function DatePicker({ date, onDateChange }: DatePickerProps) {
         <Button
           variant='outline'
           className={cn(
-            "w-[240px] justify-start text-left font-normal",
+            "min-w-fit justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
           onClick={() => setIsOpen(true)}>

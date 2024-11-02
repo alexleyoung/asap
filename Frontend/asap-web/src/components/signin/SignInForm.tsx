@@ -52,7 +52,9 @@ export default function SignInForm({
       );
       if (token) {
         localStorage.setItem("token", token.access_token);
-        setUser(await getUserByEmail(data.email));
+        const userData = await getUserByEmail(data.email);
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
         setSuccess("Signed in successfully");
         setError("");
         router.push("/dashboard");
