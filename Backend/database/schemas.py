@@ -113,8 +113,8 @@ class Event(EventBase):
 # Task
 class TaskBase(BaseModel):
     title: str
-    start: datetime
-    end: datetime
+    start: Optional[datetime]
+    end: Optional[datetime]
     description: str
     category: str
     frequency: str
@@ -131,19 +131,21 @@ class TaskBase(BaseModel):
 
 # to create
 class TaskCreate(BaseModel):
-    auto: bool
-    calendarID: int
-    category: str
-    description: str
-    difficulty: str
-    dueDate: datetime
-    duration: int
-    flexible: bool
-    frequency: str
-    completed: bool
-    priority: str
     title: str
+    description: str
+    start: Optional[datetime]
+    end: Optional[datetime]
+    duration: int
+    dueDate: datetime
+    category: str
+    difficulty: str
+    frequency: str
+    priority: str
+    auto: bool
+    flexible: bool
+    completed: bool
     userID: int
+    calendarID: int
 
 
 # main class

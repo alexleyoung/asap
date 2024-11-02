@@ -38,8 +38,8 @@ export type EventPost = {
 export type Task = {
   id: number;
   title: string;
-  start: Date;
-  end: Date;
+  start: Date | null;
+  end: Date | null;
   description: string;
   category: string;
   frequency: string;
@@ -57,6 +57,8 @@ export type Task = {
 export type TaskPost = {
   title: string;
   description: string;
+  start: Date | null;
+  end: Date | null;
   dueDate: Date;
   category: string;
   difficulty: string;
