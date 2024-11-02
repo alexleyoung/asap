@@ -21,6 +21,7 @@ import WeekView from "./WeekView";
 import MonthView from "./MonthView";
 import EditEventDialog from "./EditEventDialog";
 import { snapToTimeSlot } from "@/lib/utils";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export type ScheduleProps = {
   events: Event[];
@@ -37,12 +38,16 @@ export default function Schedule({
   onTaskUpdate,
   selectedCalendars,
 }: ScheduleProps) {
-  const { view } = useView();
+  const { view, setView } = useView();
   const { currentDate } = useCurrentDate();
   const [newItem, setNewItem] = useState<Partial<Event | Task> | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const scheduleRef = useRef<HTMLDivElement>(null);
+
+  useHotkeys("w", () => setView("week"));
+  useHotkeys("m", () => setView("month"));
+  useHotkeys("d", () => setView("day"));
 
   const handleItemCreate = (newItem: Event | Task) => {
     if ("dueDate" in newItem) {

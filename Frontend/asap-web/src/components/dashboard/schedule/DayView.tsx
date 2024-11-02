@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   format,
   startOfDay,
@@ -9,6 +9,7 @@ import {
 import { Event, Task, Calendar } from "@/lib/types";
 import TimeSlots from "./TimeSlots";
 import DraggableItem from "./DraggableItem";
+import GhostLine from "./GhostLine";
 
 type DayViewProps = {
   currentDate: Date;
@@ -29,6 +30,35 @@ export default function DayView({
   onEditTask,
   scheduleRef,
 }: DayViewProps) {
+  const [ghostLinePosition, setGhostLinePosition] = useState<{
+    top: number;
+    time: Date;
+  } | null>(null);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (scheduleRef.current) {
+        const rect = scheduleRef.current.getBoundingClientRect();
+        const scrollTop = scheduleRef.current.scrollTop;
+        const y = e.clientY - rect.top + scrollTop;
+        const totalMinutes = Math.floor(
+          (y / scheduleRef.current.scrollHeight) * 1440
+        );
+        const roundedMinutes = Math.round(totalMinutes / 15) * 15;
+        const ghostTime = addMinutes(startOfDay(currentDate), roundedMinutes);
+        setGhostLinePosition({
+          top: (roundedMinutes / 1440) * scheduleRef.current.scrollHeight,
+          time: ghostTime,
+        });
+      }
+    },
+    [currentDate, scheduleRef]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    setGhostLinePosition(null);
+  }, []);
+
   const renderItems = useCallback(
     (containerHeight: number) => {
       const dayStart = startOfDay(currentDate);
@@ -82,7 +112,11 @@ export default function DayView({
         <div className='flex-1 py-2'>{format(currentDate, "EEE d")}</div>
       </div>
       <div className='flex flex-col h-full'>
-        <div className='flex-1 overflow-y-auto relative' ref={scheduleRef}>
+        <div
+          className='flex-1 overflow-y-auto relative'
+          ref={scheduleRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}>
           <div className='flex h-[1440px]'>
             <div className='w-16 flex-shrink-0 bg-background z-10'>
               <TimeSlots showLabels={true} day={currentDate} />
@@ -92,6 +126,7 @@ export default function DayView({
               {scheduleRef.current &&
                 renderItems(scheduleRef.current.scrollHeight)}
               <CurrentTimeLine day={currentDate} />
+              <GhostLine position={ghostLinePosition} />
             </div>
           </div>
         </div>
