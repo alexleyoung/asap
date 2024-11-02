@@ -83,6 +83,7 @@ class EventBase(BaseModel):
 
 # to create
 class EventCreate(EventBase):
+    userID: int
     calendarID: int  # Foreign key
 
 
@@ -95,6 +96,7 @@ class EventUpdate(EventBase):
     category: Optional[str] = None
     frequency: Optional[str] = None
     location: Optional[str] = None
+    calendarID: Optional[int] = None
 
 
 # main class

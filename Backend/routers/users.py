@@ -45,11 +45,11 @@ def read_user(userID: int, db: Session = Depends(get_db)):
 
 
 # to get user by email
-@router.get("/email", response_model=schemas.User)
+@router.get("/email/{email}", response_model=schemas.User)
 def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
     if not email:
         raise HTTPException(status_code=400, detail="Email is required")
-    user = controller.get_user_by_email(db, email=email)
+    user = controller.get_user_by_email(db, email)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

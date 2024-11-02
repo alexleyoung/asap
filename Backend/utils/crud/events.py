@@ -4,7 +4,7 @@ from ...database import schemas, models
 # from ...routers.events import manager
 
 
-def create_event(db: Session, event: schemas.EventCreate, userID: int):
+def create_event(db: Session, event: schemas.EventCreate):
     db_event = models.Event(
         title=event.title,
         start=event.start,
@@ -13,7 +13,7 @@ def create_event(db: Session, event: schemas.EventCreate, userID: int):
         category=event.category,
         frequency=event.frequency,
         location=event.location,
-        userID=userID,
+        userID=event.userID,
         calendarID=event.calendarID,
     )
     db.add(db_event)
