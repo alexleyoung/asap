@@ -61,12 +61,9 @@ export default function Schedule({
     throw new Error("Function not implemented.");
   }
 
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      // Implement drag end logic here
-    },
-    [events, tasks, onEventUpdate, onTaskUpdate]
-  );
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    // Implement drag end logic here
+  }, []);
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -101,6 +98,7 @@ export default function Schedule({
               tasks={tasks}
               selectedCalendars={selectedCalendars}
               onEditEvent={handleEditEvent}
+              onEditTask={handleEditTask}
               scheduleRef={scheduleRef}
             />
           )}
@@ -111,6 +109,7 @@ export default function Schedule({
               tasks={tasks}
               selectedCalendars={selectedCalendars}
               onEditEvent={handleEditEvent}
+              onEditTask={handleEditTask}
             />
           )}
         </ScrollArea>
@@ -122,10 +121,7 @@ export default function Schedule({
             </DialogDescription>
           </DialogHeader>
           <DialogContent>
-            <CreateItemTabs
-              onFormSubmit={() => {}}
-              onItemCreate={handleItemCreate}
-            />
+            <CreateItemTabs onItemCreate={handleItemCreate} />
           </DialogContent>
         </Dialog>
       </div>

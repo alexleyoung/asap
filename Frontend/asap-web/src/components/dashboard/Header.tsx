@@ -55,14 +55,11 @@ export default function Header() {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("User");
-    console.log("Stored User: " + storedUser);
 
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        console.log("User data after parsing:", parsedUser);
         setUser(parsedUser);
-        console.log("User data after parsing:", user);
       } catch (error) {
         console.error("Error parsing user data from localStorage:", error);
 
@@ -198,10 +195,9 @@ export default function Header() {
                 View Profile
               </Button>
               <Button
-                variant="ghost"
-                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                onClick={() => setIsOpenManageCalendars(true)}
-              >
+                variant='ghost'
+                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
+                onClick={() => setIsOpenManageCalendars(true)}>
                 Manage Calendars
               </Button>
 

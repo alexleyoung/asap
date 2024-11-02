@@ -47,8 +47,8 @@ export default function DayView({
         <>
           {dayEvents.map((event, i) => (
             <DraggableItem
-              key={event.id}
-              dragID={i}
+              key={`event-${event.id}`}
+              dragID={`event-${event.id}`}
               item={event}
               onItemClick={() => onEditEvent(event)}
               containerHeight={containerHeight}
@@ -59,8 +59,8 @@ export default function DayView({
           ))}
           {dayTasks.map((task, i) => (
             <DraggableItem
-              key={task.id}
-              dragID={i + dayEvents.length}
+              key={`task-${task.id}`}
+              dragID={`task-${task.id}`}
               item={task}
               onItemClick={() => onEditTask(task)}
               containerHeight={containerHeight}

@@ -5,11 +5,13 @@ import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
 import { Task, Event, Calendar } from "@/lib/types";
 import { getEvents, getTasks } from "@/lib/scheduleCrud";
+import { useUser } from "@/contexts/UserContext";
 
 export default function Dashboard() {
-  const { events, tasks, setEvents, setTasks } = useScheduleItems();
   const [loading, setLoading] = useState(true);
   const [calendars, setCalendars] = useState<Calendar[]>([]);
+  const { events, tasks, setEvents, setTasks } = useScheduleItems();
+  const { user } = useUser();
 
   const handleEventUpdate = (updatedEvent: Event) => {};
   const handleTaskUpdate = (updatedTask: Task) => {};
@@ -17,36 +19,34 @@ export default function Dashboard() {
   useEffect(() => {
     (async () => {
       try {
-        const storedUser = localStorage.getItem("User");
-        const userID = storedUser ? JSON.parse(storedUser).id : null;
-        if (!userID) return;
+        if (!user) return;
 
-        setEvents((await getEvents(userID)) || []);
-        setTasks((await getTasks(userID)) || []);
+        setEvents((await getEvents(user.id)) || []);
+        setTasks((await getTasks(user.id)) || []);
       } catch (error) {
         console.error("Failed to fetch schedule items:", error);
       } finally {
         setLoading(false);
       }
     })();
-  }, [setEvents, setTasks]);
+  }, [setEvents, setTasks, user]);
 
-  useEffect(() => {
-    const fetchCalendars = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/calendars");
-        if (!response.ok) {
-          throw new Error("Failed to fetch calendars");
-        }
-        const data = await response.json();
-        setCalendars(data);
-      } catch (error) {
-        console.error("Failed to fetch calendars:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchCalendars = async () => {
+  //     try {
+  //       const response = await fetch("http://localhost:8000/calendars");
+  //       if (!response.ok) {
+  //         throw new Error("Failed to fetch calendars");
+  //       }
+  //       const data = await response.json();
+  //       setCalendars(data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch calendars:", error);
+  //     }
+  //   };
 
-    fetchCalendars();
-  }, []);
+  //   fetchCalendars();
+  // }, []);
 
   return (
     <>

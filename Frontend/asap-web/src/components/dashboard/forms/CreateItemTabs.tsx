@@ -97,10 +97,10 @@ export default function CreateItemTabs({ onItemCreate }: CreateItemTabsProps) {
         </TabsList>
       </DialogHeader>
       <TabsContent value='event'>
-        <EventForm onSubmit={handleEventSubmit} />
+        <EventForm onSubmit={handleEventSubmit} isLoading={loading} />
       </TabsContent>
       <TabsContent value='task'>
-        <TaskForm onSubmit={handleTaskSubmit} />
+        <TaskForm onSubmit={handleTaskSubmit} isLoading={loading} />
       </TabsContent>
     </Tabs>
   );

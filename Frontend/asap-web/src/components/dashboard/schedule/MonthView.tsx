@@ -7,20 +7,24 @@ import {
   isSameMonth,
   isSameDay,
 } from "date-fns";
-import { EventFormData, ScheduleItem } from "@/lib/types";
+import { Event, Task, Calendar } from "@/lib/types";
 
 type MonthViewProps = {
   currentDate: Date;
-  scheduleItems: ScheduleItem[];
-  selectedCalendars: number[];
-  onEditItem: (item: EventFormData) => void;
+  events: Event[];
+  tasks: Task[];
+  selectedCalendars: Calendar[];
+  onEditEvent: (event: Event) => void;
+  onEditTask: (task: Task) => void;
 };
 
 export default function MonthView({
   currentDate,
-  scheduleItems,
+  events,
+  tasks,
   selectedCalendars,
-  onEditItem,
+  onEditEvent,
+  onEditTask,
 }: MonthViewProps) {
   const startDate = startOfMonth(currentDate);
   const endDate = endOfMonth(currentDate);
@@ -28,31 +32,42 @@ export default function MonthView({
 
   const renderItems = useCallback(
     (day: Date) => {
-      const dayItems = scheduleItems.filter(
-        (item) =>
-          isSameDay(item.start, day) &&
-          selectedCalendars.includes(item.calendarID)
+      const dayEvents = events.filter(
+        (event) =>
+          isSameDay(event.start, day) &&
+          selectedCalendars.some((cal) => cal.id === event.calendarID)
       );
 
-      return dayItems.map((item) => (
-        <div
-          key={item.siid}
-          className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
-          style={{ backgroundColor: item.color || "#800080" }}
-          onClick={() => {
-            const eventFormData: EventFormData = {
-              ...item,
-              type: "event",
-              siid: item.siid,
-              uid: item.uid,
-            };
-            onEditItem(eventFormData);
-          }}>
-          {item.title}
-        </div>
-      ));
+      const dayTasks = tasks.filter(
+        (task) =>
+          isSameDay(task.dueDate, day) &&
+          selectedCalendars.some((cal) => cal.id === task.calendarID)
+      );
+
+      return (
+        <>
+          {dayEvents.map((event) => (
+            <div
+              key={`event-${event.id}`}
+              className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+              style={{ backgroundColor: "#800080" }}
+              onClick={() => onEditEvent(event)}>
+              {event.title}
+            </div>
+          ))}
+          {dayTasks.map((task) => (
+            <div
+              key={`task-${task.id}`}
+              className='text-xs p-1 mb-1 rounded cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap'
+              style={{ backgroundColor: "#4CAF50" }}
+              onClick={() => onEditTask(task)}>
+              {task.title}
+            </div>
+          ))}
+        </>
+      );
     },
-    [scheduleItems, selectedCalendars, onEditItem]
+    [events, tasks, selectedCalendars, onEditEvent, onEditTask]
   );
 
   return (

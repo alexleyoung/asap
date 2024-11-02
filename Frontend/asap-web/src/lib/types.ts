@@ -55,19 +55,19 @@ export type Task = {
 };
 
 export type TaskPost = {
-  auto: boolean;
-  calendarID: number;
-  category: string;
+  title: string;
   description: string;
-  difficulty: string;
   dueDate: Date;
+  category: string;
+  difficulty: string;
   duration: number;
-  flexible: boolean;
   frequency: string;
   completed: boolean;
   priority: string;
-  title: string;
+  auto: boolean;
+  flexible: boolean;
   userID: number;
+  calendarID: number;
 };
 
 // Calendars
