@@ -44,7 +44,6 @@ export default function DraggableItem({
       height: `${heightPercentage}%`,
       left: `${columnOffset * columnWidth}%`,
       width: `${columnWidth}%`,
-      backgroundColor: isEvent(item) ? "#80080" : "#4CAF50", // Default green color for tasks
       cursor: isDragging ? "grabbing" : "grab",
       zIndex: isDragging ? 20 : 10,
       opacity: isDragging ? 0.8 : 1,
@@ -84,7 +83,7 @@ export default function DraggableItem({
         e.stopPropagation();
         onItemClick(item);
       }}
-      className='scale-95 rounded-sm transition-transform p-2 text-white'>
+      className='scale-95 rounded-sm transition-transform p-2 text-white bg-blue-500'>
       <h3 className='font-medium truncate'>{title}</h3>
       <p className='text-xs'>
         {startTime} - {endTime}

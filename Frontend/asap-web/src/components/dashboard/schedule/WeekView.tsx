@@ -73,15 +73,17 @@ export default function WeekView({
     (day: Date, containerHeight: number) => {
       const dayStart = startOfDay(day);
       const dayEvents = events.filter(
-        (event) =>
-          isSameDay(event.start, day) &&
-          selectedCalendars.some((cal) => cal.id === event.calendarID)
+        (event) => isSameDay(event.start, day)
+        // && selectedCalendars.some((cal) => cal.id === event.calendarID)
       );
-      const dayTasks = tasks.filter(
-        (task) =>
-          isSameDay(task.dueDate, day) &&
-          selectedCalendars.some((cal) => cal.id === task.calendarID)
-      );
+      const dayTasks = tasks.filter((task) => {
+        // only render scheduled tasks
+        if (!("start" in task)) {
+          return false;
+        }
+        isSameDay(task.dueDate, day) &&
+          selectedCalendars.some((cal) => cal.id === task.calendarID);
+      });
 
       return (
         <>

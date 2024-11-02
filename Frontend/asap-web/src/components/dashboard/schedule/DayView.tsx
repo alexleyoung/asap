@@ -63,15 +63,16 @@ export default function DayView({
     (containerHeight: number) => {
       const dayStart = startOfDay(currentDate);
       const dayEvents = events.filter(
-        (event) =>
-          isSameDay(event.start, currentDate) &&
-          selectedCalendars.some((cal) => cal.id === event.calendarID)
+        (event) => isSameDay(event.start, currentDate)
+        // &&  selectedCalendars.some((cal) => cal.id === event.calendarID) temporarily disable until calendars implemented
       );
-      const dayTasks = tasks.filter(
-        (task) =>
-          isSameDay(task.dueDate, currentDate) &&
-          selectedCalendars.some((cal) => cal.id === task.calendarID)
-      );
+      const dayTasks = tasks.filter((task) => {
+        if (!("start" in task)) {
+          return false;
+        }
+        isSameDay(task.dueDate, currentDate) &&
+          selectedCalendars.some((cal) => cal.id === task.calendarID);
+      });
 
       return (
         <>

@@ -20,7 +20,6 @@ export default function Dashboard() {
     (async () => {
       try {
         if (!user) return;
-
         setEvents((await getEvents(user.id)) || []);
         setTasks((await getTasks(user.id)) || []);
       } catch (error) {

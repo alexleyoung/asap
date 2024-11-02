@@ -49,14 +49,6 @@ export default function Schedule({
   useHotkeys("m", () => setView("month"));
   useHotkeys("d", () => setView("day"));
 
-  const handleItemCreate = (newItem: Event | Task) => {
-    if ("dueDate" in newItem) {
-      onTaskUpdate(newItem as Task);
-    } else {
-      onEventUpdate(newItem as Event);
-    }
-  };
-
   const handleEditEvent = (event: Event) => {
     setEditingEvent(event);
     setIsEditing(true);
@@ -126,7 +118,7 @@ export default function Schedule({
             </DialogDescription>
           </DialogHeader>
           <DialogContent>
-            <CreateItemTabs onItemCreate={handleItemCreate} />
+            <CreateItemTabs />
           </DialogContent>
         </Dialog>
       </div>
