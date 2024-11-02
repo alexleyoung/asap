@@ -4,7 +4,6 @@ from fastapi import (
     HTTPException,
     WebSocket,
     WebSocketDisconnect,
-    Query,
 )
 from sqlalchemy.orm import Session
 from typing import List
@@ -15,7 +14,9 @@ from ..utils.crud import users
 from ..utils.auth import get_current_user
 
 
-router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
+router = APIRouter(
+    dependencies=[Depends(get_current_user)], tags=["events"], prefix="/events"
+)
 
 
 # connection mamnger for websocket
@@ -40,7 +41,7 @@ manager = ConnectionManager()
 
 
 # websocket endpoint for real-time notifications
-@router.websocket("/ws/notifications")
+@router.websocket("/notifications")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
@@ -51,10 +52,12 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 # to create an event
-@router.post("/users/{userID}/events", response_model=schemas.Event)
+@router.post("/", response_model=schemas.Event)
 async def create_event_endpoint(
     userID: int, event: schemas.EventCreate, db: Session = Depends(get_db)
 ):
+    if not userID:
+        raise HTTPException(status_code=400, detail="User ID is required")
     db_user = users.get_user(db, userID=userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -67,7 +70,7 @@ async def create_event_endpoint(
 
 
 # edit event
-@router.put("/events/{eventID}", response_model=schemas.Event)
+@router.put("/{eventID}", response_model=schemas.Event)
 def edit_event_endpoint(
     eventID: int, event_update: schemas.EventUpdate, db: Session = Depends(get_db)
 ):
@@ -78,7 +81,7 @@ def edit_event_endpoint(
 
 
 # get event
-@router.get("/events/{eventID}", response_model=schemas.Event)
+@router.get("/{eventID}", response_model=schemas.Event)
 def get_event_endpoint(eventID: int, db: Session = Depends(get_db)):
     db_event = controller.get_event(db=db, eventID=eventID)
     if db_event is None:
@@ -88,7 +91,7 @@ def get_event_endpoint(eventID: int, db: Session = Depends(get_db)):
 
 
 # delete event
-@router.delete("/events/{eventID}/delete", response_model=schemas.Event)
+@router.delete("/{eventID}", response_model=schemas.Event)
 def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
     db_event = controller.delete_event(db=db, eventID=eventID)
     if db_event is None:
@@ -97,22 +100,11 @@ def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
 
 
 # get a user's events
-@router.get("/users/{userID}/events", response_model=list[schemas.Event])
+@router.get("/", response_model=list[schemas.Event])
 def get_user_events(userID: int, db: Session = Depends(get_db)):
+    if not userID:
+        raise HTTPException(status_code=400, detail="User ID is required")
     events = controller.get_events_by_user(db, userID)
     if not events:
         raise HTTPException(status_code=404, detail="No events found for this user")
     return events
-
-
-# Endpoint to create a new calendar
-@router.post("/users/{userID}/calendars", response_model=schemas.Calendar)
-def create_calendar_endpoint(
-    userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)
-):
-    db_user = users.get_user(db, userID=userID)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    db_calendar = controller.create_calendar(db=db, calendar=calendar, userID=userID)
-    return db_calendar

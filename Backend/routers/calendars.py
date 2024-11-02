@@ -18,31 +18,36 @@ def create_calendar(Calendar: schemas.CalendarCreate, db: Session = Depends(get_
         raise HTTPException(status_code=400, detail="Calendar creation failed")
     return db_calendar
 
+
 # Get calendar details by ID
 @router.get("/calendars/{calendar_id}", response_model=schemas.Calendar)
-def get_calendar_endpoint(calendar_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+def get_calendar_endpoint(
+    calendar_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     calendar = controller.get_calendar(db, calendar_id)
     if not calendar:
         raise HTTPException(status_code=404, detail="Calendar not found")
-    
+
     # Check if the user has at least viewer permissions for this calendar
-    #controller.check_calendar_permission(current_user.id, calendar_id, "viewer", db)
+    # controller.check_calendar_permission(current_user.id, calendar_id, "viewer", db)
     return calendar
+
 
 # Edit calendar details
 @router.put("/calendars/{calendar_id}", response_model=schemas.Calendar)
 def edit_calendar_endpoint(
-    calendar_id: int, 
-    calendar_update: schemas.CalendarUpdate, 
-    db: Session = Depends(get_db), 
-    current_user: models.User = Depends(get_current_user)
+    calendar_id: int,
+    calendar_update: schemas.CalendarUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
 ):
     # Ensure the user has admin or editor permissions to update calendar details
-    #controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
-    
+    # controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
+
     updated_calendar = controller.edit_calendar(db, calendar_id, calendar_update)
     if not updated_calendar:
         raise HTTPException(status_code=404, detail="Calendar not found")
-    
-    return updated_calendar
 
+    return updated_calendar
