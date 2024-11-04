@@ -107,7 +107,7 @@ class Group(Base):
 class GroupUser(Base):
     __tablename__ = "group_user"
     id = Column(Integer, primary_key = True, index = True, unique = True)
-    group_id = Column("group_id", Integer, ForeignKey(groups.id))
+    group_id = Column("group_id", Integer, ForeignKey(groups.id)) # 
     user_id = Column("user_id", Integer, ForeignKey(users.id))
     permission = Column(Enum(PermissionLevel), nullable = False)
 
@@ -118,4 +118,5 @@ class GroupUser(Base):
 # Permissions enum
 class PermissionLevel(enum.Enum):
     ADMIN = "admin" # can CRUD tasks and events
+    EDITOR = "editor" # can CRU tasks and events
     VIEWER = "viewer" # can R tasks and events
