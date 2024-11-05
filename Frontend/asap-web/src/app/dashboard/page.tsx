@@ -5,6 +5,7 @@ import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getProtectedData } from "../../lib/auth";
+import { fetchCalendars } from "@/lib/scheduleCrud";
 
 export default function Dashboard() {
   const { items, setItems } = useScheduleItems();
@@ -59,13 +60,9 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const fetchCalendars = async () => {
+    const loadCalendars = async () => {
       try {
-        const response = await fetch("http://localhost:8000/calendars", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const response = await fetchCalendars();
         if (!response.ok) {
           throw new Error("Failed to fetch calendars");
         }
@@ -76,7 +73,7 @@ export default function Dashboard() {
       }
     };
 
-    fetchCalendars();
+    loadCalendars();
   }, []);
 
   return (

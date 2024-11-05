@@ -16,6 +16,7 @@ import { set } from "date-fns";
 import { Calendar } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
+import { fetchCalendars } from "@/lib/scheduleCrud";
 
 export default function CalendarsCollapsible() {
   const [open, setOpen] = useState(true);
@@ -25,16 +26,16 @@ export default function CalendarsCollapsible() {
   const [newCalendarName, setNewCalendarName] = useState("");
 
   useEffect(() => {
-    const fetchCalendars = async () => {
+    const loadCalendars = async () => {
       try {
-        const response = await fetch("/api/calendars");
+        const response = await fetchCalendars();
         const data = await response.json();
         setCalendars(data);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
     };
-    fetchCalendars();
+    loadCalendars();
   }, []);
 
   const handleBoxChange = (calendarId: number) => {
@@ -57,7 +58,7 @@ export default function CalendarsCollapsible() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({ name: newCalendarName }),
       });

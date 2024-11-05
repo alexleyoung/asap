@@ -29,9 +29,11 @@ interface ManageCalendarsProps {
   calendars: Calendar[];
   onClose: () => void; // Function to close or hide the manage view
   onUpdate: (updatedCalendar: {
-    id: number;
+    // id: number;
     name: string;
-    color: string;
+    // color: string;
+    description: string;
+    timezone: string;
   }) => void; // Function to update calendar
   onDelete: () => void; // Function to delete calendar
 }
@@ -48,9 +50,11 @@ export const ManageCalendarsDialog = ({
   );
 
   const handleSave = (updatedCalendar: {
-    id: number;
+    // id: number;
     name: string;
-    color: string;
+    // color: string;
+    description: string;
+    timezone: string;
   }) => {
     onUpdate(updatedCalendar); // Call the function passed in props to update the calendar
     setIsEditing(false);

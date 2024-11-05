@@ -34,6 +34,7 @@ import {
 import { useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
+import { fetchCalendars } from "@/lib/scheduleCrud";
 
 interface User {
   id: string;
@@ -76,16 +77,16 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    const fetchCalendars = async () => {
+    const loadCalendars = async () => {
       try {
-        const response = await fetch("/api/calendars");
+        const response = await fetchCalendars();
         const data = await response.json();
         setCalendars(data);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
     };
-    fetchCalendars();
+    loadCalendars();
   }, []);
 
   const handleViewChange = (newView: string) => {

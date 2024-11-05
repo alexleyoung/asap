@@ -71,5 +71,7 @@ export type EventFormData = {
 export type Calendar = {
   id: number;
   name: string;
+  description: string;
+  timezone: string;
   color: string;
 };

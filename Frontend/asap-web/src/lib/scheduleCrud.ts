@@ -142,14 +142,14 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
   return await response.json();
 }
 
-export async function fetchCalendars(userId: string) {
+export async function fetchCalendars() {
   const response = await fetch(
-    `http://localhost:8000/users/${userId}/calendars`,
+    `http://localhost:8000/users/calendars/calendars/`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorizaton: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }
   );

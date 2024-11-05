@@ -89,7 +89,9 @@ export function EditEventForm({
   useEffect(() => {
     const fetchCalendars = async () => {
       try {
-        const response = await fetch("http://localhost:8000/calendars");
+        const response = await fetch(
+          "http://localhost:8000/calendars/calendars/"
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch calendars");
         }
