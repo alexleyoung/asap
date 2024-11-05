@@ -59,7 +59,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   category: z.string().optional(),
   frequency: z.string().optional(),
-  calendarID: z.number(),
+  calendarID: z.number({ required_error: "Calendar is required" }),
 });
 
 type FormValues = z.infer<typeof formSchema>;

@@ -80,11 +80,7 @@ export const ViewProfileDialog = ({
             ) : (
               <div>
                 <div className="flex justify-center">
-                  {" "}
-                  {/* Center the avatar */}
                   <Avatar className="hover:cursor-pointer relative group w-24 h-24">
-                    {" "}
-                    {/* Adjust size here */}
                     <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
                     <AvatarImage
                       src={user.avatar}
@@ -97,11 +93,11 @@ export const ViewProfileDialog = ({
                   </Avatar>
                 </div>
                 <br />
-                <p>
+                <div>
                   Name: {user.firstname} {user.lastname}
-                </p>
+                </div>
                 <br />
-                <p>Email: {user.email}</p>
+                <div>Email: {user.email}</div>
                 <br />
               </div>
             )}

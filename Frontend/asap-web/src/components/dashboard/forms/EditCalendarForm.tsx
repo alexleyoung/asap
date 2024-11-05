@@ -23,6 +23,8 @@ import {
 const calendarSchema = z.object({
   name: z.string().min(1, "Calendar name is required"),
   color: z.string().min(1, "Calendar color is required"),
+  description: z.string().optional(),
+  timezone: z.string().optional(),
 });
 
 type CalendarFormValues = z.infer<typeof calendarSchema>;
@@ -31,12 +33,16 @@ interface EditCalendarFormProps {
   calendar: {
     id: number;
     name: string;
-    color: string;
+    // color: string;
+    description: string;
+    timezone: string;
   };
   onSave: (updatedCalendar: {
-    id: number;
+    // id: number;
     name: string;
-    color: string;
+    // color: string;
+    description: string;
+    timezone: string;
   }) => void;
 }
 
@@ -45,7 +51,9 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
     resolver: zodResolver(calendarSchema),
     defaultValues: {
       name: calendar.name,
-      color: calendar.color,
+      // color: calendar.color,
+      description: calendar.description,
+      timezone: calendar.timezone,
     },
   });
 
@@ -62,7 +70,7 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
       console.log("Data to send:", dataToSend); // Debugging info
 
       const response = await fetch(
-        `http://localhost:8000/users/${calendar.id}`,
+        `http://localhost:8000/calendars/${calendar.id}`,
         {
           method: "PUT",
           headers: {

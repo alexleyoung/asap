@@ -16,6 +16,7 @@ import { set } from "date-fns";
 import { Calendar } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
+import { fetchCalendars } from "@/lib/scheduleCrud";
 
 export default function CalendarsCollapsible() {
   const [open, setOpen] = useState(true);
@@ -25,16 +26,17 @@ export default function CalendarsCollapsible() {
   const [newCalendarName, setNewCalendarName] = useState("");
 
   useEffect(() => {
-    const fetchCalendars = async () => {
+    const loadCalendars = async () => {
       try {
-        const response = await fetch("/api/calendars");
+        const user = JSON.parse(localStorage.getItem("User")!);
+        const response = await fetchCalendars(user.id);
         const data = await response.json();
         setCalendars(data);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
     };
-    fetchCalendars();
+    loadCalendars();
   }, []);
 
   const handleBoxChange = (calendarId: number) => {
@@ -53,19 +55,25 @@ export default function CalendarsCollapsible() {
     const newCalendar = { name: newCalendarName };
 
     try {
-      const response = await fetch("/api/calendars", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: newCalendarName }),
-      });
+      const user = JSON.parse(localStorage.getItem("User")!);
+      const response = await fetch(
+        `http://localhost:8000/calendars/users/${user.id}/calendars`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ name: newCalendarName }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to add calendar");
       }
 
       const addedCalendar: Calendar = await response.json();
+      console.log("Added calendar:", addedCalendar);
       setCalendars((prevCalendars) => [...prevCalendars, addedCalendar]);
       setNewCalendarName("");
       setIsAddingCalendar(false);

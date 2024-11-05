@@ -78,14 +78,14 @@ def get_user_events(userID: int, db: Session = Depends(get_db)):
     return events
 
 
-# Endpoint to create a new calendar
-@router.post("/users/{userID}/calendars", response_model=schemas.Calendar)
-def create_calendar_endpoint(
-    userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)
-):
-    db_user = users.get_user(db, userID=userID)
-    if not db_user:
-        raise HTTPException(status_code=404, detail="User not found")
+# # Endpoint to create a new calendar
+# @router.post("/users/{userID}/calendars", response_model=schemas.Calendar)
+# def create_calendar_endpoint(
+#     userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)
+# ):
+#     db_user = users.get_user(db, userID=userID)
+#     if not db_user:
+#         raise HTTPException(status_code=404, detail="User not found")
 
-    db_calendar = controller.create_calendar(db=db, calendar=calendar, userID=userID)
-    return db_calendar
+#     db_calendar = controller.create_calendar(db=db, calendar=calendar, userID=userID)
+#     return db_calendar

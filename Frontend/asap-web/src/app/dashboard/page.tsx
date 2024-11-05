@@ -5,6 +5,7 @@ import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getProtectedData } from "../../lib/auth";
+import { fetchCalendars } from "@/lib/scheduleCrud";
 
 export default function Dashboard() {
   const { items, setItems } = useScheduleItems();
@@ -59,9 +60,12 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    const fetchCalendars = async () => {
+    const loadCalendars = async () => {
       try {
-        const response = await fetch("http://localhost:8000/calendars");
+        const storedUser = localStorage.getItem("User");
+        if (!storedUser) return;
+        const user = JSON.parse(storedUser);
+        const response = await fetchCalendars(user.id);
         if (!response.ok) {
           throw new Error("Failed to fetch calendars");
         }
@@ -72,30 +76,8 @@ export default function Dashboard() {
       }
     };
 
-    fetchCalendars();
+    loadCalendars();
   }, []);
-
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     try {
-  //       const data = await getProtectedData("token");
-  //       if (data) {
-  //         setLoading(false);
-  //       } else {
-  //         router.back();
-  //         console.log("Not authenticated");
-  //       }
-  //     } catch (error) {
-  //       router.back();
-  //       console.log("An error occurred. Please try again.");
-  //     }
-  //   };
-  //   checkAuth();
-  // }, [router]);
-
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
 
   return (
     <>
