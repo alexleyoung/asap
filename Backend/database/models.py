@@ -1,5 +1,7 @@
 import enum as py_enum
+import enum as py_enum
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Enum as sql_enum
 from sqlalchemy import Enum as sql_enum
 from sqlalchemy.orm import relationship
 from .db import Base
@@ -21,6 +23,7 @@ class User(Base):
     events = relationship("Event", back_populates="user")
     tasks = relationship("Task", back_populates="user")
     membership = relationship("Membership", back_populates = "user") # what groups are you in?
+    membership = relationship("Membership", back_populates = "user") # what groups are you in?
 
 
 # calendars table
@@ -32,6 +35,8 @@ class Calendar(Base):
     timezone = Column("timezone", String)
 
     # foreign key
+    userID = Column("ownerID", Integer, ForeignKey("users.id")) # multiple (should this be a relation table?)
+    #groupID = Column("groupID", Integer, ForeignKey("groups.id")) # resolving foreign key conflict
     userID = Column("ownerID", Integer, ForeignKey("users.id")) # multiple (should this be a relation table?)
     #groupID = Column("groupID", Integer, ForeignKey("groups.id")) # resolving foreign key conflict
 
@@ -96,7 +101,10 @@ class Group(Base):
     title = Column("title", String)
    
     #relationships
+    #group_member = relationship("Membership", back_populates = "groups")
+    #group_member = relationship("Membership", back_populates = "groups")
     calendar = relationship("Calendar", back_populates="group")
+    membership = relationship("Membership", back_populates = "group") # what users do you have?
     membership = relationship("Membership", back_populates = "group") # what users do you have?
     
     #foreign keys
@@ -117,5 +125,5 @@ class Membership(Base):
     permission = Column(sql_enum(PermissionLevel), nullable = False)
 
     #relationships
-    user = relationship("User", back_populates="membership")
-    group = relationship("Group", back_populates = "membership")
+    user = relationship("User", back_populates="group")
+    group = relationship("Group", back_populates = "user")
