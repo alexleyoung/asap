@@ -40,6 +40,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { fetchCalendars } from "@/lib/scheduleCrud";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -89,16 +90,16 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
   });
 
   useEffect(() => {
-    const fetchCalendars = async () => {
+    const loadCalendars = async () => {
       try {
-        const response = await fetch("/api/calendars");
-        const data = await response.json();
-        setCalendars(data);
+        const user = JSON.parse(localStorage.getItem("User")!);
+        const response = await fetchCalendars(user.id);
+        setCalendars(response);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
     };
-    fetchCalendars();
+    loadCalendars();
   }, []);
 
   const handleSubmit = (data: FormValues) => {

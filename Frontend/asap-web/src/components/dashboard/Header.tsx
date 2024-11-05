@@ -81,8 +81,7 @@ export default function Header() {
       try {
         if (!user) return;
         const response = await fetchCalendars(user.id);
-        const data = await response.json();
-        setCalendars(data);
+        setCalendars(response);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
