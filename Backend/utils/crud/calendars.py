@@ -37,4 +37,4 @@ def edit_calendar(db: Session, calendar_id: int, calendar_update: schemas.Calend
 
 # get calendars for user
 def get_calendars_by_user(db: Session, user_id: int):
-    return db.query(models.calendar).filter(models.calendar.user_id == user_id).all()
+    return db.query(models.Calendar).filter(models.Calendar.userID == user_id).all()

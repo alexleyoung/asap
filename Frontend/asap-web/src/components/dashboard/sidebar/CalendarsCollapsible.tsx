@@ -28,7 +28,8 @@ export default function CalendarsCollapsible() {
   useEffect(() => {
     const loadCalendars = async () => {
       try {
-        const response = await fetchCalendars();
+        const user = JSON.parse(localStorage.getItem("User")!);
+        const response = await fetchCalendars(user.id);
         const data = await response.json();
         setCalendars(data);
       } catch (error) {
@@ -68,6 +69,7 @@ export default function CalendarsCollapsible() {
       }
 
       const addedCalendar: Calendar = await response.json();
+      console.log("Added calendar:", addedCalendar);
       setCalendars((prevCalendars) => [...prevCalendars, addedCalendar]);
       setNewCalendarName("");
       setIsAddingCalendar(false);

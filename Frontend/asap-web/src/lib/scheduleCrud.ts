@@ -142,9 +142,9 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
   return await response.json();
 }
 
-export async function fetchCalendars() {
+export async function fetchCalendars(userId: string) {
   const response = await fetch(
-    `http://localhost:8000/users/calendars/calendars/`,
+    `http://localhost:8000/users/calendars/calendars/?user_id=${userId}`,
     {
       method: "GET",
       headers: {

@@ -79,7 +79,8 @@ export default function Header() {
   useEffect(() => {
     const loadCalendars = async () => {
       try {
-        const response = await fetchCalendars();
+        if (!user) return;
+        const response = await fetchCalendars(user.id);
         const data = await response.json();
         setCalendars(data);
       } catch (error) {

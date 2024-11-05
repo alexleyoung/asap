@@ -62,7 +62,10 @@ export default function Dashboard() {
   useEffect(() => {
     const loadCalendars = async () => {
       try {
-        const response = await fetchCalendars();
+        const storedUser = localStorage.getItem("User");
+        if (!storedUser) return;
+        const user = JSON.parse(storedUser);
+        const response = await fetchCalendars(user.id);
         if (!response.ok) {
           throw new Error("Failed to fetch calendars");
         }
