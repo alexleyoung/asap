@@ -55,14 +55,18 @@ export default function CalendarsCollapsible() {
     const newCalendar = { name: newCalendarName };
 
     try {
-      const response = await fetch("http://localhost:8000/calendars/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ name: newCalendarName }),
-      });
+      const user = JSON.parse(localStorage.getItem("User")!);
+      const response = await fetch(
+        `http://localhost:8000/calendars/users/${user.id}/calendars`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({ name: newCalendarName }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to add calendar");
