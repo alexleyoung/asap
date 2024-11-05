@@ -52,8 +52,6 @@ class Event(Base):
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String)
-    userID = Column("userID", Integer, ForeignKey("users.id"))
-    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"))
     location = Column("location", String)
 
     # foreign keys
@@ -120,5 +118,5 @@ class Membership(Base):
     permission = Column(sql_enum(PermissionLevel), nullable = False)
 
     #relationships
-    user = relationship("User", back_populates="group")
-    group = relationship("Group", back_populates = "user")
+    user = relationship("User", back_populates="membership")
+    group = relationship("Group", back_populates = "membership")
