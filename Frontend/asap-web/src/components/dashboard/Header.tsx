@@ -35,6 +35,8 @@ import { useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
 import { fetchCalendars } from "@/lib/scheduleCrud";
+import { useCalendarContext } from "@/contexts/CalendarsContext";
+import { Calendar } from "@/lib/types";
 
 interface User {
   id: string;
@@ -53,6 +55,8 @@ export default function Header() {
   const [isOpenManageCalendars, setIsOpenManageCalendars] = useState(false);
   const [calendar, setCalendar] = useState<any>(null);
   const [calendars, setCalendars] = useState<any>([]);
+  const { selectedCalendars, toggleCalendar, removeCalendar } =
+    useCalendarContext();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("User");
@@ -96,14 +100,16 @@ export default function Header() {
     );
   };
 
-  const handleDeleteCalendar = async (calendarId: string) => {
+  const handleDeleteCalendar = async (calendar: any) => {
     try {
+      const deleteCalendar = calendar;
       const response = await fetch(
-        `http://localhost:8000/calendars/${calendarId}`,
+        `http://localhost:8000/calendars/calendars/${calendar.id}`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -113,10 +119,16 @@ export default function Header() {
       }
 
       setCalendars((prevCalendars: any[]) =>
-        prevCalendars.filter((calendar: any) => calendar.id !== calendarId)
+        prevCalendars.filter(
+          (calendar: any) => calendar.id !== deleteCalendar.id
+        )
       );
+
+      removeCalendar(deleteCalendar);
+
+      console.log("Calendar and associated events deleted successfully.");
     } catch (error) {
-      console.error("Error deleting calendar:", error);
+      console.error("Error deleting calendar and events:", error);
     }
   };
 
@@ -283,8 +295,8 @@ export default function Header() {
             onUpdate={(updatedCalendar) => {
               handleUpdateCalendar(updatedCalendar);
             }}
-            onDelete={() => {
-              // Handle calendar delete
+            onDelete={(deletedCalendar) => {
+              handleDeleteCalendar(deletedCalendar);
             }}
           />
         )}

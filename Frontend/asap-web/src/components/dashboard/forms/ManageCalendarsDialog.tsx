@@ -36,7 +36,12 @@ interface ManageCalendarsProps {
     description: string;
     timezone: string;
   }) => void; // Function to update calendar
-  onDelete: () => void; // Function to delete calendar
+  onDelete: (deletedCalendar: {
+    id: number;
+    name: string;
+    description: string;
+    timezone: string;
+  }) => void; // Function to delete calendar
 }
 
 export const ManageCalendarsDialog = ({
@@ -72,6 +77,10 @@ export const ManageCalendarsDialog = ({
     setIsEditing(true);
   };
 
+  const handleDelete = (calendar: Calendar) => {
+    onDelete(calendar);
+  };
+
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogPortal>
@@ -101,6 +110,12 @@ export const ManageCalendarsDialog = ({
                     className="m-3"
                   >
                     Edit
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(calendar)}
+                    variant="destructive"
+                  >
+                    Delete
                   </Button>
                 </div>
               ))

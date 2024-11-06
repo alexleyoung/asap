@@ -6,6 +6,7 @@ import { useEffect } from "react";
 interface CalendarContextType {
   selectedCalendars: Calendar[];
   toggleCalendar: (calendar: Calendar) => void;
+  removeCalendar: (calendar: Calendar) => void;
 }
 
 const CalendarContext = createContext<CalendarContextType | undefined>(
@@ -49,12 +50,27 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const removeCalendar = (calendar: Calendar) => {
+    setSelectedCalendars((prevCalendars) => {
+      const updatedCalendars = prevCalendars.filter(
+        (c) => c.id !== calendar.id
+      );
+      localStorage.setItem(
+        "selectedCalendars",
+        JSON.stringify(updatedCalendars)
+      );
+      return updatedCalendars;
+    });
+  };
+
   useEffect(() => {
     console.log("selectedCalendars:", selectedCalendars);
   }, [selectedCalendars]);
 
   return (
-    <CalendarContext.Provider value={{ selectedCalendars, toggleCalendar }}>
+    <CalendarContext.Provider
+      value={{ selectedCalendars, toggleCalendar, removeCalendar }}
+    >
       {children}
     </CalendarContext.Provider>
   );

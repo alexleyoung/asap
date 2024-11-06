@@ -12,7 +12,9 @@ export default function DashboardLayout({
   return (
     <ScheduleProvider>
       <div className="flex h-screen w-screen flex-col overflow-hidden">
-        <Header />
+        <CalendarProvider>
+          <Header />
+        </CalendarProvider>
         <CalendarProvider>
           <div className="flex flex-grow h-[50%]">
             <Sidebar />
