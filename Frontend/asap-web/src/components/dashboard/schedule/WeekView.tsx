@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import React, { useCallback, useState } from "react";
 import {
   format,
@@ -43,34 +44,34 @@ export default function WeekView({
   } | null>(null);
   const [ghostLineDay, setGhostLineDay] = useState<Date | null>(null);
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>, day: Date) => {
-      if (scheduleRef.current) {
-        const rect = scheduleRef.current.getBoundingClientRect();
-        const scrollTop = scheduleRef.current.scrollTop;
-        const y = e.clientY - rect.top + scrollTop;
-        const totalMinutes = Math.floor(
-          (y / scheduleRef.current.scrollHeight) * 1440
-        );
-        const roundedMinutes = Math.round(totalMinutes / 15) * 15;
-        const ghostTime = addMinutes(startOfDay(day), roundedMinutes);
-        setGhostLinePosition({
-          top: (roundedMinutes / 1440) * scheduleRef.current.scrollHeight,
-          time: ghostTime,
-        });
-        setGhostLineDay(day);
-      }
-    },
-    [scheduleRef]
-  );
+  // const handleMouseMove = useCallback(
+  //   (e: React.MouseEvent<HTMLDivElement>, day: Date) => {
+  //     if (scheduleRef.current) {
+  //       const rect = scheduleRef.current.getBoundingClientRect();
+  //       const scrollTop = scheduleRef.current.scrollTop;
+  //       const y = e.clientY - rect.top + scrollTop;
+  //       const totalMinutes = Math.floor(
+  //         (y / scheduleRef.current.scrollHeight) * 1440
+  //       );
+  //       const roundedMinutes = Math.round(totalMinutes / 15) * 15;
+  //       const ghostTime = addMinutes(startOfDay(day), roundedMinutes);
+  //       setGhostLinePosition({
+  //         top: (roundedMinutes / 1440) * scheduleRef.current.scrollHeight,
+  //         time: ghostTime,
+  //       });
+  //       setGhostLineDay(day);
+  //     }
+  //   },
+  //   [scheduleRef]
+  // );
 
-  const handleMouseLeave = useCallback(() => {
-    setGhostLinePosition(null);
-    setGhostLineDay(null);
-  }, []);
+  // const handleMouseLeave = useCallback(() => {
+  //   setGhostLinePosition(null);
+  //   setGhostLineDay(null);
+  // }, []);
 
   const renderItems = useCallback(
-    (day: Date, containerHeight: number) => {
+    (day: Date) => {
       const dayStart = startOfDay(day);
       const dayEvents = events.filter(
         (event) => isSameDay(event.start, day)
@@ -78,11 +79,11 @@ export default function WeekView({
       );
       const dayTasks = tasks.filter((task) => {
         // only render scheduled tasks
-        if (!("start" in task)) {
-          return false;
+        if (task.start) {
+          isSameDay(task.start, day) &&
+            selectedCalendars.some((cal) => cal.id === task.calendarID);
+          return task;
         }
-        isSameDay(task.dueDate, day) &&
-          selectedCalendars.some((cal) => cal.id === task.calendarID);
       });
 
       return (
@@ -93,7 +94,6 @@ export default function WeekView({
               dragID={`event-${event.id}`}
               item={event}
               onItemClick={() => onEditEvent(event)}
-              containerHeight={containerHeight}
               dayStart={dayStart}
               columnWidth={100}
               columnOffset={0}
@@ -105,7 +105,6 @@ export default function WeekView({
               dragID={`task-${task.id}`}
               item={task}
               onItemClick={() => onEditTask(task)}
-              containerHeight={containerHeight}
               dayStart={dayStart}
               columnWidth={100}
               columnOffset={0}
@@ -135,12 +134,9 @@ export default function WeekView({
           {days.map((day) => (
             <div
               key={day.toISOString()}
-              className='flex-1 border-l border-border relative'
-              onMouseMove={(e) => handleMouseMove(e, day)}
-              onMouseLeave={handleMouseLeave}>
+              className='flex-1 border-l border-border relative'>
               <TimeSlots showLabels={false} day={day} />
-              {scheduleRef.current &&
-                renderItems(day, scheduleRef.current.scrollHeight)}
+              {scheduleRef.current && renderItems(day)}
               <CurrentTimeLine day={day} />
               {ghostLineDay && isSameDay(ghostLineDay, day) && (
                 <GhostLine position={ghostLinePosition} />

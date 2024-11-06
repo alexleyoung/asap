@@ -51,7 +51,7 @@ class CalendarBase(BaseModel):
 
 # for creating a calendar
 class CalendarCreate(CalendarBase):
-    pass
+    userID: int
 
 
 # for editing a calendar

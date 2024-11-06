@@ -104,5 +104,5 @@ def get_user_events(
     else:
         events = controller.get_events_by_user(db, userID)
     if not events:
-        raise HTTPException(status_code=404, detail="No events found for this user")
+        return []
     return events

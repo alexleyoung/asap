@@ -65,7 +65,11 @@ export function EventForm({
   });
 
   const handleSubmit = (values: FormValues) => {
-    onSubmit(values);
+    onSubmit({
+      ...values,
+      start: new Date(values.start),
+      end: new Date(values.end),
+    });
   };
 
   return (

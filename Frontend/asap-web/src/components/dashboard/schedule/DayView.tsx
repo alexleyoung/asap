@@ -76,7 +76,7 @@ export default function DayView({
 
       return (
         <>
-          {dayEvents.map((event, i) => (
+          {dayEvents.map((event) => (
             <DraggableItem
               key={`event-${event.id}`}
               dragID={`event-${event.id}`}
@@ -88,7 +88,7 @@ export default function DayView({
               columnOffset={0}
             />
           ))}
-          {dayTasks.map((task, i) => (
+          {dayTasks.map((task) => (
             <DraggableItem
               key={`task-${task.id}`}
               dragID={`task-${task.id}`}

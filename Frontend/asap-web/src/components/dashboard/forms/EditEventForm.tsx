@@ -61,19 +61,18 @@ export function EditEventForm({
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
-      ...eventData,
-      start: new Date(eventData.start),
-      end: new Date(eventData.end),
+      id: eventData.id,
+      title: eventData.title,
+      start: eventData.start,
+      end: eventData.end,
+      description: eventData.description,
+      category: eventData.category,
+      frequency: eventData.frequency,
+      location: eventData.location,
+      userID: eventData.userID,
+      calendarID: eventData.calendarID,
     },
   });
-
-  useEffect(() => {
-    form.reset({
-      ...eventData,
-      start: new Date(eventData.start),
-      end: new Date(eventData.end),
-    });
-  }, [eventData, form]);
 
   const handleDelete = async () => {
     try {

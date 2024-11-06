@@ -1,11 +1,11 @@
-import React from "react";
+import React, { memo } from "react";
 import { format } from "date-fns";
 
 type GhostLineProps = {
   position: { top: number; time: Date } | null;
 };
 
-export default function GhostLine({ position }: GhostLineProps) {
+const GhostLine = memo(function GhostLine({ position }: GhostLineProps) {
   if (!position) return null;
 
   return (
@@ -18,4 +18,6 @@ export default function GhostLine({ position }: GhostLineProps) {
       </span>
     </div>
   );
-}
+});
+
+export default GhostLine;

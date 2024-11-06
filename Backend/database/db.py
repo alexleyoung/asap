@@ -14,6 +14,9 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+
+from .models import User, Calendar, Event, Task
+
 Base.metadata.create_all(bind=engine)
 
 

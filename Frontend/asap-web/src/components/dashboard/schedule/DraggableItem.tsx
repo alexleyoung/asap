@@ -8,7 +8,7 @@ type DraggableItemProps = {
   item: Event | Task;
   dragID: string;
   onItemClick: (item: Event | Task) => void;
-  containerHeight: number;
+  columnWidth: number;
   dayStart: Date;
 
   columnOffset: number;
@@ -18,7 +18,6 @@ export default function DraggableItem({
   item,
   dragID,
   onItemClick,
-  containerHeight,
   dayStart,
   columnWidth,
   columnOffset,
@@ -30,13 +29,11 @@ export default function DraggableItem({
     });
 
   const style = useMemo(() => {
-    const start = isEvent(item) ? item.start : item.dueDate;
-    const end = isEvent(item)
-      ? item.end
-      : new Date(start.getTime() + item.duration * 60000);
+    const start = item.start;
+    const end = item.end;
 
-    const topPercentage = (differenceInMinutes(start, dayStart) / 1440) * 100;
-    const heightPercentage = (differenceInMinutes(end, start) / 1440) * 100;
+    const topPercentage = (differenceInMinutes(start!, dayStart) / 1440) * 100;
+    const heightPercentage = (differenceInMinutes(end!, start!) / 1440) * 100;
 
     return {
       position: "absolute" as const,
