@@ -31,7 +31,6 @@ export default function DraggableItem({
   const style = useMemo(() => {
     const start = item.start;
     const end = item.end;
-    console.log(start, end);
 
     const topPercentage = (differenceInMinutes(start!, dayStart) / 1440) * 100;
     const heightPercentage = (differenceInMinutes(end!, start!) / 1440) * 100;

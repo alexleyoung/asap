@@ -54,8 +54,12 @@ export function EditEventForm({
   onSubmit,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
-  const [startString, setStartString] = useState("");
-  const [endString, setEndString] = useState("");
+  const [startString, setStartString] = useState(
+    eventData.start.toString().substring(0, 16)
+  );
+  const [endString, setEndString] = useState(
+    eventData.end.toString().substring(0, 16)
+  );
   const { setEvents, events } = useScheduleItems();
   const { toast } = useToast();
   // const { calendars, isLoading: isLoadingCalendars } = useCalendars();
@@ -65,8 +69,8 @@ export function EditEventForm({
     defaultValues: {
       id: eventData.id,
       title: eventData.title,
-      start: eventData.start,
-      end: eventData.end,
+      start: new Date(eventData.start),
+      end: new Date(eventData.end),
       description: eventData.description,
       category: eventData.category,
       frequency: eventData.frequency,
