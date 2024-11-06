@@ -66,3 +66,23 @@ def create_calendar_endpoint(
 
     db_calendar = controller.create_calendar(db=db, calendar=calendar, userID=userID)
     return db_calendar
+
+# delete calendar
+@router.delete("/calendars/{calendarID}", status_code=204)
+def delete_calendar_endpoint(
+    calendarID: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    # Optional: Add permission check if needed
+    #controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
+    
+    # Attempt to delete the calendar
+    result = controller.delete_calendar(db, calendarID)
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail="Calendar not found"
+        )
+    
+    return None  # 204 No Content response
