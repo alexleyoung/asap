@@ -30,7 +30,7 @@ export default function CalendarsCollapsible() {
       try {
         const user = JSON.parse(localStorage.getItem("User")!);
         const response = await fetchCalendars(user.id);
-
+        console.log("response:", response);
         setCalendars(response);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
@@ -52,7 +52,11 @@ export default function CalendarsCollapsible() {
   const handleAddCalendar = async () => {
     if (!newCalendarName) return;
 
-    const newCalendar = { name: newCalendarName };
+    const newCalendar = {
+      name: newCalendarName,
+      description: "",
+      timezone: "UTC",
+    };
 
     try {
       const user = JSON.parse(localStorage.getItem("User")!);
@@ -64,7 +68,11 @@ export default function CalendarsCollapsible() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({ name: newCalendarName }),
+          body: JSON.stringify({
+            name: newCalendarName,
+            description: "",
+            timezone: "UTC",
+          }),
         }
       );
 
@@ -72,9 +80,15 @@ export default function CalendarsCollapsible() {
         throw new Error("Failed to add calendar");
       }
 
-      const addedCalendar: Calendar = await response.json();
-      console.log("Added calendar:", addedCalendar);
-      setCalendars((prevCalendars) => [...prevCalendars, addedCalendar]);
+      const addedCalendar = await response.json();
+      const mergedCalendar = {
+        ...newCalendar,
+        id: addedCalendar.id,
+        color: "blue",
+      };
+
+      setCalendars((prevCalendars) => [...prevCalendars, mergedCalendar]);
+      console.log("calendars:", calendars);
       setNewCalendarName("");
       setIsAddingCalendar(false);
     } catch (error) {
@@ -107,7 +121,7 @@ export default function CalendarsCollapsible() {
                     ? "data-[state=checked]:bg-green-500 border-green-500"
                     : "data-[state=checked]:bg-orange-500 border-orange-500"
                 )}
-                checkmark={false}
+                // checkmark={false}
               />
               <span>{calendar.name}</span>
             </div>
