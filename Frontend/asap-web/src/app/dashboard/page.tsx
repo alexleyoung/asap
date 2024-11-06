@@ -6,12 +6,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getProtectedData } from "../../lib/auth";
 import { fetchCalendars } from "@/lib/scheduleCrud";
+import { useCalendarContext } from "@/contexts/CalendarsContext";
 
 export default function Dashboard() {
   const { items, setItems } = useScheduleItems();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [calendars, setCalendars] = useState([]);
+  const { selectedCalendars } = useCalendarContext();
 
   const handleItemUpdate = (updatedItem: ScheduleItem) => {
     setItems((prevItems) =>
@@ -28,7 +30,7 @@ export default function Dashboard() {
         const userID = storedUser ? JSON.parse(storedUser).id : null;
         console.log("Fetching schedule items...");
         const response = await fetch(
-          `http://localhost:8000/users/${userID}/events`,
+          `http://localhost:8000/?userID=${userID}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -62,20 +64,13 @@ export default function Dashboard() {
   useEffect(() => {
     const loadCalendars = async () => {
       try {
-        const storedUser = localStorage.getItem("User");
-        if (!storedUser) return;
-        const user = JSON.parse(storedUser);
+        const user = JSON.parse(localStorage.getItem("User")!);
         const response = await fetchCalendars(user.id);
-        if (!response.ok) {
-          throw new Error("Failed to fetch calendars");
-        }
-        const data = await response.json();
-        setCalendars(data);
+        setCalendars(response);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
     };
-
     loadCalendars();
   }, []);
 
@@ -84,7 +79,7 @@ export default function Dashboard() {
       <Schedule
         items={items}
         onItemUpdate={handleItemUpdate}
-        selectedCalenders={calendars}
+        selectedCalenders={selectedCalendars}
       />
     </>
   );

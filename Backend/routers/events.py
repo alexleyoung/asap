@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import events as controller
@@ -70,12 +70,25 @@ def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
 
 
 # get a user's events
-@router.get("/users/{userID}/events", response_model=list[schemas.Event])
-def get_user_events(userID: int, db: Session = Depends(get_db)):
-    events = controller.get_events_by_user(db, userID)
+@router.get("/", response_model=list[schemas.Event])
+def get_user_events(userID: int, calendarID: Optional[int] = None, db: Session = Depends(get_db)):
+    if not userID:
+        raise HTTPException(status_code=400, detail="User ID is required")
+    if calendarID:
+        events = controller.get_events_by_calendar(db, userID, calendarID)
+    else:
+        events = controller.get_events_by_user(db, userID)
     if not events:
         raise HTTPException(status_code=404, detail="No events found for this user")
     return events
+
+# # get a user's events
+# @router.get("/users/{userID}/events", response_model=list[schemas.Event])
+# def get_user_events(userID: int, db: Session = Depends(get_db)):
+#     events = controller.get_events_by_user(db, userID)
+#     if not events:
+#         raise HTTPException(status_code=404, detail="No events found for this user")
+#     return events
 
 
 # # Endpoint to create a new calendar

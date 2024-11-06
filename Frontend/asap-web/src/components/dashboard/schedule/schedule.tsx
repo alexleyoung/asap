@@ -49,7 +49,7 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CreateItemTabs from "../forms/CreateItemTabs";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { EventFormData } from "@/lib/types";
+import { Calendar, EventFormData } from "@/lib/types";
 import EventCard from "./EventCard";
 import { Edit } from "lucide-react";
 import EditEventForm from "../forms/EditEventForm";
@@ -57,7 +57,7 @@ import EditEventForm from "../forms/EditEventForm";
 export type ScheduleProps = {
   items: ScheduleItem[];
   onItemUpdate: (item: ScheduleItem) => void;
-  selectedCalenders: number[];
+  selectedCalenders: Calendar[];
 };
 
 export const Schedule: React.FC<ScheduleProps> = ({
@@ -458,7 +458,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
       const dayItems = scheduleItems.filter(
         (item) =>
           isSameDay(item.start, day) &&
-          selectedCalenders.includes(item.calendarID)
+          selectedCalenders.some((calendar) => calendar.id === item.calendarID)
       );
 
       if (isMonthView) {

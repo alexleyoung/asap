@@ -49,8 +49,8 @@ def edit_calendar_endpoint(
 
 # get all of a users calendars
 @router.get("/calendars/", response_model=list[schemas.Calendar])
-def get_calendars(user_id: int = Query(...), db: Session = Depends(get_db)):
-    calendars = controller.get_calendars_by_user(db, user_id=user_id)
+def get_calendars(userID: int = Query(...), db: Session = Depends(get_db)):
+    calendars = controller.get_calendars_by_user(db, userID=userID)
     if not calendars:
         raise HTTPException(status_code=404, detail="No calendars found for this user")
     return calendars
@@ -66,3 +66,31 @@ def create_calendar_endpoint(
 
     db_calendar = controller.create_calendar(db=db, calendar=calendar, userID=userID)
     return db_calendar
+
+# delete calendar
+@router.delete("/calendars/{calendarID}", status_code=204)
+def delete_calendar_endpoint(
+    calendarID: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    # Optional: Add permission check if needed
+    #controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
+    
+    try:
+        # Attempt to delete the calendar and its events
+        result = controller.delete_calendar(db, calendarID)
+        if not result:
+            raise HTTPException(
+                status_code=404,
+                detail="Calendar not found"
+            )
+        
+        return None  # 204 No Content response
+    
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while deleting the calendar and its events"
+        )

@@ -54,12 +54,12 @@ class CalendarCreate(CalendarBase):
     pass
 
 # for editing a calendar 
-class CalendarUpdate(BaseModel):
+class CalendarUpdate(CalendarBase):
     name: Optional[str] = None
     description: Optional[str] = None
 
 # main class
-class Calendar(BaseModel):
+class Calendar(CalendarBase):
     id: int
     userID: int
 

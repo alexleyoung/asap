@@ -1,6 +1,6 @@
 import { EventFormData } from "@/lib/types";
 import React, { use, useEffect, useState } from "react";
-import { updateEvent } from "@/lib/scheduleCrud";
+import { fetchCalendars, updateEvent } from "@/lib/scheduleCrud";
 import { deleteEvent } from "@/lib/scheduleCrud";
 import {
   Form,
@@ -87,22 +87,16 @@ export function EditEventForm({
   const [calendars, setCalendars] = useState<any[]>([]); // Adjust type as needed
 
   useEffect(() => {
-    const fetchCalendars = async () => {
+    const loadCalendars = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/calendars/calendars/"
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch calendars");
-        }
-        const data = await response.json();
-        setCalendars(data);
+        const user = JSON.parse(localStorage.getItem("User")!);
+        const response = await fetchCalendars(user.id);
+        setCalendars(response);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
     };
-
-    fetchCalendars();
+    loadCalendars();
   }, []);
 
   useEffect(() => {

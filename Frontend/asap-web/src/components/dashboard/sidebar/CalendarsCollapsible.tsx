@@ -17,11 +17,12 @@ import { Calendar } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { fetchCalendars } from "@/lib/scheduleCrud";
+import { useCalendarContext } from "@/contexts/CalendarsContext";
 
 export default function CalendarsCollapsible() {
   const [open, setOpen] = useState(true);
   const [calendars, setCalendars] = useState<Calendar[]>([]);
-  const [selectedCalendars, setSelectedCalendars] = useState<number[]>([]);
+  const { selectedCalendars, toggleCalendar } = useCalendarContext();
   const [isAddingCalendar, setIsAddingCalendar] = useState(false);
   const [newCalendarName, setNewCalendarName] = useState("");
 
@@ -30,29 +31,27 @@ export default function CalendarsCollapsible() {
       try {
         const user = JSON.parse(localStorage.getItem("User")!);
         const response = await fetchCalendars(user.id);
-        const data = await response.json();
-        setCalendars(data);
+        console.log("response:", response);
+        setCalendars(response);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);
       }
     };
     loadCalendars();
-  }, []);
+  }, [calendars]);
 
-  const handleBoxChange = (calendarId: number) => {
-    setSelectedCalendars((prevSelected) => {
-      if (prevSelected.includes(calendarId)) {
-        return prevSelected.filter((id) => id !== calendarId);
-      } else {
-        return [...prevSelected, calendarId];
-      }
-    });
+  const handleBoxChange = (calendar: Calendar) => {
+    toggleCalendar(calendar);
   };
 
   const handleAddCalendar = async () => {
     if (!newCalendarName) return;
 
-    const newCalendar = { name: newCalendarName };
+    const newCalendar = {
+      name: newCalendarName,
+      description: "",
+      timezone: "UTC",
+    };
 
     try {
       const user = JSON.parse(localStorage.getItem("User")!);
@@ -64,7 +63,11 @@ export default function CalendarsCollapsible() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify({ name: newCalendarName }),
+          body: JSON.stringify({
+            name: newCalendarName,
+            description: "",
+            timezone: "UTC",
+          }),
         }
       );
 
@@ -72,9 +75,15 @@ export default function CalendarsCollapsible() {
         throw new Error("Failed to add calendar");
       }
 
-      const addedCalendar: Calendar = await response.json();
-      console.log("Added calendar:", addedCalendar);
-      setCalendars((prevCalendars) => [...prevCalendars, addedCalendar]);
+      const addedCalendar = await response.json();
+      const mergedCalendar = {
+        ...newCalendar,
+        id: addedCalendar.id,
+        color: "blue",
+      };
+
+      setCalendars((prevCalendars) => [...prevCalendars, mergedCalendar]);
+      console.log("calendars:", calendars);
       setNewCalendarName("");
       setIsAddingCalendar(false);
     } catch (error) {
@@ -97,8 +106,8 @@ export default function CalendarsCollapsible() {
             <div className="flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md">
               <Checkbox
                 id={calendar.id.toString()}
-                checked={selectedCalendars.includes(calendar.id)}
-                onChange={() => handleBoxChange(calendar.id)}
+                checked={selectedCalendars.some((c) => c.id === calendar.id)}
+                onCheckedChange={() => handleBoxChange(calendar)}
                 className={cn(
                   "rounded-full",
                   i === 0
@@ -107,7 +116,7 @@ export default function CalendarsCollapsible() {
                     ? "data-[state=checked]:bg-green-500 border-green-500"
                     : "data-[state=checked]:bg-orange-500 border-orange-500"
                 )}
-                checkmark={false}
+                // checkmark={false}
               />
               <span>{calendar.name}</span>
             </div>
