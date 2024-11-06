@@ -17,11 +17,12 @@ import { Calendar } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { fetchCalendars } from "@/lib/scheduleCrud";
+import { useCalendarContext } from "@/contexts/CalendarsContext";
 
 export default function CalendarsCollapsible() {
   const [open, setOpen] = useState(true);
   const [calendars, setCalendars] = useState<Calendar[]>([]);
-  const [selectedCalendars, setSelectedCalendars] = useState<number[]>([]);
+  const { selectedCalendars, toggleCalendar } = useCalendarContext();
   const [isAddingCalendar, setIsAddingCalendar] = useState(false);
   const [newCalendarName, setNewCalendarName] = useState("");
 
@@ -39,14 +40,8 @@ export default function CalendarsCollapsible() {
     loadCalendars();
   }, []);
 
-  const handleBoxChange = (calendarId: number) => {
-    setSelectedCalendars((prevSelected) => {
-      if (prevSelected.includes(calendarId)) {
-        return prevSelected.filter((id) => id !== calendarId);
-      } else {
-        return [...prevSelected, calendarId];
-      }
-    });
+  const handleBoxChange = (calendar: Calendar) => {
+    toggleCalendar(calendar);
   };
 
   const handleAddCalendar = async () => {
@@ -111,8 +106,8 @@ export default function CalendarsCollapsible() {
             <div className="flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md">
               <Checkbox
                 id={calendar.id.toString()}
-                checked={selectedCalendars.includes(calendar.id)}
-                onCheckedChange={() => handleBoxChange(calendar.id)}
+                checked={selectedCalendars.some((c) => c.id === calendar.id)}
+                onCheckedChange={() => handleBoxChange(calendar)}
                 className={cn(
                   "rounded-full",
                   i === 0
