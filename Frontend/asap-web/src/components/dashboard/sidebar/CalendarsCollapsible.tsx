@@ -112,7 +112,7 @@ export default function CalendarsCollapsible() {
               <Checkbox
                 id={calendar.id.toString()}
                 checked={selectedCalendars.includes(calendar.id)}
-                onChange={() => handleBoxChange(calendar.id)}
+                onCheckedChange={() => handleBoxChange(calendar.id)}
                 className={cn(
                   "rounded-full",
                   i === 0

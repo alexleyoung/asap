@@ -21,9 +21,10 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar } from "@/lib/types";
 import EditCalendarForm from "./EditCalendarForm";
+import { set } from "date-fns";
 
 interface ManageCalendarsProps {
   calendars: Calendar[];
@@ -48,6 +49,12 @@ export const ManageCalendarsDialog = ({
   const [selectedCalendar, setSelectedCalendar] = useState<Calendar | null>(
     null
   );
+  const [updatedCalendars, setUpdatedCalendars] =
+    useState<Calendar[]>(calendars);
+
+  useEffect(() => {
+    setUpdatedCalendars(calendars);
+  }, [calendars]);
 
   const handleSave = (updatedCalendar: {
     // id: number;
@@ -82,12 +89,17 @@ export const ManageCalendarsDialog = ({
                   onSave={handleSave}
                 />
               ) : null
+            ) : calendars.length === 0 ? (
+              <div>No calendars available</div>
             ) : (
               calendars.map((calendar) => (
                 <div key={calendar.id}>
                   <span>{calendar.name}</span>
                   <span>{calendar.color}</span>
-                  <Button onClick={() => handleEditClick(calendar)}>
+                  <Button
+                    onClick={() => handleEditClick(calendar)}
+                    className="m-3"
+                  >
                     Edit
                   </Button>
                 </div>

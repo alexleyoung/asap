@@ -76,18 +76,17 @@ export default function Header() {
     }
   }, []);
 
-  useEffect(() => {
-    const loadCalendars = async () => {
-      try {
-        if (!user) return;
-        const response = await fetchCalendars(user.id);
-        setCalendars(response);
-      } catch (error) {
-        console.error("Failed to fetch calendars:", error);
-      }
-    };
-    loadCalendars();
-  }, []);
+  const loadCalendars = async () => {
+    try {
+      if (!user) return;
+      const response = await fetchCalendars(user.id);
+      setCalendars(response);
+      console.log(calendars);
+    } catch (error) {
+      console.error("Failed to fetch calendars:", error);
+    }
+    setIsOpenManageCalendars(true);
+  };
 
   const handleViewChange = (newView: string) => {
     setView(newView);
@@ -111,7 +110,7 @@ export default function Header() {
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    // localStorage.removeItem("User");
     router.push("/");
   };
 
@@ -203,7 +202,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                onClick={() => setIsOpenManageCalendars(true)}
+                onClick={loadCalendars}
               >
                 Manage Calendars
               </Button>

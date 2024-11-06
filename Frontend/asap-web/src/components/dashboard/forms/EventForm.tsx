@@ -60,7 +60,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   category: z.string().optional(),
   frequency: z.string().optional(),
-  calendarID: z.number({ required_error: "Calendar is required" }),
+  calendarID: z.string({ required_error: "Calendar is required" }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -85,7 +85,7 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
       startTime: format(new Date(), "HH:mm"),
       endDate: format(new Date(), "yyyy-MM-dd"),
       endTime: format(new Date(), "HH:mm"),
-      calendarID: 1,
+      calendarID: "1",
     },
   });
 
@@ -118,7 +118,7 @@ export function EventForm({ onSubmit, onItemCreate }: EventFormProps) {
       category: data.category || "",
       frequency: data.frequency || "",
       uid: userId,
-      calendarID: data.calendarID,
+      calendarID: Number(data.calendarID),
       siid: eventID,
       color: "#000000", // Add a default color or modify as needed
     };

@@ -22,7 +22,7 @@ import {
 
 const calendarSchema = z.object({
   name: z.string().min(1, "Calendar name is required"),
-  color: z.string().min(1, "Calendar color is required"),
+  color: z.string().optional(),
   description: z.string().optional(),
   timezone: z.string().optional(),
 });
@@ -70,11 +70,12 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
       console.log("Data to send:", dataToSend); // Debugging info
 
       const response = await fetch(
-        `http://localhost:8000/calendars/${calendar.id}`,
+        `http://localhost:8000/calendars/calendars/${calendar.id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(dataToSend),
         }
@@ -96,7 +97,6 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
       console.log("Response: still reading");
       const updatedCalendar = await response.json();
       onSave({ ...updatedCalendar, id: calendar.id });
-      localStorage.setItem("User", JSON.stringify(updatedCalendar));
     } catch (error) {
       console.error(error);
     }

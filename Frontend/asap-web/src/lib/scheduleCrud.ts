@@ -144,7 +144,7 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
 
 export async function fetchCalendars(userId: string) {
   const response = await fetch(
-    `http://localhost:8000/calendars/calendars/?user_id=${userId}`,
+    `http://localhost:8000/calendars/calendars/?userID=${userId}`,
     {
       method: "GET",
       headers: {
