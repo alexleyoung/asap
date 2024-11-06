@@ -16,6 +16,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
+import { useScheduleItems } from "@/contexts/ScheduleContext";
+import { useToast } from "@/hooks/use-toast";
 // import {
 //   Select,
 //   SelectContent,
@@ -52,6 +54,8 @@ export function EditEventForm({
   onSubmit,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
+  const { setEvents, events } = useScheduleItems();
+  const { toast } = useToast();
   // const { calendars, isLoading: isLoadingCalendars } = useCalendars();
 
   const form = useForm<EventFormValues>({
@@ -72,33 +76,45 @@ export function EditEventForm({
   }, [eventData, form]);
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this event?")) {
-      try {
-        setLoading(true);
-        await deleteEvent(eventData.id);
-        onClose();
-      } catch (error) {
-        console.error("Failed to delete event:", error);
-      } finally {
-        setLoading(false);
-      }
+    try {
+      setEvents((prevEvents) =>
+        prevEvents.filter((event) => event.id !== eventData.id)
+      );
+      await deleteEvent(eventData.id);
+      toast({
+        title: "Event deleted",
+        description: "Your event has been deleted.",
+      });
+    } catch (error) {
+      setEvents((prevEvents) => [...prevEvents, eventData]);
+      toast({
+        title: "Event deletion failed",
+        description: "Failed to delete your event.",
+        variant: "destructive",
+      });
+      console.error("Failed to delete event:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSubmit = async (data: EventFormValues) => {
     try {
       setLoading(true);
-      const updatedEvent: Event = {
-        ...data,
-        start: new Date(data.start),
-        end: new Date(data.end),
-      };
-      const response = await updateEvent(updatedEvent);
+      const response = await updateEvent(data);
       if (!response.ok) {
         const errorDetails = await response.json();
         throw new Error(`Error: ${errorDetails.message || "Unknown error"}`);
       }
-      onSubmit(updatedEvent);
+      setEvents(
+        events.map((event) => {
+          if (event.id == data.id) {
+            return data;
+          }
+          return event;
+        })
+      );
+      onSubmit(data);
     } catch (error) {
       console.error("Failed to update event:", error);
     } finally {

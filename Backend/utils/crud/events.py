@@ -42,6 +42,17 @@ def get_events_by_user(db: Session, userID: int):
     return db.query(models.Event).filter(models.Event.userID == userID).all()
 
 
+# get a user's events by calendar
+def get_events_by_calendar(
+    db: Session, userID: int, calendarID: int
+) -> list[models.Event]:
+    return (
+        db.query(models.Event)
+        .filter(models.Event.userID == userID, models.Event.calendarID == calendarID)
+        .all()
+    )
+
+
 # edit event
 def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()

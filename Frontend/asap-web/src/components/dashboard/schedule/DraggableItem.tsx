@@ -10,7 +10,7 @@ type DraggableItemProps = {
   onItemClick: (item: Event | Task) => void;
   containerHeight: number;
   dayStart: Date;
-  columnWidth: number;
+
   columnOffset: number;
 };
 
