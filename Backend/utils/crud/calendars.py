@@ -38,3 +38,14 @@ def edit_calendar(db: Session, calendar_id: int, calendar_update: schemas.Calend
 # get calendars for user
 def get_calendars_by_user(db: Session, userID: int):
     return db.query(models.Calendar).filter(models.Calendar.userID == userID).all()
+
+# delete a calendar
+def delete_calendar(db: Session, calendarID: int) -> bool:
+    calendar = db.query(models.Calendar).filter(models.Calendar.id == calendarID).first()
+    if not calendar:
+        return False
+    
+    # Delete the calendar
+    db.delete(calendar)
+    db.commit()
+    return True
