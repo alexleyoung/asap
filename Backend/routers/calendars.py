@@ -49,8 +49,8 @@ def edit_calendar_endpoint(
 
 # get all of a users calendars
 @router.get("/calendars/", response_model=list[schemas.Calendar])
-def get_calendars(user_id: int = Query(...), db: Session = Depends(get_db)):
-    calendars = controller.get_calendars_by_user(db, user_id=user_id)
+def get_calendars(userID: int = Query(...), db: Session = Depends(get_db)):
+    calendars = controller.get_calendars_by_user(db, userID=userID)
     if not calendars:
         raise HTTPException(status_code=404, detail="No calendars found for this user")
     return calendars
