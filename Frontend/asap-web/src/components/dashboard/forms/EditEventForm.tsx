@@ -54,6 +54,8 @@ export function EditEventForm({
   onSubmit,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
+  const [startString, setStartString] = useState("");
+  const [endString, setEndString] = useState("");
   const { setEvents, events } = useScheduleItems();
   const { toast } = useToast();
   // const { calendars, isLoading: isLoadingCalendars } = useCalendars();
@@ -160,12 +162,11 @@ export function EditEventForm({
                 <Input
                   type='datetime-local'
                   {...field}
-                  value={
-                    field.value instanceof Date
-                      ? field.value.toISOString().slice(0, 16)
-                      : ""
-                  }
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
+                  value={startString}
+                  onChange={(e) => {
+                    setStartString(e.target.value);
+                    field.onChange(new Date(e.target.value));
+                  }}
                 />
               </FormControl>
               <FormMessage />
@@ -182,12 +183,11 @@ export function EditEventForm({
                 <Input
                   type='datetime-local'
                   {...field}
-                  value={
-                    field.value instanceof Date
-                      ? field.value.toISOString().slice(0, 16)
-                      : ""
-                  }
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
+                  value={endString}
+                  onChange={(e) => {
+                    setEndString(e.target.value);
+                    field.onChange(new Date(e.target.value));
+                  }}
                 />
               </FormControl>
               <FormMessage />
