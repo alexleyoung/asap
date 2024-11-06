@@ -41,11 +41,14 @@ def get_calendars_by_user(db: Session, userID: int):
 
 # delete a calendar
 def delete_calendar(db: Session, calendarID: int) -> bool:
+    # First, delete all associated events
+    db.query(models.Event).filter(models.Event.calendarID == calendarID).delete(synchronize_session=False)
+    
+    # Then delete the calendar
     calendar = db.query(models.Calendar).filter(models.Calendar.id == calendarID).first()
     if not calendar:
         return False
     
-    # Delete the calendar
     db.delete(calendar)
     db.commit()
     return True

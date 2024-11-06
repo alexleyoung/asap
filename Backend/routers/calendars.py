@@ -77,12 +77,20 @@ def delete_calendar_endpoint(
     # Optional: Add permission check if needed
     #controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
     
-    # Attempt to delete the calendar
-    result = controller.delete_calendar(db, calendarID)
-    if not result:
-        raise HTTPException(
-            status_code=404,
-            detail="Calendar not found"
-        )
+    try:
+        # Attempt to delete the calendar and its events
+        result = controller.delete_calendar(db, calendarID)
+        if not result:
+            raise HTTPException(
+                status_code=404,
+                detail="Calendar not found"
+            )
+        
+        return None  # 204 No Content response
     
-    return None  # 204 No Content response
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="An error occurred while deleting the calendar and its events"
+        )
