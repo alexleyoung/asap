@@ -1,6 +1,6 @@
 "use client";
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
-import { addDays, addMonths, format } from "date-fns";
+import { addDays, addMonths, format, set } from "date-fns";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -86,6 +86,38 @@ export default function Header() {
       console.error("Failed to fetch calendars:", error);
     }
     setIsOpenManageCalendars(true);
+  };
+
+  const handleUpdateCalendar = (updatedCalendar: any) => {
+    setCalendars((prevCalendars: any[]) =>
+      prevCalendars.map((calendar: any) =>
+        calendar.id === updatedCalendar.id ? updatedCalendar : calendar
+      )
+    );
+  };
+
+  const handleDeleteCalendar = async (calendarId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/calendars/${calendarId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete the calendar");
+      }
+
+      setCalendars((prevCalendars: any[]) =>
+        prevCalendars.filter((calendar: any) => calendar.id !== calendarId)
+      );
+    } catch (error) {
+      console.error("Error deleting calendar:", error);
+    }
   };
 
   const handleViewChange = (newView: string) => {
@@ -249,7 +281,7 @@ export default function Header() {
             calendars={calendars} // Pass the actual calendars here
             onClose={() => setIsOpenManageCalendars(false)}
             onUpdate={(updatedCalendar) => {
-              setCalendar(updatedCalendar);
+              handleUpdateCalendar(updatedCalendar);
             }}
             onDelete={() => {
               // Handle calendar delete

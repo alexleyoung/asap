@@ -22,7 +22,7 @@ import {
 
 const calendarSchema = z.object({
   name: z.string().min(1, "Calendar name is required"),
-  color: z.string().optional(),
+  // color: z.string().optional(),
   description: z.string().optional(),
   timezone: z.string().optional(),
 });
@@ -120,6 +120,32 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
         />
         <FormField
           control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter a description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <FormField
+          control={form.control}
+          name="timezone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Timezone</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter a timezone" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        /> */}
+        {/* <FormField
+          control={form.control}
           name="color"
           render={({ field }) => (
             <FormItem>
@@ -143,7 +169,7 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <div className="flex justify-end">
           <Button type="submit" variant="secondary">
             Save
