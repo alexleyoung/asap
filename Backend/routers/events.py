@@ -23,10 +23,10 @@ async def websocket_endpoint(websocket: WebSocket):
         while True:
             message = await websocket.receive_text()  # Keep connection alive
             data = json.loads(message)
-            if data.get("action") == "edit_event":
-                
-               response = {"status": "success", "message": "Event edited successfully"}
-               await websocket.send_text(json.dumps(response))
+            if data["action"] == "edit_event":
+                data["type"] = "event_updated"
+                # response = {"status": "success", "message": "Event edited successfully"}
+                await websocket.send_text(json.dumps(data))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception as e:
