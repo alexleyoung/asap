@@ -7,6 +7,7 @@ import logging
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from .database.db import init_db
 
 from .routers import users, events, tasks, calendars, auth
 
@@ -15,6 +16,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # create app
 app = FastAPI()
+init_db()
 
 app.include_router(auth.router)
 app.include_router(users.router)

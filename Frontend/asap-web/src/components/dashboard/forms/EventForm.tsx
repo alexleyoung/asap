@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,13 @@ export function EventForm({
   calendars,
   loading = false,
 }: EventFormProps) {
+  const [startString, setStartString] = useState(
+    new Date().toISOString().substring(0, 14) + "00"
+  );
+  const [endString, setEndString] = useState(
+    new Date(Date.now() + 60 * 60 * 1000).toISOString().substring(0, 14) + "00"
+  );
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -89,80 +96,45 @@ export function EventForm({
           )}
         />
 
-        <div className='flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0'>
-          <Controller
+        <div className='flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 w-full'>
+          <FormField
             control={form.control}
             name='start'
             render={({ field }) => (
-              <FormItem className='flex-1'>
-                <FormLabel>Start</FormLabel>
-                <div className='flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0'>
-                  <FormControl>
-                    <Input
-                      type='date'
-                      onChange={(e) => {
-                        const date = new Date(e.target.value);
-                        date.setHours(
-                          field.value.getHours(),
-                          field.value.getMinutes()
-                        );
-                        field.onChange(date);
-                      }}
-                      value={field.value.toISOString().split("T")[0]}
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <Input
-                      type='time'
-                      onChange={(e) => {
-                        const [hours, minutes] = e.target.value.split(":");
-                        const date = new Date(field.value);
-                        date.setHours(parseInt(hours), parseInt(minutes));
-                        field.onChange(date);
-                      }}
-                      value={field.value.toTimeString().slice(0, 5)}
-                    />
-                  </FormControl>
-                </div>
+              <FormItem>
+                <FormLabel>Start Date</FormLabel>
+                <FormControl>
+                  <Input
+                    type='datetime-local'
+                    {...field}
+                    value={startString}
+                    onChange={(e) => {
+                      setStartString(e.target.value);
+                      field.onChange(new Date(e.target.value));
+                    }}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          <Controller
+          <FormField
             control={form.control}
             name='end'
             render={({ field }) => (
-              <FormItem className='flex-1'>
-                <FormLabel>End</FormLabel>
-                <div className='flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0'>
-                  <FormControl>
-                    <Input
-                      type='date'
-                      onChange={(e) => {
-                        const date = new Date(e.target.value);
-                        date.setHours(
-                          field.value.getHours(),
-                          field.value.getMinutes()
-                        );
-                        field.onChange(date);
-                      }}
-                      value={field.value.toISOString().split("T")[0]}
-                    />
-                  </FormControl>
-                  <FormControl>
-                    <Input
-                      type='time'
-                      onChange={(e) => {
-                        const [hours, minutes] = e.target.value.split(":");
-                        const date = new Date(field.value);
-                        date.setHours(parseInt(hours), parseInt(minutes));
-                        field.onChange(date);
-                      }}
-                      value={field.value.toTimeString().slice(0, 5)}
-                    />
-                  </FormControl>
-                </div>
+              <FormItem>
+                <FormLabel>End Date</FormLabel>
+                <FormControl>
+                  <Input
+                    type='datetime-local'
+                    {...field}
+                    value={endString}
+                    onChange={(e) => {
+                      setEndString(e.target.value);
+                      field.onChange(new Date(e.target.value));
+                    }}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
