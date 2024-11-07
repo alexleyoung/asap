@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
+import enum as py_enum
 
 
 # For JWT token response
@@ -65,6 +66,39 @@ class Calendar(CalendarBase):
     id: int
     userID: int
 
+    class Config:
+        from_attributes = True
+
+class PermissionLevel(py_enum.Enum):
+    ADMIN = "admin" # can CRUD tasks and events
+    EDITOR = "editor" # can CRU tasks and events
+    VIEWER = "viewer" # can R tasks and events
+
+###
+# Membership
+class MembershipBase(BaseModel):
+    user: UserBase
+    permission: PermissionLevel
+
+###
+# Group
+class GroupBase(BaseModel):
+    title: str
+    calendarID: int
+    members: Optional[List[MembershipBase]] = None
+
+# to create
+class GroupCreate(GroupBase):
+    pass
+
+# to update
+class GroupUpdate(BaseModel):
+    title : Optional[str] = None
+    members: Optional[List[MembershipBase]] = None
+
+# main class
+class Group(GroupBase):
+    id: int
     class Config:
         from_attributes = True
 
