@@ -222,3 +222,23 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
 
   return await response.json();
 }
+
+export async function fetchCalendars(userId: string) {
+  const response = await fetch(
+    `http://localhost:8000/calendars/calendars/?userID=${userId}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error || "Something went wrong");
+  }
+
+  return await response.json();
+}

@@ -21,19 +21,27 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar } from "@/lib/types";
 import EditCalendarForm from "./EditCalendarForm";
+import { set } from "date-fns";
 
 interface ManageCalendarsProps {
   calendars: Calendar[];
   onClose: () => void; // Function to close or hide the manage view
   onUpdate: (updatedCalendar: {
+    // id: number;
+    name: string;
+    // color: string;
+    description: string;
+    timezone: string;
+  }) => void; // Function to update calendar
+  onDelete: (deletedCalendar: {
     id: number;
     name: string;
-    color: string;
-  }) => void; // Function to update calendar
-  onDelete: () => void; // Function to delete calendar
+    description: string;
+    timezone: string;
+  }) => void; // Function to delete calendar
 }
 
 export const ManageCalendarsDialog = ({
@@ -46,11 +54,19 @@ export const ManageCalendarsDialog = ({
   const [selectedCalendar, setSelectedCalendar] = useState<Calendar | null>(
     null
   );
+  const [updatedCalendars, setUpdatedCalendars] =
+    useState<Calendar[]>(calendars);
+
+  useEffect(() => {
+    setUpdatedCalendars(calendars);
+  }, [calendars]);
 
   const handleSave = (updatedCalendar: {
-    id: number;
+    // id: number;
     name: string;
-    color: string;
+    // color: string;
+    description: string;
+    timezone: string;
   }) => {
     onUpdate(updatedCalendar); // Call the function passed in props to update the calendar
     setIsEditing(false);
@@ -59,6 +75,10 @@ export const ManageCalendarsDialog = ({
   const handleEditClick = (calendar: Calendar) => {
     setSelectedCalendar(calendar);
     setIsEditing(true);
+  };
+
+  const handleDelete = (calendar: Calendar) => {
+    onDelete(calendar);
   };
 
   return (
@@ -78,13 +98,24 @@ export const ManageCalendarsDialog = ({
                   onSave={handleSave}
                 />
               ) : null
+            ) : calendars.length === 0 ? (
+              <div>No calendars available</div>
             ) : (
               calendars.map((calendar) => (
                 <div key={calendar.id}>
                   <span>{calendar.name}</span>
                   <span>{calendar.color}</span>
-                  <Button onClick={() => handleEditClick(calendar)}>
+                  <Button
+                    onClick={() => handleEditClick(calendar)}
+                    className="m-3"
+                  >
                     Edit
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(calendar)}
+                    variant="destructive"
+                  >
+                    Delete
                   </Button>
                 </div>
               ))

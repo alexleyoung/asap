@@ -26,6 +26,7 @@ def hash_password(password: str):
 def authenticate_user(email: str, password: str, db):
     user = users.get_user_by_email(db, email)
     if not user:
+        print(user)
         return False
     if not bcrypt_context.verify(password, user.hashed_password):
         return False

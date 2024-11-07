@@ -22,7 +22,9 @@ import {
 
 const calendarSchema = z.object({
   name: z.string().min(1, "Calendar name is required"),
-  color: z.string().min(1, "Calendar color is required"),
+  // color: z.string().optional(),
+  description: z.string().optional(),
+  timezone: z.string().optional(),
 });
 
 type CalendarFormValues = z.infer<typeof calendarSchema>;
@@ -31,12 +33,16 @@ interface EditCalendarFormProps {
   calendar: {
     id: number;
     name: string;
-    color: string;
+    // color: string;
+    description: string;
+    timezone: string;
   };
   onSave: (updatedCalendar: {
-    id: number;
+    // id: number;
     name: string;
-    color: string;
+    // color: string;
+    description: string;
+    timezone: string;
   }) => void;
 }
 
@@ -45,7 +51,9 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
     resolver: zodResolver(calendarSchema),
     defaultValues: {
       name: calendar.name,
-      color: calendar.color,
+      // color: calendar.color,
+      description: calendar.description,
+      timezone: calendar.timezone,
     },
   });
 
@@ -60,11 +68,12 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
       };
 
       const response = await fetch(
-        `http://localhost:8000/users/${calendar.id}`,
+        `http://localhost:8000/calendars/calendars/${calendar.id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: JSON.stringify(dataToSend),
         }
@@ -82,7 +91,6 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
       }
       const updatedCalendar = await response.json();
       onSave({ ...updatedCalendar, id: calendar.id });
-      localStorage.setItem("User", JSON.stringify(updatedCalendar));
     } catch (error) {
       console.error(error);
     }
@@ -106,7 +114,33 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
         />
         <FormField
           control={form.control}
-          name='color'
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter a description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <FormField
+          control={form.control}
+          name="timezone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Timezone</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter a timezone" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        /> */}
+        {/* <FormField
+          control={form.control}
+          name="color"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calendar Color</FormLabel>
@@ -128,9 +162,9 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
               <FormMessage />
             </FormItem>
           )}
-        />
-        <div className='flex justify-end'>
-          <Button type='submit' variant='secondary'>
+        /> */}
+        <div className="flex justify-end">
+          <Button type="submit" variant="secondary">
             Save
           </Button>
         </div>

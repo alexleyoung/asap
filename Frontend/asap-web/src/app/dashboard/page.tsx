@@ -6,12 +6,15 @@ import { useEffect, useState } from "react";
 import { Task, Event, Calendar } from "@/lib/types";
 import { getEvents, getTasks } from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
+import { useCalendarContext } from "@/contexts/CalendarsContext";
+import { fetchCalendars } from "@/lib/scheduleCrud";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
-  const [calendars, setCalendars] = useState<Calendar[]>([]);
   const { events, tasks, setEvents, setTasks } = useScheduleItems();
   const { user } = useUser();
+  const [calendars, setCalendars] = useState<Calendar[]>([]);
+  const { selectedCalendars } = useCalendarContext();
 
   const handleEventUpdate = (updatedEvent: Event) => {};
   const handleTaskUpdate = (updatedTask: Task) => {};
@@ -30,22 +33,18 @@ export default function Dashboard() {
     })();
   }, [setEvents, setTasks, user]);
 
-  // useEffect(() => {
-  //   const fetchCalendars = async () => {
-  //     try {
-  //       const response = await fetch("http://localhost:8000/calendars");
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch calendars");
-  //       }
-  //       const data = await response.json();
-  //       setCalendars(data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch calendars:", error);
-  //     }
-  //   };
-
-  //   fetchCalendars();
-  // }, []);
+  useEffect(() => {
+    const loadCalendars = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("User")!);
+        const response = await fetchCalendars(user.id);
+        setCalendars(response);
+      } catch (error) {
+        console.error("Failed to fetch calendars:", error);
+      }
+    };
+    loadCalendars();
+  }, []);
 
   return (
     <>
@@ -54,8 +53,7 @@ export default function Dashboard() {
         tasks={tasks}
         onEventUpdate={handleEventUpdate}
         onTaskUpdate={handleTaskUpdate}
-        selectedCalendars={calendars}
-      />
+        selectedCalendars={calendars} />
     </>
   );
 }

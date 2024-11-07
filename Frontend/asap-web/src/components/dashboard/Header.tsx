@@ -1,6 +1,6 @@
 "use client";
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
-import { addDays, addMonths, format } from "date-fns";
+import { addDays, addMonths, format, set } from "date-fns";
 import { useHotkeys } from "react-hotkeys-hook";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -34,6 +34,9 @@ import {
 import { useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
+import { fetchCalendars } from "@/lib/scheduleCrud";
+import { useCalendarContext } from "@/contexts/CalendarsContext";
+import { Calendar } from "@/lib/types";
 
 interface User {
   id: string;
@@ -52,6 +55,8 @@ export default function Header() {
   const [isOpenManageCalendars, setIsOpenManageCalendars] = useState(false);
   const [calendar, setCalendar] = useState<any>(null);
   const [calendars, setCalendars] = useState<any>([]);
+  const { selectedCalendars, toggleCalendar, removeCalendar } =
+    useCalendarContext();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("User");
@@ -72,18 +77,57 @@ export default function Header() {
     }
   }, []);
 
-  useEffect(() => {
-    const fetchCalendars = async () => {
-      try {
-        const response = await fetch("/api/calendars");
-        const data = await response.json();
-        setCalendars(data);
-      } catch (error) {
-        console.error("Failed to fetch calendars:", error);
+  const loadCalendars = async () => {
+    try {
+      if (!user) return;
+      const response = await fetchCalendars(user.id);
+      setCalendars(response);
+      console.log(calendars);
+    } catch (error) {
+      console.error("Failed to fetch calendars:", error);
+    }
+    setIsOpenManageCalendars(true);
+  };
+
+  const handleUpdateCalendar = (updatedCalendar: any) => {
+    setCalendars((prevCalendars: any[]) =>
+      prevCalendars.map((calendar: any) =>
+        calendar.id === updatedCalendar.id ? updatedCalendar : calendar
+      )
+    );
+  };
+
+  const handleDeleteCalendar = async (calendar: any) => {
+    try {
+      const deleteCalendar = calendar;
+      const response = await fetch(
+        `http://localhost:8000/calendars/calendars/${calendar.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete the calendar");
       }
-    };
-    fetchCalendars();
-  }, []);
+
+      setCalendars((prevCalendars: any[]) =>
+        prevCalendars.filter(
+          (calendar: any) => calendar.id !== deleteCalendar.id
+        )
+      );
+
+      removeCalendar(deleteCalendar);
+
+      console.log("Calendar and associated events deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting calendar and events:", error);
+    }
+  };
 
   const handleViewChange = (newView: string) => {
     setView(newView);
@@ -107,7 +151,7 @@ export default function Header() {
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    // localStorage.removeItem("User");
     router.push("/");
   };
 
@@ -137,75 +181,79 @@ export default function Header() {
   };
 
   return (
-    <header className='px-5 py-3 border-b border-border flex items-center justify-between'>
-      <h1 className='text-2xl font-bold'>asap.</h1>
-      <div className='flex justify-between items-center gap-4'>
-        <div className='flex gap-4 items-center'>
+    <header className="px-5 py-3 border-b border-border flex items-center justify-between">
+      <h1 className="text-2xl font-bold">asap.</h1>
+      <div className="flex justify-between items-center gap-4">
+        <div className="flex gap-4 items-center">
           <ChevronLeft
             size={32}
-            className='rounded-full hover:bg-muted p-1 transition-colors'
+            className="rounded-full hover:bg-muted p-1 transition-colors"
             onClick={() => handleDateChange("prev")}
           />
           <ChevronRight
             size={32}
-            className='rounded-full hover:bg-muted p-1 transition-colors'
+            className="rounded-full hover:bg-muted p-1 transition-colors"
             onClick={() => handleDateChange("next")}
           />
-          <Button variant='outline' onClick={() => setCurrentDate(new Date())}>
+          <Button variant="outline" onClick={() => setCurrentDate(new Date())}>
             Today
           </Button>
-          <h2 className='font-medium text-xl'>
+          <h2 className="font-medium text-xl">
             {view === "day"
               ? format(currentDate, "MMMM d, yyyy")
               : format(currentDate, "MMMM yyyy")}
           </h2>
         </div>
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <Select value={view} onValueChange={handleViewChange}>
             <SelectTrigger>
-              <SelectValue placeholder='View' className='text-sm' />
+              <SelectValue placeholder="View" className="text-sm" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='day'>Day</SelectItem>
-              <SelectItem value='week'>Week</SelectItem>
-              <SelectItem value='month'>Month</SelectItem>
+              <SelectItem value="day">Day</SelectItem>
+              <SelectItem value="week">Week</SelectItem>
+              <SelectItem value="month">Month</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
-      <div className='flex gap-4 items-center'>
+      <div className="flex gap-4 items-center">
         {user && (
           <Popover>
             <PopoverTrigger>
-              <Avatar className='hover:cursor-pointer relative group'>
-                <div className='absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all' />
+              <Avatar className="hover:cursor-pointer relative group">
+                <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
                 <AvatarImage src={user.avatar} alt={user.firstname} />
                 <AvatarFallback>{user.firstname[0]}</AvatarFallback>
               </Avatar>
             </PopoverTrigger>
             <PopoverContent
               sideOffset={5}
-              className='mr-4 p-2 flex flex-col gap-4 text-sm'>
-              <h1 className='px-2 pt-1 font-medium'>Hi {user.firstname}!</h1>
+              className="mr-4 p-2 flex flex-col gap-4 text-sm"
+            >
+              <h1 className="px-2 pt-1 font-medium">Hi {user.firstname}!</h1>
               <Separator />
               <Button
-                variant='ghost'
-                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
-                onClick={() => setIsOpen(true)}>
+                variant="ghost"
+                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                onClick={() => setIsOpenProfile(true)}
+              >
                 View Profile
               </Button>
               <Button
-                variant='ghost'
-                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
-                onClick={() => setIsOpenManageCalendars(true)}>
+                variant="ghost"
+                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                onClick={loadCalendars}
+              >
                 Manage Calendars
               </Button>
 
               <AlertDialog>
                 <AlertDialogTrigger>
                   <Button
-                    variant='ghost'
-                    className='w-full text-left px-2 py-2 font-normal items-center justify-start'>
+                    variant="ghost"
+                    className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                  >
                     Sign Out
                   </Button>
                 </AlertDialogTrigger>
@@ -242,10 +290,10 @@ export default function Header() {
             calendars={calendars} // Pass the actual calendars here
             onClose={() => setIsOpenManageCalendars(false)}
             onUpdate={(updatedCalendar) => {
-              setCalendar(updatedCalendar);
+              handleUpdateCalendar(updatedCalendar);
             }}
-            onDelete={() => {
-              // Handle calendar delete
+            onDelete={(deletedCalendar) => {
+              handleDeleteCalendar(deletedCalendar);
             }}
           />
         )}

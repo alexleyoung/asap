@@ -6,11 +6,13 @@ from fastapi import (
     WebSocketDisconnect,
 )
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import events as controller
 from ..utils.auth import get_current_user
+from ..utils.websocket_manager import manager
+import json
 
 
 router = APIRouter(
@@ -18,25 +20,6 @@ router = APIRouter(
 )
 
 
-# connection mamnger for websocket
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: List[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-
-    async def broadcast(self, message: str):
-        for connection in self.active_connections:
-            await connection.send_text(message)
-
-
-# create manager
-manager = ConnectionManager()
 
 
 # websocket endpoint for real-time notifications
@@ -94,9 +77,7 @@ def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
 
 # get a user's events
 @router.get("/", response_model=list[schemas.Event])
-def get_user_events(
-    userID: int, calendarID: int | None = None, db: Session = Depends(get_db)
-):
+def get_user_events(userID: int, calendarID: Optional[int] = None, db: Session = Depends(get_db)):
     if not userID:
         raise HTTPException(status_code=400, detail="User ID is required")
     if calendarID:

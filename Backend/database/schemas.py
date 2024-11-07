@@ -61,7 +61,7 @@ class CalendarUpdate(BaseModel):
 
 
 # main class
-class Calendar(BaseModel):
+class Calendar(CalendarBase):
     id: int
     userID: int
 
