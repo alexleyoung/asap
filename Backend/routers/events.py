@@ -25,6 +25,7 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
+# create event
 @newRouter.post("/users/{userID}/events", response_model=schemas.Event)
 async def create_event_endpoint(
     userID: int,
@@ -36,17 +37,28 @@ async def create_event_endpoint(
         raise HTTPException(status_code=404, detail="User not found")
 
     try:
-        db_event = controller.create_event(db=db, event=event, userID=userID)
+        db_event = await controller.create_event(db=db, event=event, userID=userID)
         
-        # Prepare notification
+        # Helper function to safely convert values for JSON serialization
+        def format_event_value(value):
+            if isinstance(value, datetime):
+                return value.isoformat()
+            return value
+        
+        # Prepare notification with all event attributes
         notification = {
             "type": "event_created",
             "data": {
                 "id": db_event.id,
                 "title": db_event.title,
-                "start_time": str(db_event.start_time),
-                "calendar_id": db_event.calendar_id,
-                "created_by": userID
+                "start": format_event_value(db_event.start),
+                "end": format_event_value(db_event.end),
+                "description": db_event.description,
+                "category": db_event.category,
+                "frequency": db_event.frequency,
+                "location": db_event.location,
+                "userID": db_event.userID,
+                "calendarID": db_event.calendarID
             }
         }
         
@@ -60,7 +72,6 @@ async def create_event_endpoint(
             status_code=500,
             detail=f"Failed to create event: {str(e)}"
         )
-
 
 
 # edit event
