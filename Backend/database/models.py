@@ -96,7 +96,6 @@ class Group(Base):
     title = Column("title", String)
    
     #relationships
-    #group_member = relationship("Membership", back_populates = "groups")
     calendar = relationship("Calendar", back_populates="group")
     membership = relationship("Membership", back_populates = "group") # what users do you have?
     
