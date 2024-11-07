@@ -63,14 +63,42 @@ async def create_event_endpoint(
 
 
 # edit event
-@router.put("/events/{eventID}", response_model=schemas.Event)
-def edit_event_endpoint(
-    eventID: int, event_update: schemas.EventUpdate, db: Session = Depends(get_db)
+@newRouter.put("/events/{eventID}", response_model=schemas.Event)
+async def edit_event_endpoint(
+    eventID: int, 
+    event_update: schemas.EventUpdate, 
+    db: Session = Depends(get_db)
 ):
     db_event = controller.edit_event(db=db, eventID=eventID, event_update=event_update)
     if db_event is None:
         raise HTTPException(status_code=404, detail="Event not found")
-    return db_event
+    
+    try:
+        # Prepare notification for WebSocket
+        notification = {
+            "type": "event_updated",
+            "data": {
+                "id": db_event.id,
+                "title": db_event.title,
+                "start_time": str(db_event.start_time),
+                "calendar_id": db_event.calendar_id,
+                "updated_fields": {
+                    key: getattr(db_event, key)
+                    for key, value in event_update.dict(exclude_unset=True).items()
+                }
+            }
+        }
+        
+        # Broadcast the update to all connected clients
+        await manager.broadcast(json.dumps(notification))
+        
+        return db_event
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to broadcast event update: {str(e)}"
+        )
 
 
 # get event
