@@ -74,20 +74,38 @@ async def edit_event_endpoint(
         raise HTTPException(status_code=404, detail="Event not found")
     
     try:
-        # Prepare notification for WebSocket
+        # Prepare notification for WebSocket with all event attributes
         notification = {
             "type": "event_updated",
             "data": {
                 "id": db_event.id,
                 "title": db_event.title,
-                "start_time": str(db_event.start_time),
-                "calendar_id": db_event.calendar_id,
+                "start": str(db_event.start),
+                "end": str(db_event.end),
+                "description": db_event.description,
+                "category": db_event.category,
+                "frequency": db_event.frequency,
+                "location": db_event.location,
+                "userID": db_event.userID,
+                "calendarID": db_event.calendarID,
                 "updated_fields": {
-                    key: getattr(db_event, key)
+                    key: str(getattr(db_event, key)) if isinstance(getattr(db_event, key), datetime) 
+                    else getattr(db_event, key)
                     for key, value in event_update.dict(exclude_unset=True).items()
                 }
             }
         }
+        
+        # Broadcast the update to all connected clients
+        await manager.broadcast(json.dumps(notification))
+        
+        return db_event
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to broadcast event update: {str(e)}"
+        )
         
         # Broadcast the update to all connected clients
         await manager.broadcast(json.dumps(notification))
