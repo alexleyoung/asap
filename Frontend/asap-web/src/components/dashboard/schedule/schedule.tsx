@@ -211,6 +211,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
   );
 
   useEffect(() => {
+    // Initialize WebSocket connection
     const ws = new WebSocket("ws://localhost:8000/ws/notifications");
 
     ws.onopen = () => {
@@ -218,17 +219,17 @@ export const Schedule: React.FC<ScheduleProps> = ({
     };
 
     ws.onmessage = (event) => {
+      console.log("Received message:", event.data);
       const notification = JSON.parse(event.data);
 
       if (notification.type === "event_created") {
-        // Add the new event to the state
         setScheduleItems((prevEvents) => [...prevEvents, notification.data]);
       }
+
       if (notification.type === "event_updated") {
         setScheduleItems((prevEvents) => {
           return prevEvents.map((event) => {
             if (event.siid === notification.data.siid) {
-              // Parse dates from ISO format
               const updatedEvent = {
                 ...event,
                 ...notification.data.updated_fields,
@@ -247,22 +248,32 @@ export const Schedule: React.FC<ScheduleProps> = ({
       }
     };
 
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
     ws.onclose = () => {
       console.log("WebSocket connection closed");
 
-      // Try to reconnect after 3 seconds
+      // Reconnect only if the connection is closed and it's not already reconnecting
       setTimeout(() => {
-        console.log("Attempting to reconnect...");
-        const newWs = new WebSocket("ws://localhost:8000/ws/notifications");
-        setWs(newWs);
-      }, 3000);
+        if (ws.readyState !== WebSocket.OPEN) {
+          console.log("Attempting to reconnect...");
+          // Open a new WebSocket connection only if the previous one was closed
+          const newWs = new WebSocket("ws://localhost:8000/ws/notifications");
+          setWs(newWs); // Update the state with the new WebSocket connection
+        }
+      }, 5000);
     };
 
+    // Set the WebSocket instance in state
     setWs(ws);
 
-    // Clean up WebSocket connection on component unmount
+    // Cleanup WebSocket connection on component unmount
     return () => {
-      ws.close();
+      if (ws.readyState === 1) {
+        ws.close();
+      }
     };
   }, []);
 
@@ -293,11 +304,12 @@ export const Schedule: React.FC<ScheduleProps> = ({
     setIsEditing(true);
 
     // Ensure WebSocket is open before sending a message
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ action: "edit_event", data: edittingItem }));
-    } else {
-      console.log("WebSocket is not open. Cannot send message.");
-    }
+    // if (ws && ws.readyState === WebSocket.OPEN) {
+    //   console.log("Sending edit event message...");
+    //   ws.send(JSON.stringify({ action: "event_updated", data: edittingItem }));
+    // } else {
+    //   console.log("WebSocket is not open. Cannot send message.");
+    // }
   };
 
   // useEffect(() => {

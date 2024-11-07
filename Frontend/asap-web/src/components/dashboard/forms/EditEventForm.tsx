@@ -141,6 +141,12 @@ export function EditEventForm({
 
       // Call the update handler
       handleUpdate(updatedEvent);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        console.log("Sending edit event message...");
+        ws.send(JSON.stringify({ action: "edit_event", data: updatedEvent }));
+      } else {
+        console.log("WebSocket is not open. Cannot send message.");
+      }
     } catch (error) {
       console.error("Failed to update event:", error);
     }

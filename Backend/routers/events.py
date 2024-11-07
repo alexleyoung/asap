@@ -21,9 +21,16 @@ async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            await websocket.receive_text()  # Keep connection alive
+            message = await websocket.receive_text()  # Keep connection alive
+            data = json.loads(message)
+            if data.get("action") == "edit_event":
+                
+               response = {"status": "success", "message": "Event edited successfully"}
+               await websocket.send_text(json.dumps(response))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 # create event
 @newRouter.post("/users/{userID}/events", response_model=schemas.Event)
@@ -96,7 +103,7 @@ async def edit_event_endpoint(
         notification = {
             "type": "event_updated",
             "data": {
-                "id": db_event.id,
+                # "id": db_event.id,
                 "title": db_event.title,
                 "start": db_event.start.isoformat() if db_event.start else None,
                 "end": db_event.end.isoformat() if db_event.end else None,
@@ -104,7 +111,7 @@ async def edit_event_endpoint(
                 "category": db_event.category,
                 "frequency": db_event.frequency,
                 "location": db_event.location,
-                "userID": db_event.userID,
+                # "userID": db_event.userID,
                 "calendarID": db_event.calendarID,
                 "updated_fields": {
                     key: format_event_value(getattr(db_event, key))
@@ -112,9 +119,11 @@ async def edit_event_endpoint(
                 }
             }
         }
-        
+        print("Broadcasting update:", notification)
+
         # Broadcast the update to all connected clients
         await manager.broadcast(json.dumps(notification))
+        print("Broadcasted update")
         
         return db_event
         
