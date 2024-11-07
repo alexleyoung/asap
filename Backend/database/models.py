@@ -42,13 +42,11 @@ class Event(Base):
     __tablename__ = "events"
     id = Column("id", Integer, primary_key=True, index=True, unique=True)
     title = Column("title", String)
-    start = Column("start", DateTime)
-    end = Column("end", DateTime)
+    start = Column("start", DateTime(timezone=True))
+    end = Column("end", DateTime(timezone=True))
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String)
-    userID = Column("userID", Integer, ForeignKey("users.id"))
-    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"))
     location = Column("location", String)
 
     # foreign keys
@@ -65,12 +63,12 @@ class Task(Base):
     __tablename__ = "tasks"
     id = Column("id", Integer, primary_key=True, index=True, unique=True)
     title = Column("title", String)
-    start = Column("start", DateTime)
-    end = Column("end", DateTime)
+    start = Column("start", DateTime(timezone=True), nullable=True)
+    end = Column("end", DateTime(timezone=True), nullable=True)
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String)
-    dueDate = Column("dueDate", DateTime)
+    dueDate = Column("dueDate", DateTime(timezone=True))
     priority = Column("priority", String)
     auto = Column("auto", Boolean)
     completed = Column("completed", Boolean)

@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from ...database import schemas, models
+
 # from ...routers.events import manager
 
 
-def create_event(db: Session, event: schemas.EventCreate, userID: int):
+def create_event(db: Session, event: schemas.EventCreate):
     db_event = models.Event(
         title=event.title,
         start=event.start,
@@ -12,7 +13,7 @@ def create_event(db: Session, event: schemas.EventCreate, userID: int):
         category=event.category,
         frequency=event.frequency,
         location=event.location,
-        userID=userID,
+        userID=event.userID,
         calendarID=event.calendarID,
     )
     db.add(db_event)
@@ -39,6 +40,17 @@ def delete_event(db: Session, eventID: int):
 # get a user's events
 def get_events_by_user(db: Session, userID: int):
     return db.query(models.Event).filter(models.Event.userID == userID).all()
+
+# get a user's events by calendar
+def get_events_by_calendar(
+    db: Session, userID: int, calendarID: int
+) -> list[models.Event]:
+    return (
+        db.query(models.Event)
+        .filter(models.Event.userID == userID, models.Event.calendarID == calendarID)
+        .all()
+    )
+
 
 # get a user's events by calendar
 def get_events_by_calendar(

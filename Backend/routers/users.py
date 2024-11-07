@@ -20,7 +20,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 
 # to delete user
-@router.delete("/{userID}/delete", response_model=schemas.User)
+@router.delete("/{userID}", response_model=schemas.User)
 def delete_user_endpoint(userID: int, db: Session = Depends(get_db)):
     user = controller.delete_user(db, userID)
     if not user:
@@ -47,17 +47,21 @@ def read_user(userID: int, db: Session = Depends(get_db)):
 # to get user by email
 @router.get("/email/{email}", response_model=schemas.User)
 def get_user_by_email_endpoint(email: str, db: Session = Depends(get_db)):
-    user = controller.get_user_by_email(db, email=email)
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    user = controller.get_user_by_email(db, email)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
 # change password
-@router.put("/{userID}/password", response_model=schemas.User)
+@router.put("/password", response_model=schemas.User)
 def change_user_password_endpoint(
     userID: int, new_password: str, db: Session = Depends(get_db)
 ):
+    if not userID:
+        raise HTTPException(status_code=400, detail="User ID is required")
     user = controller.change_user_password(db, userID, new_password)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

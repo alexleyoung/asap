@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Card,
   CardContent,
@@ -6,39 +7,42 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-// import { TaskPost } from "@/types/event";
-import React from "react";
+import { Task } from "@/lib/types"; // Import the Task type
 
 interface TaskCardProps {
-  task: TaskPost;
+  task: Task;
+  onDelete: (taskId: number) => void;
+  onEdit: (task: Task) => void;
 }
 
-export function TaskCard({ task }: TaskCardProps) {
-  const [selectedTask, setSelectedTask] = React.useState<TaskPost | null>(null);
-  //when task is clicked, data is pulled to display in the card
-  const handleClick = (task: TaskPost) => {
-    setSelectedTask(task);
+export function TaskCard({ task, onDelete, onEdit }: TaskCardProps) {
+  const handleDelete = () => {
+    onDelete(task.id);
   };
-  const deleteTask = (task: TaskPost) => {
-    //delete task
-  };
-  const editTask = (task: TaskPost) => {
-    //edit task
+
+  const handleEdit = () => {
+    onEdit(task);
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>THIS SHOULD BE TASK TITLE</CardTitle>
-        <CardDescription>THIS SHOULD BE TASK DESCRIPTION</CardDescription>
+        <CardTitle>{task.title}</CardTitle>
+        <CardDescription>{task.description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <CardDescription>THIS SHOULD BE TASK DATE</CardDescription>
-        <CardDescription>THIS SHOULD BE TASK LOCATION</CardDescription>
+        <CardDescription>
+          Due: {task.dueDate.toLocaleDateString()}
+        </CardDescription>
+        <CardDescription>Priority: {task.priority}</CardDescription>
+        <CardDescription>Category: {task.category}</CardDescription>
+        <CardDescription>
+          Status: {task.completed ? "Completed" : "Pending"}
+        </CardDescription>
       </CardContent>
       <CardFooter>
-        <button>Delete</button>
-        <button>Edit</button>
+        <button onClick={handleDelete}>Delete</button>
+        <button onClick={handleEdit}>Edit</button>
       </CardFooter>
     </Card>
   );

@@ -67,8 +67,6 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
         ...data,
       };
 
-      console.log("Data to send:", dataToSend); // Debugging info
-
       const response = await fetch(
         `http://localhost:8000/calendars/calendars/${calendar.id}`,
         {
@@ -81,9 +79,6 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
         }
       );
 
-      console.log("Response:", response);
-      console.log("Data:", data);
-
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error updating profile:", errorData);
@@ -94,7 +89,6 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
           : "Failed to update user profile";
         throw new Error(errorMessage);
       }
-      console.log("Response: still reading");
       const updatedCalendar = await response.json();
       onSave({ ...updatedCalendar, id: calendar.id });
     } catch (error) {
@@ -104,15 +98,15 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
-          name="name"
+          name='name'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calendar Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter a calendar name" {...field} />
+                <Input placeholder='Enter a calendar name' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -153,16 +147,15 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                  defaultValue={field.value}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a color" />
+                    <SelectValue placeholder='Select a color' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="red">Red</SelectItem>
-                    <SelectItem value="green">Green</SelectItem>
-                    <SelectItem value="blue">Blue</SelectItem>
-                    <SelectItem value="yellow">Yellow</SelectItem>
+                    <SelectItem value='red'>Red</SelectItem>
+                    <SelectItem value='green'>Green</SelectItem>
+                    <SelectItem value='blue'>Blue</SelectItem>
+                    <SelectItem value='yellow'>Yellow</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
