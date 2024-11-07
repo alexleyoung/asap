@@ -66,3 +66,15 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         )
+
+# Helper function to verify token for WebSocket
+async def verify_token(token: str) -> tuple[int, str]:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        user_id = payload.get("id")
+        if email is None or user_id is None:
+            return None, None
+        return user_id, email
+    except InvalidTokenError:
+        return None, None

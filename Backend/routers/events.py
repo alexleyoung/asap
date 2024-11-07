@@ -5,58 +5,80 @@ from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import events as controller
 from ..utils.crud import users
-from ..utils.auth import get_current_user
+from ..utils.auth import get_current_user, verify_token
 from ..utils.websocket_manager import manager
 import json
+from typing import Dict, List, Annotated
+from ..database import models
 
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
 
 
-# WebSocket endpoint
 @router.websocket("/ws/notifications")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
+async def websocket_endpoint(
+    websocket: WebSocket,
+    db: Session = Depends(get_db)
+):
+    # Get token from query parameters
+    token = websocket.query_params.get("token")
+    if not token:
+        await websocket.close(code=4000)
+        return
+
+    # Verify the token
+    user_id, email = await verify_token(token)
+    if not user_id:
+        await websocket.close(code=4001)
+        return
+
+    # Verify user exists in database
+    user = users.get_user_by_email(db, email)
+    if not user:
+        await websocket.close(code=4001)
+        return
+
+    await manager.connect(websocket, user_id)
     try:
         while True:
-            # Keep the connection alive and handle incoming messages if needed
             data = await websocket.receive_text()
-            # You could add custom handling of incoming messages here
+            # Handle any incoming messages if needed
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        manager.disconnect(websocket, user_id)
 
-# Event creation endpoint with notifications
+# Modified event creation endpoint
 @router.post("/users/{userID}/events", response_model=schemas.Event)
 async def create_event_endpoint(
     userID: int, 
     event: schemas.EventCreate, 
+    current_user: Annotated[models.User, Depends(get_current_user)],
     db: Session = Depends(get_db)
 ):
-    # Verify user exists
     db_user = users.get_user(db, userID=userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Create the event
-    try:
-        db_event = controller.create_event(db=db, event=event, userID=userID)
-        
-        # Prepare a more detailed notification message
-        notification = {
-            "type": "event_created",
-            "data": {
-                "title": db_event.title,
-                "start_time": str(db_event.start_time),
-                "calendar_id": db_event.calendar_id
-            }
+    db_event = controller.create_event(db=db, event=event, userID=userID)
+    
+    # Create notification payload
+    notification = {
+        "type": "event_created",
+        "data": {
+            "id": db_event.id,
+            "title": db_event.title,
+            "start_time": str(db_event.start_time),
+            "calendar_id": db_event.calendar_id,
+            "created_by": userID
         }
-        
-        # Broadcast to all connected clients
-        await manager.broadcast(json.dumps(notification))
-        
-        return db_event
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    }
+    
+    # Broadcast to all connected users except the creator
+    await manager.broadcast(
+        json.dumps(notification),
+        exclude_user=userID
+    )
+
+    return db_event
 
 
 # edit event
