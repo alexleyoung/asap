@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from ...database import schemas, models
 # from ...routers.events import manager
 from fastapi import APIRouter, Depends, WebSocket
-from utils.websocket_manager import manager
+from ...utils.websocket_manager import manager
 
 
 def create_event(db: Session, event: schemas.EventCreate, userID: int):

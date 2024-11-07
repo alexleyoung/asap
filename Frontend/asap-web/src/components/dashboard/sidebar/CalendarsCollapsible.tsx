@@ -31,7 +31,6 @@ export default function CalendarsCollapsible() {
       try {
         const user = JSON.parse(localStorage.getItem("User")!);
         const response = await fetchCalendars(user.id);
-        console.log("response:", response);
         setCalendars(response);
       } catch (error) {
         console.error("Failed to fetch calendars:", error);

@@ -28,6 +28,7 @@ interface EditEventFormProps {
   onClose: () => void;
   eventData: EventFormData;
   onSubmit: (updatedEvent: EventFormData) => void;
+  ws?: WebSocket;
 }
 
 export type OmittedEventFormData = Omit<
@@ -63,6 +64,7 @@ export function EditEventForm({
   onClose,
   eventData,
   onSubmit,
+  ws,
 }: EditEventFormProps) {
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -112,6 +114,14 @@ export function EditEventForm({
       try {
         setLoading(true);
         await deleteEvent(eventId); // Call the delete handler with eventId
+
+        // Send WebSocket message to notify other clients of the deletion
+        if (ws) {
+          ws.send(
+            JSON.stringify({ action: "delete_event", data: { eventId } })
+          );
+        }
+
         onClose(); // Close the form after deletion
       } catch (error) {
         console.error("Failed to delete event:", error);

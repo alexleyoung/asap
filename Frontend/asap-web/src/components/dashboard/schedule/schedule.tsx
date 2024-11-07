@@ -78,6 +78,8 @@ export const Schedule: React.FC<ScheduleProps> = ({
   const [edittingItem, setEdittingItem] = useState<EventFormData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>(items);
+  // const [ws, setWs] = useState<WebSocket | null>(null);
+  const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     setScheduleItems(items);
@@ -208,6 +210,38 @@ export const Schedule: React.FC<ScheduleProps> = ({
     [items, onItemUpdate]
   );
 
+  useEffect(() => {
+    ws.current = new WebSocket("ws://localhost:8000/ws/notifications");
+
+    ws.current.onopen = () => console.log("WebSocket connected.");
+    ws.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      console.log("Message received:", message);
+
+      if (message.action === "add_event") {
+        setScheduleItems((prevItems) => [...prevItems, message.data]);
+      } else if (message.action === "update_event") {
+        setScheduleItems((prevItems) =>
+          prevItems.map((item) =>
+            item.siid === message.data.siid ? message.data : item
+          )
+        );
+      } else if (message.action === "delete_event") {
+        setScheduleItems((prevItems) =>
+          prevItems.filter((item) => item.siid !== message.data.eventId)
+        );
+      }
+    };
+
+    ws.current.onclose = () => console.log("WebSocket closed.");
+
+    return () => {
+      if (ws.current) {
+        ws.current.close(); // Cleanup on unmount
+      }
+    };
+  }, []);
+
   const handleItemCreate = (newItem: ScheduleItem) => {
     console.log("Creating new item:", newItem);
     setScheduleItems((prevItems) => [...prevItems, newItem]);
@@ -252,12 +286,17 @@ export const Schedule: React.FC<ScheduleProps> = ({
     //   });
     // }
     setIsEditing(true);
-  };
-  useEffect(() => {
-    if (edittingItem) {
-      console.log("Editing event hi: ", edittingItem);
+    if (ws.current) {
+      ws.current.send(
+        JSON.stringify({ action: "edit_event", data: edittingItem })
+      );
     }
-  }, [edittingItem]);
+  };
+  // useEffect(() => {
+  //   if (edittingItem) {
+  //     console.log("Editing event hi: ", edittingItem);
+  //   }
+  // }, [edittingItem]);
 
   const handleScheduleClick = (day: Date, yPosition: number) => {
     if (scheduleRef.current) {
@@ -738,6 +777,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
                 onItemUpdate(updatedItem); // Call the update function
               }}
               eventId={edittingItem.siid}
+              ws={ws.current ?? undefined}
             />
           </DialogContent>
         </Dialog>
