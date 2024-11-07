@@ -14,71 +14,54 @@ from ..database import models
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
 
+newRouter = APIRouter(tags=["events"])
 
-@router.websocket("/ws/notifications")
-async def websocket_endpoint(
-    websocket: WebSocket,
-    db: Session = Depends(get_db)
-):
-    # Get token from query parameters
-    token = websocket.query_params.get("token")
-    if not token:
-        await websocket.close(code=4000)
-        return
 
-    # Verify the token
-    user_id, email = await verify_token(token)
-    if not user_id:
-        await websocket.close(code=4001)
-        return
-
-    # Verify user exists in database
-    user = users.get_user_by_email(db, email)
-    if not user:
-        await websocket.close(code=4001)
-        return
-
-    await manager.connect(websocket, user_id)
+@newRouter.websocket("/ws/notifications")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
-            # Handle any incoming messages if needed
+            await websocket.receive_text()  # Keep connection alive
     except WebSocketDisconnect:
-        manager.disconnect(websocket, user_id)
+        manager.disconnect(websocket)
 
-# Modified event creation endpoint
-@router.post("/users/{userID}/events", response_model=schemas.Event)
+@newRouter.post("/users/{userID}/events", response_model=schemas.Event)
 async def create_event_endpoint(
-    userID: int, 
-    event: schemas.EventCreate, 
-    current_user: Annotated[models.User, Depends(get_current_user)],
+    userID: int,
+    event: schemas.EventCreate,
     db: Session = Depends(get_db)
 ):
     db_user = users.get_user(db, userID=userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    db_event = controller.create_event(db=db, event=event, userID=userID)
-    
-    # Create notification payload
-    notification = {
-        "type": "event_created",
-        "data": {
-            "id": db_event.id,
-            "title": db_event.title,
-            "start_time": str(db_event.start_time),
-            "calendar_id": db_event.calendar_id,
-            "created_by": userID
+    try:
+        db_event = controller.create_event(db=db, event=event, userID=userID)
+        
+        # Prepare notification
+        notification = {
+            "type": "event_created",
+            "data": {
+                "id": db_event.id,
+                "title": db_event.title,
+                "start_time": str(db_event.start_time),
+                "calendar_id": db_event.calendar_id,
+                "created_by": userID
+            }
         }
-    }
-    
-    # Broadcast to all connected users except the creator
-    await manager.broadcast(
-        json.dumps(notification),
-        exclude_user=userID
-    )
+        
+        # Broadcast to all connected clients
+        await manager.broadcast(json.dumps(notification))
 
-    return db_event
+        return db_event
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create event: {str(e)}"
+        )
+
 
 
 # edit event

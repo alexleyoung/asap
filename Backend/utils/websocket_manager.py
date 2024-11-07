@@ -1,38 +1,28 @@
-from typing import Dict, List
-from fastapi import WebSocket, WebSocketDisconnect, Depends
-import jwt
-from jwt import InvalidTokenError
+from fastapi import WebSocket, WebSocketDisconnect
+from typing import List
 import json
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: Dict[int, List[WebSocket]] = {}  # userID -> connections
+        self.active_connections: List[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket, userID: int):
+    async def connect(self, websocket: WebSocket):
         await websocket.accept()
-        if userID not in self.active_connections:
-            self.active_connections[userID] = []
-        self.active_connections[userID].append(websocket)
+        self.active_connections.append(websocket)
 
-    def disconnect(self, websocket: WebSocket, userID: int):
-        if userID in self.active_connections:
-            self.active_connections[userID].remove(websocket)
-            if not self.active_connections[userID]:
-                del self.active_connections[userID]
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
 
-    async def broadcast(self, message: str, exclude_user: int = None):
-        for userID, connections in self.active_connections.items():
-            if userID != exclude_user:
-                disconnected = []
-                for connection in connections:
-                    try:
-                        await connection.send_text(message)
-                    except:
-                        disconnected.append(connection)
-                
-                # Clean up any disconnected websockets
-                for conn in disconnected:
-                    self.disconnect(conn, userID)
+    async def broadcast(self, message: str):
+        disconnected = []
+        for connection in self.active_connections:
+            try:
+                await connection.send_text(message)
+            except:
+                disconnected.append(connection)
+        
+        # Clean up any disconnected websockets
+        for conn in disconnected:
+            self.disconnect(conn)
 
 manager = ConnectionManager()
-
