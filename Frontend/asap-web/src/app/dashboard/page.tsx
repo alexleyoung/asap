@@ -8,7 +8,7 @@ import { getEvents, getTasks } from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { getCalendars } from "@/lib/scheduleCrud";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,7 @@ export default function Dashboard() {
     (async () => {
       try {
         if (!user) {
-          router.push("/");
+          // router.push("/");
           return;
         }
         setEvents((await getEvents(user.id)) || []);

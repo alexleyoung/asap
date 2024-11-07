@@ -12,33 +12,25 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { set } from "date-fns";
 import { Calendar } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
-import { fetchCalendars } from "@/lib/scheduleCrud";
-import { useCalendarContext } from "@/contexts/CalendarsContext";
+import { getCalendars } from "@/lib/scheduleCrud";
+import { useCalendars } from "@/contexts/CalendarsContext";
+import { useUser } from "@/contexts/UserContext";
 
 export default function CalendarsCollapsible() {
   const [open, setOpen] = useState(true);
-  const [calendars, setCalendars] = useState<Calendar[]>([]);
-  const { selectedCalendars, toggleCalendar } = useCalendarContext();
+  const { selectedCalendars, calendars, setCalendars, toggleCalendar } =
+    useCalendars();
   const [isAddingCalendar, setIsAddingCalendar] = useState(false);
   const [newCalendarName, setNewCalendarName] = useState("");
+  const { user } = useUser();
 
   useEffect(() => {
-    const loadCalendars = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem("User")!);
-        const response = await fetchCalendars(user.id);
-        console.log("response:", response);
-        setCalendars(response);
-      } catch (error) {
-        console.error("Failed to fetch calendars:", error);
-      }
-    };
-    loadCalendars();
-  }, [calendars]);
+    if (!user) return;
+    (async () => setCalendars(await getCalendars(user.id)))();
+  }, [setCalendars, user]);
 
   const handleBoxChange = (calendar: Calendar) => {
     toggleCalendar(calendar);
@@ -94,16 +86,16 @@ export default function CalendarsCollapsible() {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger asChild>
-        <Button variant="ghost" className="w-full justify-between">
-          <span className="font-semibold">Calendars</span>
+        <Button variant='ghost' className='w-full justify-between'>
+          <span className='font-semibold'>Calendars</span>
           {open ? <ChevronUp /> : <ChevronDown />}
         </Button>
       </CollapsibleTrigger>
 
-      <CollapsibleContent className="w-[240px] mt-3 px-2 space-y-2">
+      <CollapsibleContent className='w-[240px] mt-3 px-2 space-y-2'>
         {calendars.map((calendar, i) => (
           <Label htmlFor={calendar.id.toString()} key={calendar.id}>
-            <div className="flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md">
+            <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md'>
               <Checkbox
                 id={calendar.id.toString()}
                 checked={selectedCalendars.some((c) => c.id === calendar.id)}
@@ -123,23 +115,22 @@ export default function CalendarsCollapsible() {
           </Label>
         ))}
         <Button
-          variant="ghost"
-          className="w-full flex items-center gap-2 mt-2"
-          onClick={() => setIsAddingCalendar((prev) => !prev)}
-        >
-          <Plus className="text-gray-500" /> Add Calendar
+          variant='ghost'
+          className='w-full flex items-center gap-2 mt-2'
+          onClick={() => setIsAddingCalendar((prev) => !prev)}>
+          <Plus className='text-gray-500' /> Add Calendar
         </Button>
 
         {/* New Calendar Input */}
         {isAddingCalendar && (
-          <div className="flex gap-2 items-center mt-2">
+          <div className='flex gap-2 items-center mt-2'>
             <Input
-              placeholder="New Calendar Name"
+              placeholder='New Calendar Name'
               value={newCalendarName}
               onChange={(e) => setNewCalendarName(e.target.value)}
-              className="flex-1"
+              className='flex-1'
             />
-            <Button onClick={handleAddCalendar} variant="default">
+            <Button onClick={handleAddCalendar} variant='default'>
               Add
             </Button>
           </div>
