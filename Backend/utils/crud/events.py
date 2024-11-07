@@ -56,7 +56,7 @@ def get_events_by_calendar(
 
 
 # edit event
-def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
+async def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
     if db_event is None:
         return None
@@ -66,5 +66,5 @@ def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
 
     db.commit()
     db.refresh(db_event)
-    manager.broadcast(db_event)
+    await manager.broadcast(db_event)
     return db_event
