@@ -13,30 +13,50 @@ import json
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
 
 
-# websocket endpoint for real-time notifications
+# WebSocket endpoint
 @router.websocket("/ws/notifications")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
-            await websocket.receive_text()  # Keeps the connection open
+            # Keep the connection alive and handle incoming messages if needed
+            data = await websocket.receive_text()
+            # You could add custom handling of incoming messages here
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
-# to create an event
+# Event creation endpoint with notifications
 @router.post("/users/{userID}/events", response_model=schemas.Event)
 async def create_event_endpoint(
-    userID: int, event: schemas.EventCreate, db: Session = Depends(get_db)
+    userID: int, 
+    event: schemas.EventCreate, 
+    db: Session = Depends(get_db)
 ):
+    # Verify user exists
     db_user = users.get_user(db, userID=userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    db_event = controller.create_event(db=db, event=event, userID=userID)
-    
-    await manager.broadcast(f"New event created: {db_event.title}")
-
-    return db_event
+    # Create the event
+    try:
+        db_event = controller.create_event(db=db, event=event, userID=userID)
+        
+        # Prepare a more detailed notification message
+        notification = {
+            "type": "event_created",
+            "data": {
+                "title": db_event.title,
+                "start_time": str(db_event.start_time),
+                "calendar_id": db_event.calendar_id
+            }
+        }
+        
+        # Broadcast to all connected clients
+        await manager.broadcast(json.dumps(notification))
+        
+        return db_event
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # edit event
