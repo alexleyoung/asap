@@ -3,18 +3,20 @@
 import Schedule from "@/components/dashboard/schedule";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
-import { Task, Event, Calendar } from "@/lib/types";
+import { Task, Event } from "@/lib/types";
 import { getEvents, getTasks } from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
-import { useCalendarContext } from "@/contexts/CalendarsContext";
-import { fetchCalendars } from "@/lib/scheduleCrud";
+import { useCalendars } from "@/contexts/CalendarsContext";
+import { getCalendars } from "@/lib/scheduleCrud";
+import { useRouter } from "next/router";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
-  const { events, tasks, setEvents, setTasks } = useScheduleItems();
   const { user } = useUser();
-  const [calendars, setCalendars] = useState<Calendar[]>([]);
-  const { selectedCalendars } = useCalendarContext();
+  const { events, tasks, setEvents, setTasks } = useScheduleItems();
+  const { calendars, setCalendars } = useCalendars();
+
+  const router = useRouter();
 
   const handleEventUpdate = (updatedEvent: Event) => {};
   const handleTaskUpdate = (updatedTask: Task) => {};
@@ -22,29 +24,20 @@ export default function Dashboard() {
   useEffect(() => {
     (async () => {
       try {
-        if (!user) return;
+        if (!user) {
+          router.push("/");
+          return;
+        }
         setEvents((await getEvents(user.id)) || []);
         setTasks((await getTasks(user.id)) || []);
+        setCalendars((await getCalendars(user.id)) || []);
       } catch (error) {
         console.error("Failed to fetch schedule items:", error);
       } finally {
         setLoading(false);
       }
     })();
-  }, [setEvents, setTasks, user]);
-
-  useEffect(() => {
-    const loadCalendars = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem("User")!);
-        const response = await fetchCalendars(user.id);
-        setCalendars(response);
-      } catch (error) {
-        console.error("Failed to fetch calendars:", error);
-      }
-    };
-    loadCalendars();
-  }, []);
+  }, [setEvents, setTasks, user, setCalendars, router]);
 
   return (
     <>
@@ -53,7 +46,8 @@ export default function Dashboard() {
         tasks={tasks}
         onEventUpdate={handleEventUpdate}
         onTaskUpdate={handleTaskUpdate}
-        selectedCalendars={calendars} />
+        selectedCalendars={calendars}
+      />
     </>
   );
 }

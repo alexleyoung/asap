@@ -1,4 +1,4 @@
-import { User, Event, Task, EventPost, TaskPost } from "./types";
+import { User, Event, Task, EventPost, TaskPost, Calendar } from "./types";
 
 // Users
 export async function getUserByEmail(email: string) {
@@ -187,9 +187,16 @@ export async function deleteTask(task: Task) {
 }
 
 // Calendars
-export async function fetchCalendars(userId: string) {
+export async function getCalendars(userID: number) {
   const response = await fetch(
-    `http://localhost:8000/users/${userId}/calendars`
+    `http://localhost:8000/calendars/calendars/?userID=${userID}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
   );
 
   if (!response.ok) {
@@ -197,7 +204,7 @@ export async function fetchCalendars(userId: string) {
     throw new Error(data.error || "Something went wrong");
   }
 
-  return await response.json();
+  return (await response.json()) as Calendar[];
 }
 
 // Schedule
@@ -214,26 +221,6 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || "Something went wrong");
-  }
-
-  return await response.json();
-}
-
-export async function fetchCalendars(userId: string) {
-  const response = await fetch(
-    `http://localhost:8000/calendars/calendars/?userID=${userId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    }
-  );
 
   if (!response.ok) {
     const data = await response.json();
