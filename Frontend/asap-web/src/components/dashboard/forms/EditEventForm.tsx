@@ -55,14 +55,17 @@ export function EditEventForm({
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
   const [startString, setStartString] = useState(
-    eventData.start.toString().substring(0, 16)
+    eventData.start instanceof Date
+      ? eventData.start.toISOString().substring(0, 16)
+      : String(eventData.start).substring(0, 16)
   );
   const [endString, setEndString] = useState(
-    eventData.end.toString().substring(0, 16)
+    eventData.end instanceof Date
+      ? eventData.start.toISOString().substring(0, 16)
+      : String(eventData.start).substring(0, 16)
   );
   const { setEvents, events } = useScheduleItems();
   const { toast } = useToast();
-  // const { calendars, isLoading: isLoadingCalendars } = useCalendars();
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),

@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar, EventPost } from "@/lib/types";
+import { useCalendars } from "@/contexts/CalendarsContext";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -40,21 +41,17 @@ type FormValues = z.infer<typeof formSchema>;
 
 type EventFormProps = {
   onSubmit: (data: EventPost) => void;
-  calendars: Calendar[];
   loading: boolean;
 };
 
-export function EventForm({
-  onSubmit,
-  calendars,
-  loading = false,
-}: EventFormProps) {
+export function EventForm({ onSubmit, loading = false }: EventFormProps) {
   const [startString, setStartString] = useState(
     new Date().toISOString().substring(0, 14) + "00"
   );
   const [endString, setEndString] = useState(
     new Date(Date.now() + 60 * 60 * 1000).toISOString().substring(0, 14) + "00"
   );
+  const { calendars } = useCalendars();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

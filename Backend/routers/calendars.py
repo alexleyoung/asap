@@ -11,6 +11,7 @@ router = APIRouter(
     dependencies=[Depends(get_current_user)], prefix="/calendars", tags=["calendars"]
 )
 
+
 # create calendar
 @router.post("/", response_model=schemas.Calendar)
 def create_calendar(Calendar: schemas.CalendarCreate, db: Session = Depends(get_db)):
@@ -51,6 +52,7 @@ def edit_calendar_endpoint(
     if not updated_calendar:
         raise HTTPException(status_code=404, detail="Calendar not found")
 
+
 # get all of a users calendars
 @router.get("/calendars/", response_model=list[schemas.Calendar])
 def get_calendars(userID: int = Query(...), db: Session = Depends(get_db)):
@@ -59,8 +61,9 @@ def get_calendars(userID: int = Query(...), db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="No calendars found for this user")
     return calendars
 
+
 # Endpoint to create a new calendar
-@router.post("/users/{userID}/calendars", response_model=schemas.Calendar)
+@router.post("/calendars", response_model=schemas.Calendar)
 def create_calendar_endpoint(
     userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)
 ):
@@ -71,30 +74,28 @@ def create_calendar_endpoint(
     db_calendar = controller.create_calendar(db=db, calendar=calendar, userID=userID)
     return db_calendar
 
+
 # delete calendar
 @router.delete("/calendars/{calendarID}", status_code=204)
 def delete_calendar_endpoint(
     calendarID: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user),
 ):
     # Optional: Add permission check if needed
-    #controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
-    
+    # controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
+
     try:
         # Attempt to delete the calendar and its events
         result = controller.delete_calendar(db, calendarID)
         if not result:
-            raise HTTPException(
-                status_code=404,
-                detail="Calendar not found"
-            )
-        
+            raise HTTPException(status_code=404, detail="Calendar not found")
+
         return None  # 204 No Content response
-    
-    except Exception as e:
+
+    except Exception:
         db.rollback()
         raise HTTPException(
             status_code=500,
-            detail="An error occurred while deleting the calendar and its events"
+            detail="An error occurred while deleting the calendar and its events",
         )
