@@ -8,7 +8,7 @@ from ..utils.crud import users
 from ..utils.auth import get_current_user
 from ..utils.websocket_manager import manager
 import json
-import datetime
+from datetime import datetime
 
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
@@ -75,14 +75,20 @@ async def edit_event_endpoint(
         raise HTTPException(status_code=404, detail="Event not found")
     
     try:
-        # Prepare notification for WebSocket with all event attributes
+        # Helper function to safely convert event values to JSON-serializable format
+        def format_event_value(value):
+            if isinstance(value, datetime):
+                return value.isoformat()
+            return value
+
+        # Prepare notification with properly formatted data
         notification = {
             "type": "event_updated",
             "data": {
                 "id": db_event.id,
                 "title": db_event.title,
-                "start": str(db_event.start),
-                "end": str(db_event.end),
+                "start": db_event.start.isoformat() if db_event.start else None,
+                "end": db_event.end.isoformat() if db_event.end else None,
                 "description": db_event.description,
                 "category": db_event.category,
                 "frequency": db_event.frequency,
@@ -90,8 +96,7 @@ async def edit_event_endpoint(
                 "userID": db_event.userID,
                 "calendarID": db_event.calendarID,
                 "updated_fields": {
-                    key: str(getattr(db_event, key)) if isinstance(getattr(db_event, key), datetime) 
-                    else getattr(db_event, key)
+                    key: format_event_value(getattr(db_event, key))
                     for key, value in event_update.model_dump(exclude_unset=True).items()
                 }
             }
@@ -105,18 +110,7 @@ async def edit_event_endpoint(
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to broadcast event update: {str(e)}"
-        )
-        
-        # Broadcast the update to all connected clients
-        await manager.broadcast(json.dumps(notification))
-        
-        return db_event
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to broadcast event update: {str(e)}"
+            detail=str(e)
         )
 
 
