@@ -78,8 +78,8 @@ export const Schedule: React.FC<ScheduleProps> = ({
   const [edittingItem, setEdittingItem] = useState<EventFormData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [scheduleItems, setScheduleItems] = useState<ScheduleItem[]>(items);
-  // const [ws, setWs] = useState<WebSocket | null>(null);
-  const ws = useRef<WebSocket | null>(null);
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  // const ws = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     setScheduleItems(items);
@@ -211,46 +211,71 @@ export const Schedule: React.FC<ScheduleProps> = ({
   );
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8000/ws/notifications");
+    const ws = new WebSocket("ws://localhost:8000/ws/notifications");
 
-    ws.current.onopen = () => console.log("WebSocket connected.");
-    ws.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      console.log("Message received:", message);
+    ws.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
 
-      if (message.action === "add_event") {
-        setScheduleItems((prevItems) => [...prevItems, message.data]);
-      } else if (message.action === "update_event") {
-        setScheduleItems((prevItems) =>
-          prevItems.map((item) =>
-            item.siid === message.data.siid ? message.data : item
-          )
-        );
-      } else if (message.action === "delete_event") {
-        setScheduleItems((prevItems) =>
-          prevItems.filter((item) => item.siid !== message.data.eventId)
-        );
+    ws.onmessage = (event) => {
+      const notification = JSON.parse(event.data);
+
+      if (notification.type === "event_created") {
+        // Add the new event to the state
+        setScheduleItems((prevEvents) => [...prevEvents, notification.data]);
+      }
+      if (notification.type === "event_updated") {
+        setScheduleItems((prevEvents) => {
+          return prevEvents.map((event) => {
+            if (event.siid === notification.data.siid) {
+              // Parse dates from ISO format
+              const updatedEvent = {
+                ...event,
+                ...notification.data.updated_fields,
+                start: notification.data.start
+                  ? new Date(notification.data.start)
+                  : null,
+                end: notification.data.end
+                  ? new Date(notification.data.end)
+                  : null,
+              };
+              return updatedEvent;
+            }
+            return event;
+          });
+        });
       }
     };
 
-    ws.current.onclose = () => console.log("WebSocket closed.");
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
 
+      // Try to reconnect after 3 seconds
+      setTimeout(() => {
+        console.log("Attempting to reconnect...");
+        const newWs = new WebSocket("ws://localhost:8000/ws/notifications");
+        setWs(newWs);
+      }, 3000);
+    };
+
+    setWs(ws);
+
+    // Clean up WebSocket connection on component unmount
     return () => {
-      if (ws.current) {
-        ws.current.close(); // Cleanup on unmount
-      }
+      ws.close();
     };
   }, []);
 
+  // Handle item creation
   const handleItemCreate = (newItem: ScheduleItem) => {
     console.log("Creating new item:", newItem);
     setScheduleItems((prevItems) => [...prevItems, newItem]);
   };
 
+  // Handle editing an item
   const handleEditItem = (item: EventFormData) => {
     console.log("Editing item:", item);
-    // Open dialog with item data
-
+    // Update editing state for the item
     setEdittingItem({
       title: item.title,
       start: item.start,
@@ -264,34 +289,17 @@ export const Schedule: React.FC<ScheduleProps> = ({
       siid: item.siid,
       type: "event",
     });
-    console.log("Editing event: ", edittingItem);
 
-    // if (item.type === "task") {
-    //   setEdittingItem({
-    //     title: item.title,
-    //     start: item.start,
-    //     end: item.end,
-    //     description: item.description,
-    //     category: item.category,
-    //     frequency: item.frequency,
-    //     due: item.due,
-    //     priority: item.priority,
-    //     difficulty: item.difficulty,
-    //     duration: item.duration,
-    //     flexible: item.flexible,
-    //     auto: item.auto,
-    //     uid: item.uid,
-    //     calendarID: item.calendarID,
-    //     siid: item.siid,
-    //   });
-    // }
     setIsEditing(true);
-    if (ws.current) {
-      ws.current.send(
-        JSON.stringify({ action: "edit_event", data: edittingItem })
-      );
+
+    // Ensure WebSocket is open before sending a message
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ action: "edit_event", data: edittingItem }));
+    } else {
+      console.log("WebSocket is not open. Cannot send message.");
     }
   };
+
   // useEffect(() => {
   //   if (edittingItem) {
   //     console.log("Editing event hi: ", edittingItem);
@@ -777,7 +785,7 @@ export const Schedule: React.FC<ScheduleProps> = ({
                 onItemUpdate(updatedItem); // Call the update function
               }}
               eventId={edittingItem.siid}
-              ws={ws.current ?? undefined}
+              ws={ws ?? undefined}
             />
           </DialogContent>
         </Dialog>

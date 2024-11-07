@@ -149,7 +149,15 @@ export function EditEventForm({
   useEffect(() => {
     const fetchEventData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/events/${eventId}`);
+        const response = await fetch(
+          `http://localhost:8000/events/${eventId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch event data");
         }

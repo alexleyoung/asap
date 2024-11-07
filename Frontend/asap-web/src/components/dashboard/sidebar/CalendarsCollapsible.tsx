@@ -37,7 +37,7 @@ export default function CalendarsCollapsible() {
       }
     };
     loadCalendars();
-  }, [calendars]);
+  }, []);
 
   const handleBoxChange = (calendar: Calendar) => {
     toggleCalendar(calendar);
