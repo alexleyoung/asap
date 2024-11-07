@@ -32,10 +32,6 @@ export default function CalendarsCollapsible() {
     (async () => setCalendars(await getCalendars(user.id)))();
   }, [setCalendars, user]);
 
-  const handleBoxChange = (calendar: Calendar) => {
-    toggleCalendar(calendar);
-  };
-
   const handleAddCalendar = async () => {
     if (!newCalendarName) return;
 
@@ -99,7 +95,7 @@ export default function CalendarsCollapsible() {
               <Checkbox
                 id={calendar.id.toString()}
                 checked={selectedCalendars.some((c) => c.id === calendar.id)}
-                onCheckedChange={() => handleBoxChange(calendar)}
+                onCheckedChange={() => toggleCalendar(calendar)}
                 className={cn(
                   "rounded-full",
                   i === 0

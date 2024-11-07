@@ -26,12 +26,21 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const [calendars, setCalendars] = useState<Calendar[]>([]);
   const [selectedCalendars, setSelectedCalendars] = useState<Calendar[]>([]);
 
+  useEffect(() => {
+    const selected = localStorage.getItem("selectedCalendars");
+    if (selected) {
+      setSelectedCalendars(JSON.parse(selected));
+    }
+  }, []);
+
   const toggleCalendar = (calendar: Calendar) => {
     setSelectedCalendars((prevCalendars) => {
       const isSelected = prevCalendars.some((c) => c.id === calendar.id);
-      return isSelected
+      const updated = isSelected
         ? prevCalendars.filter((c) => c.id !== calendar.id)
         : [...prevCalendars, calendar];
+      localStorage.setItem("selectedCalendars", JSON.stringify(updated));
+      return updated;
     });
   };
 
