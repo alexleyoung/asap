@@ -66,5 +66,5 @@ def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
 
     db.commit()
     db.refresh(db_event)
-    manager.broadcast_update_event(db_event)
+    manager.broadcast(db_event)
     return db_event
