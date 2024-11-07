@@ -82,7 +82,6 @@ export default function DayView({
               dragID={`event-${event.id}`}
               item={event}
               onItemClick={() => onEditEvent(event)}
-              containerHeight={containerHeight}
               dayStart={dayStart}
               columnWidth={100}
               columnOffset={0}
@@ -94,7 +93,6 @@ export default function DayView({
               dragID={`task-${task.id}`}
               item={task}
               onItemClick={() => onEditTask(task)}
-              containerHeight={containerHeight}
               dayStart={dayStart}
               columnWidth={100}
               columnOffset={0}
