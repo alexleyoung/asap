@@ -90,8 +90,9 @@ class GroupCreate(GroupBase):
     pass
 
 # to update
-class GroupUpdate(GroupBase):
+class GroupUpdate(BaseModel):
     title : Optional[str] = None
+    members: Optional[List[MembershipBase]] = None
 
 # main class
 class Group(GroupBase):
