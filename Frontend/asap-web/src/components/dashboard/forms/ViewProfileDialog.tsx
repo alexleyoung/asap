@@ -24,25 +24,12 @@ import {
 import EditProfileForm from "./EditProfileForm";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User } from "@/lib/types";
 
 interface ProfileViewProps {
-  user: {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    avatar: string;
-
-    // Add other profile fields as needed
-  };
+  user: User;
   onClose: () => void; // Function to close or hide the profile view
-  onUpdate: (updatedUser: {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    avatar: string;
-  }) => void; // Function to update user
+  onUpdate: (updatedUser: User) => void; // Function to update user
   onDelete: () => void; // Function to delete user
 }
 
@@ -54,13 +41,7 @@ export const ViewProfileDialog = ({
 }: ProfileViewProps) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleSave = (updatedUser: {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    avatar: string;
-  }) => {
+  const handleSave = (updatedUser: User) => {
     onUpdate(updatedUser); // Call the function passed in props to update the user
     setIsEditing(false);
   };
@@ -79,15 +60,15 @@ export const ViewProfileDialog = ({
               <EditProfileForm user={user} onSave={handleSave} />
             ) : (
               <div>
-                <div className="flex justify-center">
-                  <Avatar className="hover:cursor-pointer relative group w-24 h-24">
-                    <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
+                <div className='flex justify-center'>
+                  <Avatar className='hover:cursor-pointer relative group w-24 h-24'>
+                    <div className='absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all' />
                     <AvatarImage
                       src={user.avatar}
                       alt={user.firstname}
-                      className="rounded-full w-full h-full" // Ensure image fits the Avatar size
+                      className='rounded-full w-full h-full' // Ensure image fits the Avatar size
                     />
-                    <AvatarFallback className="w-full h-full flex items-center justify-center">
+                    <AvatarFallback className='w-full h-full flex items-center justify-center'>
                       {user.firstname[0]}
                     </AvatarFallback>
                   </Avatar>
@@ -104,17 +85,17 @@ export const ViewProfileDialog = ({
           </DialogDescription>
           <DialogFooter>
             {isEditing ? (
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
+              <Button variant='outline' onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
             ) : (
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
+              <Button variant='outline' onClick={() => setIsEditing(true)}>
                 Edit Profile
               </Button>
             )}
             <AlertDialog>
               <AlertDialogTrigger>
-                <Button variant="destructive">Delete Profile</Button>
+                <Button variant='destructive'>Delete Profile</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>

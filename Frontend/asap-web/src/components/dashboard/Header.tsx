@@ -36,7 +36,7 @@ import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialo
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
 import { getCalendars } from "@/lib/scheduleCrud";
 import { useCalendars } from "@/contexts/CalendarsContext";
-import { Calendar } from "@/lib/types";
+import { useUser } from "@/contexts/UserContext";
 
 interface User {
   id: string;
@@ -51,37 +51,16 @@ export default function Header() {
   const { currentDate, setCurrentDate } = useCurrentDate();
   const router = useRouter();
   const [isOpenProfile, setIsOpenProfile] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useUser();
   const [isOpenManageCalendars, setIsOpenManageCalendars] = useState(false);
-  const [calendar, setCalendar] = useState<any>(null);
-  const [calendars, setCalendars] = useState<any>([]);
-  const { selectedCalendars, toggleCalendar } = useCalendars();
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("User");
-
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error("Error parsing user data from localStorage:", error);
-
-        localStorage.removeItem("data");
-        router.push("/");
-      }
-      router.push("/dashboard");
-    } else {
-      router.push("/");
-    }
-  }, []);
+  const { calendars, setCalendars, selectedCalendars, toggleCalendar } =
+    useCalendars();
 
   const loadCalendars = async () => {
     try {
       if (!user) return;
       const response = await getCalendars(user.id);
       setCalendars(response);
-      console.log(calendars);
     } catch (error) {
       console.error("Failed to fetch calendars:", error);
     }

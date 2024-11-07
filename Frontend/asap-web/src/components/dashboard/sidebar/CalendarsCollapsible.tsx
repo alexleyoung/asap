@@ -44,7 +44,7 @@ export default function CalendarsCollapsible() {
     try {
       const user = JSON.parse(localStorage.getItem("User")!);
       const response = await fetch(
-        `http://localhost:8000/calendars/users/${user.id}/calendars`,
+        `http://localhost:8000/calendars?userID=${user.id}`,
         {
           method: "POST",
           headers: {
@@ -55,6 +55,7 @@ export default function CalendarsCollapsible() {
             name: newCalendarName,
             description: "",
             timezone: "UTC",
+            userID: user.id,
           }),
         }
       );

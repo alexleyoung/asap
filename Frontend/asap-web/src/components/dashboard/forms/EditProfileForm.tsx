@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
+import { User } from "@/lib/types";
 
 const profileSchema = z.object({
   firstname: z.string().min(1, "First name is required"),
@@ -26,20 +27,8 @@ const profileSchema = z.object({
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 interface EditProfileFormProps {
-  user: {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    avatar: string;
-  };
-  onSave: (updatedUser: {
-    id: string;
-    firstname: string;
-    lastname: string;
-    email: string;
-    avatar: string;
-  }) => void;
+  user: User;
+  onSave: (updatedUser: User) => void;
 }
 
 export function EditProfileForm({ user, onSave }: EditProfileFormProps) {
