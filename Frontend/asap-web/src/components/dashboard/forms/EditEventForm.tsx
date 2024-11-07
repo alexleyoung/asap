@@ -57,12 +57,12 @@ export function EditEventForm({
   const [startString, setStartString] = useState(
     eventData.start instanceof Date
       ? eventData.start.toISOString().substring(0, 16)
-      : eventData.start.toString().substring(0, 16)
+      : String(eventData.start).substring(0, 16)
   );
   const [endString, setEndString] = useState(
     eventData.end instanceof Date
       ? eventData.start.toISOString().substring(0, 16)
-      : eventData.start.toString().substring(0, 16)
+      : String(eventData.start).substring(0, 16)
   );
   const { setEvents, events } = useScheduleItems();
   const { toast } = useToast();
