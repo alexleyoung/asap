@@ -14,6 +14,7 @@ import TimeSlots from "./TimeSlots";
 import DraggableItem from "./DraggableItem";
 import CurrentTimeLine from "./CurrentTimeLine";
 import GhostLine from "./GhostLine";
+import { useCalendars } from "@/contexts/CalendarsContext";
 
 type WeekViewProps = {
   currentDate: Date;
@@ -74,8 +75,9 @@ export default function WeekView({
     (day: Date) => {
       const dayStart = startOfDay(day);
       const dayEvents = events.filter(
-        (event) => isSameDay(event.start, day)
-        // && selectedCalendars.some((cal) => cal.id === event.calendarID)
+        (event) =>
+          isSameDay(event.start, day) &&
+          selectedCalendars.some((cal) => cal.id === event.calendarID)
       );
       const dayTasks = tasks.filter((task) => {
         // only render scheduled tasks

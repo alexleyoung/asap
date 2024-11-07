@@ -14,7 +14,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
   const { events, tasks, setEvents, setTasks } = useScheduleItems();
-  const { calendars, setCalendars } = useCalendars();
+  const { calendars, setCalendars, selectedCalendars } = useCalendars();
 
   const router = useRouter();
 
@@ -46,7 +46,7 @@ export default function Dashboard() {
         tasks={tasks}
         onEventUpdate={handleEventUpdate}
         onTaskUpdate={handleTaskUpdate}
-        selectedCalendars={calendars}
+        selectedCalendars={selectedCalendars}
       />
     </>
   );
