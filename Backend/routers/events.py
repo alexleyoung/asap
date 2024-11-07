@@ -8,6 +8,7 @@ from ..utils.crud import users
 from ..utils.auth import get_current_user
 from ..utils.websocket_manager import manager
 import json
+import datetime
 
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
@@ -69,7 +70,7 @@ async def edit_event_endpoint(
     event_update: schemas.EventUpdate, 
     db: Session = Depends(get_db)
 ):
-    db_event = controller.edit_event(db=db, eventID=eventID, event_update=event_update)
+    db_event = await controller.edit_event(db=db, eventID=eventID, event_update=event_update)
     if db_event is None:
         raise HTTPException(status_code=404, detail="Event not found")
     
@@ -91,7 +92,7 @@ async def edit_event_endpoint(
                 "updated_fields": {
                     key: str(getattr(db_event, key)) if isinstance(getattr(db_event, key), datetime) 
                     else getattr(db_event, key)
-                    for key, value in event_update.dict(exclude_unset=True).items()
+                    for key, value in event_update.model_dump(exclude_unset=True).items()
                 }
             }
         }
