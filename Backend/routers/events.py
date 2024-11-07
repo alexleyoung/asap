@@ -5,11 +5,9 @@ from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import events as controller
 from ..utils.crud import users
-from ..utils.auth import get_current_user, verify_token
+from ..utils.auth import get_current_user
 from ..utils.websocket_manager import manager
 import json
-from typing import Dict, List, Annotated
-from ..database import models
 
 
 router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
