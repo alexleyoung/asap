@@ -3,11 +3,12 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from ..database.db import get_db
-from passlib.context import CryptContext
 from datetime import timedelta, datetime, timezone
 import crud
 from .crud import users
+from ..database import schemas
 
+#creating task, if flag is set, send an http request, along with 
 
 #to pass schedule items to LLM
 def get_user_context(user_id: int, db: Session = Depends(get_db)): #send more information with fetch statements?
@@ -30,27 +31,13 @@ def get_user_context(user_id: int, db: Session = Depends(get_db)): #send more in
     file_path = f"RAG_test_data/user_{db_user.firstName}_context.txt"
     with open(file_path, "w") as f:
         f.write(file_content)
-    #return {"file": file_path}
 
-def query_llm():
-    pass
 
-def return_task():
+def query_llm(task: schemas.TaskCreate):
+    
     #query_with_file{file_path, } #this will get task data from the LLM, specifically the time when it needs to be.
 
-    #assume this is a new with llm information
-    task_data = schemas.TaskCreate(
-        title="Hardcoded Task",
-        description="This is a hardcoded task description",
-        category="Work",
-        dueDate=date.today(),
-        priority="high",
-        difficulty="medium",
-        duration=60,
-        flexibility=True,
-        userID=1,  # Replace with a valid user ID
-        calendarID= null  # Replace with a valid calendar ID
-    )
+    task.start = None
+    task.end = None
 
-    scheduled_task = crud.create_task(db, task_data);
-    return scheduled_task
+    return task

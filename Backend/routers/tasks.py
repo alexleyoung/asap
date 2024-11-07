@@ -17,6 +17,8 @@ def create_task_endpoint(task: schemas.TaskCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=400, detail="Task creation failed")
     return db_task
 
+# new post endpoint here; llm method gets rest of context, type task post
+
 
 @router.delete("/{task_id}", response_model=schemas.Task)
 def delete_task_endpoint(task_id: int, db: Session = Depends(get_db)):
