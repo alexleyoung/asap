@@ -1,4 +1,12 @@
-import { User, Event, Task, EventPost, TaskPost, Calendar } from "./types";
+import {
+  User,
+  Event,
+  Task,
+  EventPost,
+  TaskPost,
+  Calendar,
+  CalendarPost,
+} from "./types";
 
 // Users
 export async function getUserByEmail(email: string) {
@@ -207,25 +215,47 @@ export async function getCalendars(userID: number) {
   return (await response.json()) as Calendar[];
 }
 
-// Schedule
-type ScheduleData = {
-  events: Event[];
-  tasks: Task[];
-};
-export async function generateSchedule({ events, tasks }: ScheduleData) {
-  const response = await fetch("/api/chat", {
-    method: "POST",
-    body: JSON.stringify({ events, tasks }),
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
+export async function createCalendar(calendar: CalendarPost) {
+  try {
+    const response = await fetch("http://localhost:8000/calendars", {
+      method: "POST",
+      body: JSON.stringify(calendar),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || "Something went wrong");
+    if (!response.ok) {
+      throw new Error("Something went wrong");
+    }
+
+    return (await response.json()) as Calendar;
+  } catch (error) {
+    console.error("Failed to create calendar:", error);
+    throw error;
   }
+}
 
-  return await response.json();
+// AI
+export async function scheduleTask(task: TaskPost) {
+  try {
+    const response = await fetch("http://localhost:8000/tasks?auto=true", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify(task),
+    });
+
+    if (!response.ok) {
+      throw new Error("Something went wrong");
+    }
+
+    return (await response.json()) as Task;
+  } catch (error) {
+    console.error("Failed to schedule task:", error);
+    throw error;
+  }
 }

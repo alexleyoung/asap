@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { Calendar } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
-import { getCalendars } from "@/lib/scheduleCrud";
+import { createCalendar, getCalendars } from "@/lib/scheduleCrud";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { useUser } from "@/contexts/UserContext";
 
@@ -33,46 +33,18 @@ export default function CalendarsCollapsible() {
   }, [setCalendars, user]);
 
   const handleAddCalendar = async () => {
-    if (!newCalendarName) return;
+    if (!user) return;
 
     const newCalendar = {
       name: newCalendarName,
       description: "",
       timezone: "UTC",
+      userID: user.id,
     };
 
     try {
-      const user = JSON.parse(localStorage.getItem("User")!);
-      const response = await fetch(
-        `http://localhost:8000/calendars?userID=${user.id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            name: newCalendarName,
-            description: "",
-            timezone: "UTC",
-            userID: user.id,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to add calendar");
-      }
-
-      const addedCalendar = await response.json();
-      const mergedCalendar = {
-        ...newCalendar,
-        id: addedCalendar.id,
-        color: "blue",
-      };
-
-      setCalendars((prevCalendars) => [...prevCalendars, mergedCalendar]);
-      console.log("calendars:", calendars);
+      const calendar = await createCalendar(newCalendar);
+      setCalendars((prevCalendars) => [...prevCalendars, calendar]);
       setNewCalendarName("");
       setIsAddingCalendar(false);
     } catch (error) {

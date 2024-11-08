@@ -86,6 +86,9 @@ export function TaskForm({ onSubmit, loading }: TaskFormProps) {
   });
 
   function onSubmitForm(values: TaskPost) {
+    if (values.auto) {
+      values = scheduleTask(values);
+    }
     onSubmit({ ...values, completed: false });
   }
 
