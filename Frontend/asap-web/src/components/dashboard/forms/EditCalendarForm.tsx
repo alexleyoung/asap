@@ -34,7 +34,7 @@ type CalendarFormValues = z.infer<typeof formSchema>;
 
 interface EditCalendarFormProps {
   calendar: Calendar;
-  onSave: (arg0: CalendarPost) => void;
+  onSave: (arg0: Calendar) => void;
 }
 
 export const EditCalendarForm = ({
@@ -55,6 +55,7 @@ export const EditCalendarForm = ({
   const handleSubmit = async (values: CalendarFormValues) => {
     try {
       const updatedCalendar = await updateCalendar(values);
+      if (!updatedCalendar) return;
       onSave(updatedCalendar);
     } catch {
       console.error("Failed to update calendar");
@@ -63,15 +64,15 @@ export const EditCalendarForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
-          name="name"
+          name='name'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calendar Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter a calendar name" {...field} />
+                <Input placeholder='Enter a calendar name' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -79,12 +80,12 @@ export const EditCalendarForm = ({
         />
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Enter a description" {...field} />
+                <Input placeholder='Enter a description' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,8 +129,8 @@ export const EditCalendarForm = ({
             </FormItem>
           )}
         /> */}
-        <div className="flex justify-end">
-          <Button type="submit" variant="secondary">
+        <div className='flex justify-end'>
+          <Button type='submit' variant='secondary'>
             Save
           </Button>
         </div>

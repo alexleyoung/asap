@@ -24,6 +24,26 @@ export async function getUserByEmail(email: string) {
   }
 }
 
+export async function deleteUser(userID: number) {
+  try {
+    const response = await fetch(`http://localhost:8000/users/${userID}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete the user");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete the user");
+    throw error;
+  }
+}
+
 // Events
 export async function getEvents(userID: number) {
   try {
@@ -264,9 +284,33 @@ export async function updateCalendar(calendar: Calendar) {
         : "Failed to update user profile";
       throw new Error(errorMessage);
     }
-    return await response.json();
+    return (await response.json()) as Calendar;
   } catch (error) {
     console.error(error);
+  }
+}
+
+export async function deleteCalendar(calendar: Calendar) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/calendars/calendars/${calendar.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delete the calendar");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete the calendar");
+    throw error;
   }
 }
 
