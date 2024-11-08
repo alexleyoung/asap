@@ -34,17 +34,10 @@ import {
 import { useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
-import { getCalendars } from "@/lib/scheduleCrud";
+import { deleteCalendar, deleteUser, getCalendars } from "@/lib/scheduleCrud";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { useUser } from "@/contexts/UserContext";
-
-interface User {
-  id: string;
-  firstname: string;
-  lastname: string;
-  email: string;
-  avatar: string;
-}
+import { Calendar } from "@/lib/types";
 
 export default function Header() {
   const { view, setView } = useView();
@@ -67,39 +60,22 @@ export default function Header() {
     setIsOpenManageCalendars(true);
   };
 
-  const handleUpdateCalendar = (updatedCalendar: any) => {
-    setCalendars((prevCalendars: any[]) =>
-      prevCalendars.map((calendar: any) =>
+  const handleUpdateCalendar = (updatedCalendar: Calendar) => {
+    setCalendars((prevCalendars) =>
+      prevCalendars.map((calendar) =>
         calendar.id === updatedCalendar.id ? updatedCalendar : calendar
       )
     );
   };
 
-  const handleDeleteCalendar = async (calendar: any) => {
+  const handleDeleteCalendar = async (calendar: Calendar) => {
     try {
-      const deleteCalendar = calendar;
-      const response = await fetch(
-        `http://localhost:8000/calendars/calendars/${calendar.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+      deleteCalendar(calendar);
+      setCalendars((prevCalendars) =>
+        prevCalendars.filter((calendar) => calendar.id !== calendar.id)
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to delete the calendar");
-      }
-
-      setCalendars((prevCalendars: any[]) =>
-        prevCalendars.filter(
-          (calendar: any) => calendar.id !== deleteCalendar.id
-        )
-      );
-
-      toggleCalendar(deleteCalendar);
+      toggleCalendar(calendar);
 
       console.log("Calendar and associated events deleted successfully.");
     } catch (error) {
@@ -129,7 +105,7 @@ export default function Header() {
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
-    // localStorage.removeItem("User");
+    localStorage.removeItem("User");
     router.push("/");
   };
 
@@ -137,19 +113,7 @@ export default function Header() {
     try {
       if (!user) return;
 
-      const response = await fetch(
-        `http://localhost:8000/users/${user.id}/delete`, // Adjust the endpoint if needed
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete the profile");
-      }
+      deleteUser(user.id);
       setUser(null);
       router.push("/");
       localStorage.removeItem("User");

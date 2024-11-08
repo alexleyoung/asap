@@ -1,3 +1,4 @@
+import { permission } from "process";
 import {
   User,
   Event,
@@ -6,6 +7,9 @@ import {
   TaskPost,
   Calendar,
   CalendarPost,
+  Group,
+  GroupPost,
+  Membership,
 } from "./types";
 
 // Users
@@ -21,6 +25,41 @@ export async function getUserByEmail(email: string) {
   } catch (error) {
     console.error("Failed to get user:", error);
     throw error; // Re-throw the error after logging it
+  }
+}
+
+export async function getUserByID(userID: number) {
+  try {
+    const response = await fetch(`http://localhost:8000/users/${userID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return (await response.json()) as User;
+  } catch (error) {
+    console.error("Failed to get user:", error);
+    throw error; // Re-throw the error after logging it
+  }
+}
+
+export async function deleteUser(userID: number) {
+  try {
+    const response = await fetch(`http://localhost:8000/users/${userID}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete the user");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete the user");
+    throw error;
   }
 }
 
@@ -264,9 +303,155 @@ export async function updateCalendar(calendar: Calendar) {
         : "Failed to update user profile";
       throw new Error(errorMessage);
     }
-    return await response.json();
+    return (await response.json()) as Calendar;
   } catch (error) {
     console.error(error);
+  }
+}
+
+export async function deleteCalendar(calendar: Calendar) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/calendars/calendars/${calendar.id}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delete the calendar");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete the calendar");
+    throw error;
+  }
+}
+
+// Groups
+export async function getGroups(userID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/?userID=${userID}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get groups");
+    }
+
+    return (await response.json()) as Group[];
+  } catch (error) {
+    console.error("Failed to get groups");
+    throw error;
+  }
+}
+
+export async function getGroupByCalendarID(calendarID: number) {
+  try {
+    const response = await fetch(`http://localhost:8000/groups/${calendarID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to get groups");
+    }
+
+    return (await response.json()) as Group;
+  } catch (error) {
+    console.error("Failed to get groups");
+    throw error;
+  }
+}
+
+export async function createGroup(group: GroupPost) {
+  try {
+    const response = await fetch("http://localhost:8000/groups", {
+      method: "POST",
+      body: JSON.stringify(group),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create group");
+    }
+
+    return (await response.json()) as Group;
+  } catch (error) {
+    console.error("Failed to create group");
+    throw error;
+  }
+}
+
+export async function addMember(
+  groupID: number,
+  userID: number,
+  permissions: "ADMIN" | "VIEWER" | "EDITOR"
+) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/${groupID}/members`,
+      {
+        method: "POST",
+        body: JSON.stringify({ userID: userID, permission: permissions }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to add member to group");
+    }
+
+    return (await response.json()) as Membership;
+  } catch (error) {
+    console.error("Failed to add member to group");
+    throw error;
+  }
+}
+
+export async function getMembers(groupID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/${groupID}/members`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get members of group");
+    }
+
+    const memberships = (await response.json()) as Membership[];
+    return memberships;
+  } catch (error) {
+    console.error("Failed to get members of group");
+    throw error;
   }
 }
 

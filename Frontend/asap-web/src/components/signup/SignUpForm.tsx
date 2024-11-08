@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { User } from "@/lib/types";
-import { getUserByEmail } from "@/lib/scheduleCrud";
+import { createCalendar, getUserByEmail } from "@/lib/scheduleCrud";
+import { userAgent } from "next/server";
 
 const formSchema = z
   .object({
@@ -79,7 +80,14 @@ export default function SignUpForm({
         // Check if the response is valid, change the condition
         setError("");
         setSuccess("Account created successfully");
-        setUser(await getUserByEmail(data.email));
+        const user = await getUserByEmail(data.email);
+        setUser(user);
+        await createCalendar({
+          name: "Personal",
+          description: "Default personal calendar",
+          timezone: "",
+          userID: user.id,
+        });
         router.push("/dashboard");
       } else {
         setError("Invalid email or password. Please try again.");

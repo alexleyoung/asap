@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { DialogHeader } from "@/components/ui/dialog";
 import { EventForm } from "../forms/EventForm";
 import { TaskForm } from "../forms/TaskForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createEvent, createTask } from "@/lib/scheduleCrud";
-import { Event, Task, EventPost, TaskPost } from "@/lib/types";
+import { EventPost, TaskPost } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
