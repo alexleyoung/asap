@@ -237,6 +237,36 @@ export async function createCalendar(calendar: CalendarPost) {
   }
 }
 
+export async function updateCalendar(calendar: Calendar) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/calendars/calendars/${calendar.id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(calendar),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Error updating profile:", errorData);
+
+      // Check if errorData has a detail property to give more context
+      const errorMessage = errorData.detail
+        ? JSON.stringify(errorData.detail)
+        : "Failed to update user profile";
+      throw new Error(errorMessage);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // Auto Schedule
 export async function scheduleTask(task: TaskPost) {
   try {
