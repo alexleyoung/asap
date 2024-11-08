@@ -28,7 +28,7 @@ export async function getUserByEmail(email: string) {
 export async function getEvents(userID: number) {
   try {
     const response = await fetch(
-      `http://localhost:8000/events?userID=${userID}`,
+      `http://localhost:8000/events/?userID=${userID}`,
       {
         method: "GET",
         headers: {
@@ -45,7 +45,7 @@ export async function getEvents(userID: number) {
 
 export async function createEvent(event: EventPost) {
   try {
-    const response = await fetch("http://localhost:8000/events", {
+    const response = await fetch(`http://localhost:8000/events`, {
       method: "POST",
       body: JSON.stringify(event),
       headers: {

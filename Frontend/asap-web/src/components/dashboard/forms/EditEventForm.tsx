@@ -31,6 +31,7 @@ interface EditEventFormProps {
   onClose: () => void;
   eventData: Event;
   onSubmit: (updatedEvent: Event) => void;
+  ws?: WebSocket;
 }
 
 const eventSchema = z.object({
@@ -52,6 +53,7 @@ export function EditEventForm({
   onClose,
   eventData,
   onSubmit,
+  ws,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
   const [startString, setStartString] = useState(
@@ -85,10 +87,19 @@ export function EditEventForm({
 
   const handleDelete = async () => {
     try {
+      const eventId = eventData.id;
       setEvents((prevEvents) =>
         prevEvents.filter((event) => event.id !== eventData.id)
       );
       await deleteEvent(eventData.id);
+      // Send WebSocket message to notify other clients of the deletion
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "delete_event", data: { eventId } }));
+      } else {
+        console.log("WebSocket is not open. Cannot send message.");
+      }
+
+      onClose(); // Close the form after deletion
       toast({
         title: "Event deleted",
         description: "Your event has been deleted.",
@@ -122,6 +133,12 @@ export function EditEventForm({
           return event;
         })
       );
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        console.log("Sending edit event message...");
+        ws.send(JSON.stringify({ action: "edit_event", data: data }));
+      } else {
+        console.log("WebSocket is not open. Cannot send message.");
+      }
       onSubmit(data);
     } catch (error) {
       console.error("Failed to update event:", error);
@@ -132,15 +149,15 @@ export function EditEventForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name='title'
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder='Event title' {...field} />
+                <Input placeholder="Event title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -148,12 +165,12 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='description'
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder='Event Description' {...field} />
+                <Input placeholder="Event Description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -161,13 +178,13 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='start'
+          name="start"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Start Date</FormLabel>
               <FormControl>
                 <Input
-                  type='datetime-local'
+                  type="datetime-local"
                   {...field}
                   value={startString}
                   onChange={(e) => {
@@ -182,13 +199,13 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='end'
+          name="end"
           render={({ field }) => (
             <FormItem>
               <FormLabel>End Date</FormLabel>
               <FormControl>
                 <Input
-                  type='datetime-local'
+                  type="datetime-local"
                   {...field}
                   value={endString}
                   onChange={(e) => {
@@ -203,12 +220,12 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='location'
+          name="location"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl>
-                <Input placeholder='Event Location' {...field} />
+                <Input placeholder="Event Location" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -242,15 +259,16 @@ export function EditEventForm({
             </FormItem>
           )}
         /> */}
-        <div className='flex justify-between'>
-          <Button type='submit' variant='secondary' disabled={loading}>
+        <div className="flex justify-between">
+          <Button type="submit" variant="secondary" disabled={loading}>
             Save Changes
           </Button>
           <Button
-            type='button'
+            type="button"
             onClick={handleDelete}
             disabled={loading}
-            variant='destructive'>
+            variant="destructive"
+          >
             Delete Event
           </Button>
         </div>
