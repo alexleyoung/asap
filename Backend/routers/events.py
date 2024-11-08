@@ -56,7 +56,11 @@ async def websocket_endpoint(websocket: WebSocket):
 async def create_event_endpoint(
     event: schemas.EventCreate, db: Session = Depends(get_db)
 ):
+<<<<<<< HEAD
     db_user = users.get_user(db, userID=event.userID)
+=======
+    db_user = controller.get_user(db, userID=userID)
+>>>>>>> 46c1c5f (group stuff not done)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 

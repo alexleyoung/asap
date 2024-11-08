@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from .database.db import init_db
 
-from .routers import users, events, tasks, calendars, auth
+from .routers import users, events, tasks, calendars, auth, groups
 from .database import models
 from .database.db import init_db  # Import init_db from database module
 from contextlib import asynccontextmanager  # Import asynccontextmanager
@@ -34,6 +34,7 @@ app.include_router(events.router)
 app.include_router(events.newRouter) 
 app.include_router(tasks.router)
 app.include_router(calendars.router)
+app.include_router(groups.router)
 
 
 # Unprocessable Entity error handler

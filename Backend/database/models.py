@@ -102,16 +102,16 @@ class Group(Base):
 
 # Permissions enum
 class PermissionLevel(py_enum.Enum):
-    ADMIN = "admin"
-    EDITOR = "editor"
-    VIEWER = "viewer"
+    ADMIN = "ADMIN"
+    EDITOR = "EDITOR"
+    VIEWER = "VIEWER"
 
 # Group and User relationship table
 class Membership(Base):
     __tablename__ = "group_user"
     id = Column(Integer, primary_key=True, index=True, unique=True)
-    group_id = Column("group_id", Integer, ForeignKey("groups.id"))
-    user_id = Column("user_id", Integer, ForeignKey("users.id"))
+    groupID = Column("groupID", Integer, ForeignKey("groups.id"))
+    userID = Column("userID", Integer, ForeignKey("users.id"))
     permission = Column(sql_enum(PermissionLevel), nullable=False)
 
     # relationships
