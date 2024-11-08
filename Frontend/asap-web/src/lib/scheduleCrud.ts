@@ -360,22 +360,19 @@ export async function getGroups(userID: number) {
 
 export async function getGroupByCalendarID(calendarID: number) {
   try {
-    const response = await fetch(
-      `http://localhost:8000/groups/?calendarID=${calendarID}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+    const response = await fetch(`http://localhost:8000/groups/${calendarID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Failed to get groups");
     }
 
-    return (await response.json()) as Group[];
+    return (await response.json()) as Group;
   } catch (error) {
     console.error("Failed to get groups");
     throw error;
