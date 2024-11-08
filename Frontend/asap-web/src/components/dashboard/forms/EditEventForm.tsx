@@ -116,10 +116,12 @@ export function EditEventForm({
         await deleteEvent(eventId); // Call the delete handler with eventId
 
         // Send WebSocket message to notify other clients of the deletion
-        if (ws) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
           ws.send(
             JSON.stringify({ action: "delete_event", data: { eventId } })
           );
+        } else {
+          console.log("WebSocket is not open. Cannot send message.");
         }
 
         onClose(); // Close the form after deletion

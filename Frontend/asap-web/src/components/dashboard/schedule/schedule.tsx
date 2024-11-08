@@ -226,13 +226,17 @@ export const Schedule: React.FC<ScheduleProps> = ({
         setScheduleItems((prevEvents) => [...prevEvents, notification.data]);
       }
 
+      if (notification.type === "event_deleted") {
+        setScheduleItems((prevEvents) => {
+          return prevEvents.filter(
+            (event) => event.siid !== notification.data.siid
+          );
+        });
+      }
+
       if (notification.type === "event_updated") {
         setScheduleItems((prevEvents) => {
           return prevEvents.map((event) => {
-            console.log("Notification SIID:", notification.data.siid);
-            console.log("Event SIID:", event.siid);
-            console.log("Updated Fields:", notification.data.updated_fields);
-
             if (event.siid === notification.data.siid) {
               const updatedEvent = {
                 ...event,
@@ -244,10 +248,6 @@ export const Schedule: React.FC<ScheduleProps> = ({
                   ? new Date(notification.data.end)
                   : null,
               };
-              console.log("Updated Start Date:", notification.data.start);
-              console.log("Updated End Date:", notification.data.end);
-              console.log("Previous Events:", prevEvents);
-              console.log("Updated Events:", updatedEvent);
 
               return updatedEvent;
             }
