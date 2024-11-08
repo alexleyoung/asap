@@ -15,7 +15,7 @@ router = APIRouter(dependencies=[Depends(get_current_user)], tags=["events"])
 
 newRouter = APIRouter(tags=["events"])
 
-
+# websocket endpoint
 @newRouter.websocket("/ws/notifications")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
@@ -153,12 +153,44 @@ def get_event_endpoint(eventID: int, db: Session = Depends(get_db)):
 
 
 # delete event
-@router.delete("/events/{eventID}/delete", response_model=schemas.Event)
-def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
-    db_event = controller.delete_event(db=db, eventID=eventID)
+@newRouter.delete("/events/{eventID}/delete", response_model=schemas.Event)
+async def delete_event_endpoint(
+    eventID: int,
+    db: Session = Depends(get_db)
+):
+    db_event = await controller.delete_event(db=db, eventID=eventID)
     if db_event is None:
         raise HTTPException(status_code=404, detail="Event not found")
-    return db_event
+    
+    try:
+        # Prepare notification for deletion
+        notification = {
+            "type": "event_deleted",
+            "data": {
+                "siid": db_event.id,
+                "title": db_event.title,
+                "start": db_event.start.isoformat() if db_event.start else None,
+                "end": db_event.end.isoformat() if db_event.end else None,
+                "description": db_event.description,
+                "category": db_event.category,
+                "frequency": db_event.frequency,
+                "location": db_event.location,
+                "calendarID": db_event.calendarID
+            }
+        }
+        print("Broadcasting deletion:", notification)
+
+        # Broadcast the deletion to all connected clients
+        await manager.broadcast(json.dumps(notification))
+        print("Broadcasted deletion")
+        
+        return db_event
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
 # get a user's events
