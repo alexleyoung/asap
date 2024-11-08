@@ -237,7 +237,7 @@ export async function createCalendar(calendar: CalendarPost) {
   }
 }
 
-// AI
+// Auto Schedule
 export async function scheduleTask(task: TaskPost) {
   try {
     const response = await fetch("http://localhost:8000/tasks?auto=true", {
