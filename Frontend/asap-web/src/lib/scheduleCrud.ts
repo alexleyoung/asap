@@ -425,9 +425,7 @@ export async function getMembers(groupID: number) {
     }
 
     const memberships = (await response.json()) as Membership[];
-    return memberships.map(async (membership) => {
-      return await getUserByID(membership.userID);
-    });
+    return memberships;
   } catch (error) {
     console.error("Failed to get members of group");
     throw error;
