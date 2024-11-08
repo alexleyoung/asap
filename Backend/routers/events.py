@@ -27,6 +27,14 @@ async def websocket_endpoint(websocket: WebSocket):
                 data["type"] = "event_updated"
                 # response = {"status": "success", "message": "Event edited successfully"}
                 await websocket.send_text(json.dumps(data))
+            if data["action"] == "delete_event":
+                data["type"] = "event_deleted"
+                # response = {"status": "success", "message": "Event deleted successfully"}
+                await websocket.send_text(json.dumps(data))
+            if data["action"] == "create_event":
+                data["type"] = "event_created"
+                # response = {"status": "success", "message": "Event created successfully"}
+                await websocket.send_text(json.dumps(data))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
     except Exception as e:
@@ -103,7 +111,7 @@ async def edit_event_endpoint(
         notification = {
             "type": "event_updated",
             "data": {
-                # "id": db_event.id,
+                "siid": db_event.id,
                 "title": db_event.title,
                 "start": db_event.start.isoformat() if db_event.start else None,
                 "end": db_event.end.isoformat() if db_event.end else None,
