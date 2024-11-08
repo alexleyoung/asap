@@ -29,6 +29,7 @@ def delete_group_endpoint(
 ):
     return controller.delete_group(db, groupID, current_userID)
 
+# add member
 @router.post("/{groupID}/members", response_model=schemas.Membership)
 def add_member_endpoint(
     groupID: int,
@@ -38,6 +39,7 @@ def add_member_endpoint(
 ):
     return controller.add_member(db, groupID, membership, current_userID)
 
+# update member
 @router.put("/{groupID}/members/{memberID}", response_model=schemas.Membership)
 def update_member_endpoint(
     groupID: int,
@@ -59,6 +61,7 @@ def remove_member_endpoint(
 ):
     return controller.remove_member(db, groupID, memberID, current_userID)
 
+# get group members
 @router.get("/{groupID}/members", response_model=List[schemas.Membership])
 def get_group_members(
     groupID: int,
