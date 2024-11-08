@@ -21,8 +21,10 @@ def create_task_endpoint(task: schemas.TaskCreate, auto: Optional[bool] = False,
         #query_with_file(context, task)
         new_task = query_with_file(context, task) # do the rest
         print(new_task.description)
-        return new_task
-        
+        if not new_task:
+            raise HTTPException(status_code=400, detail="Task creation failed")
+        return controller.create_task(db, new_task) 
+       
     db_task = controller.create_task(db, task)
     if not db_task:
         raise HTTPException(status_code=400, detail="Task creation failed")
