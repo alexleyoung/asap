@@ -48,7 +48,7 @@ def read_task_endpoint(task_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[schemas.Task])
-def read_user_endpoint(userID: int, db: Session = Depends(get_db), limit: int = 10):
+def read_user_endpoint(userID: int, db: Session = Depends(get_db), limit: int = 999999):
     if not userID:
         raise HTTPException(status_code=400, detail="User ID is required")
     tasks = controller.get_tasks(db, userID, limit)

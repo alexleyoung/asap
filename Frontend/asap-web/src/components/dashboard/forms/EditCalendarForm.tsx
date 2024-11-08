@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -12,93 +11,46 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Calendar } from "@/lib/types";
+import { updateCalendar } from "@/lib/scheduleCrud";
 
-const calendarSchema = z.object({
+const formSchema = z.object({
+  id: z.number(),
   name: z.string().min(1, "Calendar name is required"),
-  color: z.string().min(1, "Calendar color is required"),
-  description: z.string().optional(),
-  timezone: z.string().optional(),
+  description: z.string(),
+  timezone: z.string(),
+  userID: z.number(),
 });
 
-type CalendarFormValues = z.infer<typeof calendarSchema>;
+type CalendarFormValues = z.infer<typeof formSchema>;
 
 interface EditCalendarFormProps {
-  calendar: {
-    id: number;
-    name: string;
-    // color: string;
-    description: string;
-    timezone: string;
-  };
-  onSave: (updatedCalendar: {
-    // id: number;
-    name: string;
-    // color: string;
-    description: string;
-    timezone: string;
-  }) => void;
+  calendar: Calendar;
+  onSave: (arg0: Calendar) => void;
 }
 
-const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
+export const EditCalendarForm = ({
+  calendar,
+  onSave,
+}: EditCalendarFormProps) => {
   const form = useForm<CalendarFormValues>({
-    resolver: zodResolver(calendarSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
+      id: calendar.id,
       name: calendar.name,
-      // color: calendar.color,
       description: calendar.description,
       timezone: calendar.timezone,
+      userID: calendar.userID,
     },
   });
 
-  useEffect(() => {
-    form.reset(calendar);
-  }, [calendar]);
-
-  const handleSubmit = async (data: Omit<CalendarFormValues, "id">) => {
+  const handleSubmit = async (values: CalendarFormValues) => {
     try {
-      const dataToSend = {
-        ...data,
-      };
-
-      console.log("Data to send:", dataToSend); // Debugging info
-
-      const response = await fetch(
-        `http://localhost:8000/calendars/${calendar.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataToSend),
-        }
-      );
-
-      console.log("Response:", response);
-      console.log("Data:", data);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error updating profile:", errorData);
-
-        // Check if errorData has a detail property to give more context
-        const errorMessage = errorData.detail
-          ? JSON.stringify(errorData.detail)
-          : "Failed to update user profile";
-        throw new Error(errorMessage);
-      }
-      console.log("Response: still reading");
-      const updatedCalendar = await response.json();
-      onSave({ ...updatedCalendar, id: calendar.id });
-      localStorage.setItem("User", JSON.stringify(updatedCalendar));
-    } catch (error) {
-      console.error(error);
+      const updatedCalendar = await updateCalendar(values);
+      if (!updatedCalendar) return;
+      onSave(updatedCalendar);
+    } catch {
+      console.error("Failed to update calendar");
     }
   };
 
@@ -120,6 +72,32 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
         />
         <FormField
           control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter a description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <FormField
+          control={form.control}
+          name="timezone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Timezone</FormLabel>
+              <FormControl>
+                <Input placeholder="Enter a timezone" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        /> */}
+        {/* <FormField
+          control={form.control}
           name="color"
           render={({ field }) => (
             <FormItem>
@@ -127,23 +105,22 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+                  defaultValue={field.value}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a color" />
+                    <SelectValue placeholder='Select a color' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="red">Red</SelectItem>
-                    <SelectItem value="green">Green</SelectItem>
-                    <SelectItem value="blue">Blue</SelectItem>
-                    <SelectItem value="yellow">Yellow</SelectItem>
+                    <SelectItem value='red'>Red</SelectItem>
+                    <SelectItem value='green'>Green</SelectItem>
+                    <SelectItem value='blue'>Blue</SelectItem>
+                    <SelectItem value='yellow'>Yellow</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <div className="flex justify-end">
           <Button type="submit" variant="secondary">
             Save

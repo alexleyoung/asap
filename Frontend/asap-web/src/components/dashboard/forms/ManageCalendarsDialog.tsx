@@ -10,32 +10,15 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar } from "@/lib/types";
-import EditCalendarForm from "./EditCalendarForm";
+import EditCalendarTabs from "./EditCalendarTabs";
 
 interface ManageCalendarsProps {
   calendars: Calendar[];
   onClose: () => void; // Function to close or hide the manage view
-  onUpdate: (updatedCalendar: {
-    // id: number;
-    name: string;
-    // color: string;
-    description: string;
-    timezone: string;
-  }) => void; // Function to update calendar
-  onDelete: () => void; // Function to delete calendar
+  onUpdate: (calendar: Calendar) => void; // Function to update calendar
+  onDelete: (calendar: Calendar) => void; // Function to delete calendar
 }
 
 export const ManageCalendarsDialog = ({
@@ -48,14 +31,14 @@ export const ManageCalendarsDialog = ({
   const [selectedCalendar, setSelectedCalendar] = useState<Calendar | null>(
     null
   );
+  const [updatedCalendars, setUpdatedCalendars] =
+    useState<Calendar[]>(calendars);
 
-  const handleSave = (updatedCalendar: {
-    // id: number;
-    name: string;
-    // color: string;
-    description: string;
-    timezone: string;
-  }) => {
+  useEffect(() => {
+    setUpdatedCalendars(calendars);
+  }, [calendars]);
+
+  const handleSave = (updatedCalendar: Calendar) => {
     onUpdate(updatedCalendar); // Call the function passed in props to update the calendar
     setIsEditing(false);
   };
@@ -63,6 +46,10 @@ export const ManageCalendarsDialog = ({
   const handleEditClick = (calendar: Calendar) => {
     setSelectedCalendar(calendar);
     setIsEditing(true);
+  };
+
+  const handleDelete = (calendar: Calendar) => {
+    onDelete(calendar);
   };
 
   return (
@@ -77,18 +64,29 @@ export const ManageCalendarsDialog = ({
           <DialogDescription>
             {isEditing ? (
               selectedCalendar ? (
-                <EditCalendarForm
+                <EditCalendarTabs
                   calendar={selectedCalendar}
                   onSave={handleSave}
+                  onClose={onClose}
                 />
               ) : null
+            ) : calendars.length === 0 ? (
+              <div>No calendars available</div>
             ) : (
               calendars.map((calendar) => (
                 <div key={calendar.id}>
                   <span>{calendar.name}</span>
-                  <span>{calendar.color}</span>
-                  <Button onClick={() => handleEditClick(calendar)}>
+                  <Button
+                    onClick={() => handleEditClick(calendar)}
+                    className="m-3"
+                  >
                     Edit
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(calendar)}
+                    variant="destructive"
+                  >
+                    Delete
                   </Button>
                 </div>
               ))

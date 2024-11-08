@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Card,
   CardContent,
@@ -7,31 +7,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { EditEventForm } from "@/components/dashboard/forms/EditEventForm";
-import { EventFormData } from "@/lib/types";
+import { Event } from "@/lib/types"; // Import the Event type
 
 interface EventCardProps {
-  event: EventFormData;
-  onDelete: (eventId: string) => void;
-  onUpdate: (updatedEvent: EventFormData) => void; // callback to update the event
-  onClose: () => void;
+  event: Event;
+  onDelete: (eventId: number) => void;
+  onUpdate: (updatedEvent: Event) => void;
 }
 
-export function EventCard({
-  event,
-  onDelete,
-  onUpdate,
-  onClose,
-}: EventCardProps) {
-  const [isEditing, setIsEditing] = useState(false);
-
-  const handleEditClick = () => {
-    setIsEditing(true);
+export function EventCard({ event, onDelete, onUpdate }: EventCardProps) {
+  const handleDelete = () => {
+    onDelete(event.id);
   };
 
-  const handleSaveChanges = (updatedEvent: EventFormData) => {
-    onUpdate(updatedEvent);
-    setIsEditing(false); // close edit form after saving
+  const handleEdit = () => {
+    // You might want to open an edit form or dialog here
+    // For now, we'll just call onUpdate with the same event
+    onUpdate(event);
   };
 
   return (
@@ -40,29 +32,15 @@ export function EventCard({
         <CardTitle>{event.title}</CardTitle>
         <CardDescription>{event.description}</CardDescription>
       </CardHeader>
-      {isEditing ? (
-        <EditEventForm
-          eventData={event}
-          onSubmit={handleSaveChanges}
-          eventId={event.siid}
-          onClose={function (): void {
-            throw new Error("Function not implemented.");
-          }}
-        />
-      ) : (
-        <CardContent>
-          <CardDescription>
-            Start Date: {event.start.toISOString()}
-          </CardDescription>
-          <CardDescription>
-            End Date: {event.end.toLocaleDateString()}
-          </CardDescription>
-          <CardDescription>Location: {event.location}</CardDescription>
-        </CardContent>
-      )}
+      <CardContent>
+        <CardDescription>Start: {event.start.toLocaleString()}</CardDescription>
+        <CardDescription>End: {event.end.toLocaleString()}</CardDescription>
+        <CardDescription>Location: {event.location}</CardDescription>
+        <CardDescription>Category: {event.category}</CardDescription>
+      </CardContent>
       <CardFooter>
-        <button onClick={() => onDelete(event.siid.toString())}>Delete</button>
-        {!isEditing && <button onClick={handleEditClick}>Edit</button>}
+        <button onClick={handleDelete}>Delete</button>
+        <button onClick={handleEdit}>Edit</button>
       </CardFooter>
     </Card>
   );

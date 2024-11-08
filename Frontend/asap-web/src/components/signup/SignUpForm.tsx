@@ -19,6 +19,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { User } from "@/lib/types";
+import { createCalendar, getUserByEmail } from "@/lib/scheduleCrud";
+import { userAgent } from "next/server";
 
 const formSchema = z
   .object({
@@ -39,7 +42,11 @@ const formSchema = z
     message: "Passwords do not match",
   });
 
-export default function SignUpForm() {
+export default function SignUpForm({
+  setUser,
+}: {
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+}) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const router = useRouter();
@@ -73,6 +80,14 @@ export default function SignUpForm() {
         // Check if the response is valid, change the condition
         setError("");
         setSuccess("Account created successfully");
+        const user = await getUserByEmail(data.email);
+        setUser(user);
+        await createCalendar({
+          name: "Personal",
+          description: "Default personal calendar",
+          timezone: "",
+          userID: user.id,
+        });
         router.push("/dashboard");
       } else {
         setError("Invalid email or password. Please try again.");
