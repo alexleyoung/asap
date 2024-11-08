@@ -38,7 +38,7 @@ export default function EditCalendarTabs({
         <EditCalendarForm calendar={calendar} onSave={handleSave} />
       </TabsContent>
       <TabsContent value="members">
-        <CalendarMembers />
+        <CalendarMembers calendar={calendar} />
       </TabsContent>
     </Tabs>
   );
