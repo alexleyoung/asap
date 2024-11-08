@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, WebSocket
 from ...utils.websocket_manager import manager
 
 
-def create_event(db: Session, event: schemas.EventCreate, userID: int):
+async def create_event(db: Session, event: schemas.EventCreate, userID: int):
     db_event = models.Event(
         title=event.title,
         start=event.start,
@@ -31,7 +31,7 @@ def get_event(db: Session, eventID: int):
 
 
 # delete event
-def delete_event(db: Session, eventID: int):
+async def delete_event(db: Session, eventID: int):
     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
     if db_event is None:
         return None
