@@ -132,83 +132,85 @@ export default function Schedule({
     setEditingEvent(event);
     setIsEditing(true);
 
-  function handleEditTask(task: Task): void {
-    throw new Error("Function not implemented.");
-  }
+    function handleEditTask(task: Task): void {
+      throw new Error("Function not implemented.");
+    }
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    // Implement drag end logic here
-  }, []);
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+      // Implement drag end logic here
+    }, []);
 
-  const pointerSensor = useSensor(PointerSensor, {
-    activationConstraint: {
-      delay: 100,
-      tolerance: 5,
-    },
-  });
+    const pointerSensor = useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 100,
+        tolerance: 5,
+      },
+    });
 
-  return (
-    <DndContext
-      onDragEnd={handleDragEnd}
-      modifiers={[snapToTimeSlot]}
-      sensors={[pointerSensor]}
-      autoScroll={false}>
-      <div className='flex-grow h-full flex flex-col p-4 bg-background text-foreground'>
-        <ScrollArea className='h-full'>
-          {view === "day" && (
-            <DayView
-              currentDate={currentDate}
-              events={events}
-              tasks={tasks}
-              selectedCalendars={selectedCalendars}
-              onEditEvent={handleEditEvent}
-              onEditTask={handleEditTask}
-              scheduleRef={scheduleRef}
-            />
-          )}
-          {view === "week" && (
-            <WeekView
-              currentDate={currentDate}
-              events={events}
-              tasks={tasks}
-              selectedCalendars={selectedCalendars}
-              onEditEvent={handleEditEvent}
-              onEditTask={handleEditTask}
-              scheduleRef={scheduleRef}
-            />
-          )}
-          {view === "month" && (
-            <MonthView
-              currentDate={currentDate}
-              events={events}
-              tasks={tasks}
-              selectedCalendars={selectedCalendars}
-              onEditEvent={handleEditEvent}
-              onEditTask={handleEditTask}
-            />
-          )}
-        </ScrollArea>
-        <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
-          <DialogHeader>
-            <DialogTitle className='sr-only'>Create New Item</DialogTitle>
-            <DialogDescription className='sr-only'>
-              Create a new item
-            </DialogDescription>
-          </DialogHeader>
-          <DialogContent>
-            <CreateItemTabs />
-          </DialogContent>
-        </Dialog>
-      </div>
-      <EditEventDialog
-        isOpen={isEditing}
-        onClose={() => setIsEditing(false)}
-        eventData={editingEvent}
-        onSubmit={(updatedEvent: Event) => {
-          onEventUpdate(updatedEvent);
-          setIsEditing(false);
-        }}
-      />
-    </DndContext>
-  );
+    return (
+      <DndContext
+        onDragEnd={handleDragEnd}
+        modifiers={[snapToTimeSlot]}
+        sensors={[pointerSensor]}
+        autoScroll={false}
+      >
+        <div className="flex-grow h-full flex flex-col p-4 bg-background text-foreground">
+          <ScrollArea className="h-full">
+            {view === "day" && (
+              <DayView
+                currentDate={currentDate}
+                events={events}
+                tasks={tasks}
+                selectedCalendars={selectedCalendars}
+                onEditEvent={handleEditEvent}
+                onEditTask={handleEditTask}
+                scheduleRef={scheduleRef}
+              />
+            )}
+            {view === "week" && (
+              <WeekView
+                currentDate={currentDate}
+                events={events}
+                tasks={tasks}
+                selectedCalendars={selectedCalendars}
+                onEditEvent={handleEditEvent}
+                onEditTask={handleEditTask}
+                scheduleRef={scheduleRef}
+              />
+            )}
+            {view === "month" && (
+              <MonthView
+                currentDate={currentDate}
+                events={events}
+                tasks={tasks}
+                selectedCalendars={selectedCalendars}
+                onEditEvent={handleEditEvent}
+                onEditTask={handleEditTask}
+              />
+            )}
+          </ScrollArea>
+          <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
+            <DialogHeader>
+              <DialogTitle className="sr-only">Create New Item</DialogTitle>
+              <DialogDescription className="sr-only">
+                Create a new item
+              </DialogDescription>
+            </DialogHeader>
+            <DialogContent>
+              <CreateItemTabs />
+            </DialogContent>
+          </Dialog>
+        </div>
+        <EditEventDialog
+          isOpen={isEditing}
+          onClose={() => setIsEditing(false)}
+          eventData={editingEvent}
+          onSubmit={(updatedEvent: Event) => {
+            onEventUpdate(updatedEvent);
+            setIsEditing(false);
+          }}
+        />
+      </DndContext>
+    );
+  };
 }

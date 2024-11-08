@@ -11,6 +11,7 @@ from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import events as controller
 from ..utils.auth import get_current_user
+from ..utils.crud import users
 from ..utils.websocket_manager import manager
 import json
 from datetime import datetime
