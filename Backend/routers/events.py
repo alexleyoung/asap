@@ -126,7 +126,7 @@ async def edit_event_endpoint(
         notification = {
             "type": "event_updated",
             "data": {
-                "siid": db_event.id,
+                "id": db_event.id,
                 "title": db_event.title,
                 "start": db_event.start.isoformat() if db_event.start else None,
                 "end": db_event.end.isoformat() if db_event.end else None,
