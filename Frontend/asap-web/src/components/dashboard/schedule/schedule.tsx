@@ -111,7 +111,7 @@ export default function Schedule({
         if (ws.readyState !== WebSocket.OPEN) {
           console.log("Attempting to reconnect...");
           // Open a new WebSocket connection only if the previous one was closed
-          const newWs = new WebSocket("ws://localhost:8000/ws/notifications");
+          const newWs = new WebSocket("ws://localhost:8000/notifications");
           setWs(newWs); // Update the state with the new WebSocket connection
         }
       }, 5000);
@@ -131,86 +131,85 @@ export default function Schedule({
   const handleEditEvent = (event: Event) => {
     setEditingEvent(event);
     setIsEditing(true);
-
-    function handleEditTask(task: Task): void {
-      throw new Error("Function not implemented.");
-    }
-
-    const handleDragEnd = useCallback((event: DragEndEvent) => {
-      // Implement drag end logic here
-    }, []);
-
-    const pointerSensor = useSensor(PointerSensor, {
-      activationConstraint: {
-        delay: 100,
-        tolerance: 5,
-      },
-    });
-
-    return (
-      <DndContext
-        onDragEnd={handleDragEnd}
-        modifiers={[snapToTimeSlot]}
-        sensors={[pointerSensor]}
-        autoScroll={false}
-      >
-        <div className="flex-grow h-full flex flex-col p-4 bg-background text-foreground">
-          <ScrollArea className="h-full">
-            {view === "day" && (
-              <DayView
-                currentDate={currentDate}
-                events={events}
-                tasks={tasks}
-                selectedCalendars={selectedCalendars}
-                onEditEvent={handleEditEvent}
-                onEditTask={handleEditTask}
-                scheduleRef={scheduleRef}
-              />
-            )}
-            {view === "week" && (
-              <WeekView
-                currentDate={currentDate}
-                events={events}
-                tasks={tasks}
-                selectedCalendars={selectedCalendars}
-                onEditEvent={handleEditEvent}
-                onEditTask={handleEditTask}
-                scheduleRef={scheduleRef}
-              />
-            )}
-            {view === "month" && (
-              <MonthView
-                currentDate={currentDate}
-                events={events}
-                tasks={tasks}
-                selectedCalendars={selectedCalendars}
-                onEditEvent={handleEditEvent}
-                onEditTask={handleEditTask}
-              />
-            )}
-          </ScrollArea>
-          <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
-            <DialogHeader>
-              <DialogTitle className="sr-only">Create New Item</DialogTitle>
-              <DialogDescription className="sr-only">
-                Create a new item
-              </DialogDescription>
-            </DialogHeader>
-            <DialogContent>
-              <CreateItemTabs />
-            </DialogContent>
-          </Dialog>
-        </div>
-        <EditEventDialog
-          isOpen={isEditing}
-          onClose={() => setIsEditing(false)}
-          eventData={editingEvent}
-          onSubmit={(updatedEvent: Event) => {
-            onEventUpdate(updatedEvent);
-            setIsEditing(false);
-          }}
-        />
-      </DndContext>
-    );
   };
+  function handleEditTask(task: Task): void {
+    throw new Error("Function not implemented.");
+  }
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    // Implement drag end logic here
+  }, []);
+
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      delay: 100,
+      tolerance: 5,
+    },
+  });
+
+  return (
+    <DndContext
+      onDragEnd={handleDragEnd}
+      modifiers={[snapToTimeSlot]}
+      sensors={[pointerSensor]}
+      autoScroll={false}
+    >
+      <div className="flex-grow h-full flex flex-col p-4 bg-background text-foreground">
+        <ScrollArea className="h-full">
+          {view === "day" && (
+            <DayView
+              currentDate={currentDate}
+              events={events}
+              tasks={tasks}
+              selectedCalendars={selectedCalendars}
+              onEditEvent={handleEditEvent}
+              onEditTask={handleEditTask}
+              scheduleRef={scheduleRef}
+            />
+          )}
+          {view === "week" && (
+            <WeekView
+              currentDate={currentDate}
+              events={events}
+              tasks={tasks}
+              selectedCalendars={selectedCalendars}
+              onEditEvent={handleEditEvent}
+              onEditTask={handleEditTask}
+              scheduleRef={scheduleRef}
+            />
+          )}
+          {view === "month" && (
+            <MonthView
+              currentDate={currentDate}
+              events={events}
+              tasks={tasks}
+              selectedCalendars={selectedCalendars}
+              onEditEvent={handleEditEvent}
+              onEditTask={handleEditTask}
+            />
+          )}
+        </ScrollArea>
+        <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
+          <DialogHeader>
+            <DialogTitle className="sr-only">Create New Item</DialogTitle>
+            <DialogDescription className="sr-only">
+              Create a new item
+            </DialogDescription>
+          </DialogHeader>
+          <DialogContent>
+            <CreateItemTabs />
+          </DialogContent>
+        </Dialog>
+      </div>
+      <EditEventDialog
+        isOpen={isEditing}
+        onClose={() => setIsEditing(false)}
+        eventData={editingEvent}
+        onSubmit={(updatedEvent: Event) => {
+          onEventUpdate(updatedEvent);
+          setIsEditing(false);
+        }}
+      />
+    </DndContext>
+  );
 }

@@ -26,7 +26,7 @@ router = APIRouter(
 newRouter = APIRouter(tags=["events"])
 
 # websocket endpoint for real-time notifications
-@router.websocket("/notifications")
+@newRouter.websocket("/notifications")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
@@ -51,18 +51,18 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"Error occurred: {e}")
 
 # create event
-@newRouter.post("/users/{userID}/events", response_model=schemas.Event)
+@newRouter.post("/events", response_model=schemas.Event)
 async def create_event_endpoint(
-    userID: int,
+   
     event: schemas.EventCreate,
     db: Session = Depends(get_db)
 ):
-    db_user = users.get_user(db, userID=userID)
+    db_user = users.get_user(db, userID=event.userID)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
     try:
-        db_event = await controller.create_event(db=db, event=event, userID=userID)
+        db_event = await controller.create_event(db=db, event=event, userID=event.userID)   
         
         # Helper function to safely convert event values to JSON-serializable format
         def format_event_value(value):
