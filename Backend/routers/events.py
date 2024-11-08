@@ -54,38 +54,43 @@ async def create_event_endpoint(
     try:
         db_event = await controller.create_event(db=db, event=event, userID=userID)
         
-        # Helper function to safely convert values for JSON serialization
+        # Helper function to safely convert event values to JSON-serializable format
         def format_event_value(value):
             if isinstance(value, datetime):
                 return value.isoformat()
             return value
-        
-        # Prepare notification with all event attributes
+
+        # Prepare notification with properly formatted data
         notification = {
             "type": "event_created",
             "data": {
-                "id": db_event.id,
+                "siid": db_event.id,
                 "title": db_event.title,
-                "start": format_event_value(db_event.start),
-                "end": format_event_value(db_event.end),
+                "start": db_event.start.isoformat() if db_event.start else None,
+                "end": db_event.end.isoformat() if db_event.end else None,
                 "description": db_event.description,
                 "category": db_event.category,
                 "frequency": db_event.frequency,
                 "location": db_event.location,
-                "userID": db_event.userID,
-                "calendarID": db_event.calendarID
+                "calendarID": db_event.calendarID,
+                "created_fields": {
+                    key: format_event_value(getattr(db_event, key))
+                    for key, value in event.model_dump().items()
+                }
             }
         }
-        
-        # Broadcast to all connected clients
-        await manager.broadcast(json.dumps(notification))
+        print("Broadcasting creation:", notification)
 
+        # Broadcast the creation to all connected clients
+        await manager.broadcast(json.dumps(notification))
+        print("Broadcasted creation")
+        
         return db_event
         
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to create event: {str(e)}"
+            detail=str(e)
         )
 
 
