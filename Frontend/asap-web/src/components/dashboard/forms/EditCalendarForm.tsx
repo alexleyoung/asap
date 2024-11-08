@@ -37,7 +37,10 @@ interface EditCalendarFormProps {
   onSave: (arg0: CalendarPost) => void;
 }
 
-const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
+export const EditCalendarForm = ({
+  calendar,
+  onSave,
+}: EditCalendarFormProps) => {
   const form = useForm<CalendarFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,15 +63,15 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name='name'
+          name="name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calendar Name</FormLabel>
               <FormControl>
-                <Input placeholder='Enter a calendar name' {...field} />
+                <Input placeholder="Enter a calendar name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,12 +79,12 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
         />
         <FormField
           control={form.control}
-          name='description'
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder='Enter a description' {...field} />
+                <Input placeholder="Enter a description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,8 +128,8 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
             </FormItem>
           )}
         /> */}
-        <div className='flex justify-end'>
-          <Button type='submit' variant='secondary'>
+        <div className="flex justify-end">
+          <Button type="submit" variant="secondary">
             Save
           </Button>
         </div>
