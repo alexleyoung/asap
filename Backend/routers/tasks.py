@@ -17,11 +17,11 @@ def create_task_endpoint(task: schemas.TaskCreate, auto: Optional[bool] = False,
     if auto:
         user = task.userID
         context = get_user_context(user, db)
-        file_path = f"RAG_test_data/user_{user.firstName}_context.txt"
-        with open(file_path, "w") as f:
-            f.write(context)
-        print(context)
-        #query_with_file(context, task_id) // do the rest
+        #print(context)
+        #query_with_file(context, task)
+        new_task = query_with_file(context, task) # do the rest
+        #print(new_task)
+        return new_task
         
     db_task = controller.create_task(db, task)
     if not db_task:
