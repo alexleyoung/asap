@@ -20,8 +20,6 @@ router = APIRouter(
 )
 
 
-
-
 # websocket endpoint for real-time notifications
 @router.websocket("/notifications")
 async def websocket_endpoint(websocket: WebSocket):
@@ -77,7 +75,9 @@ def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
 
 # get a user's events
 @router.get("/", response_model=list[schemas.Event])
-def get_user_events(userID: int, calendarID: Optional[int] = None, db: Session = Depends(get_db)):
+def get_user_events(
+    userID: int, calendarID: Optional[int] = None, db: Session = Depends(get_db)
+):
     if not userID:
         raise HTTPException(status_code=400, detail="User ID is required")
     if calendarID:

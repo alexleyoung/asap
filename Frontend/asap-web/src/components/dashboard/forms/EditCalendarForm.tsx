@@ -27,6 +27,7 @@ const formSchema = z.object({
   name: z.string().min(1, "Calendar name is required"),
   description: z.string(),
   timezone: z.string(),
+  userID: z.number(),
 });
 
 type CalendarFormValues = z.infer<typeof formSchema>;
@@ -44,6 +45,7 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
       name: calendar.name,
       description: calendar.description,
       timezone: calendar.timezone,
+      userID: calendar.userID,
     },
   });
 
