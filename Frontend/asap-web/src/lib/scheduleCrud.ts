@@ -92,12 +92,15 @@ export async function updateEvent(event: Event) {
 }
 export async function deleteEvent(eventId: number) {
   try {
-    const response = await fetch(`http://localhost:8000/events/${eventId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await fetch(
+      `http://localhost:8000/events/${eventId}/delete`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       const data = await response.json();
