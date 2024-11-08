@@ -56,19 +56,7 @@ def get_events_by_calendar(
     )
 
 
-# # edit event
-# async def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
-#     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
-#     if db_event is None:
-#         return None
 
-#     for key, value in event_update.model_dump(exclude_unset=True).items():
-#         setattr(db_event, key, value)
-
-#     db.commit()
-#     db.refresh(db_event)
-#     await manager.broadcast(db_event)
-#     return db_event
 # edit event
 async def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
@@ -82,21 +70,5 @@ async def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdat
     db.commit()
     db.refresh(db_event)
     
-    # Broadcast the updated event
-    updated_event_data = json.dumps({
-        "type": "event_updated",
-        "data": {
-            "id": db_event.id,
-            "title": db_event.title,
-            "start": db_event.start.isoformat(),
-            "end": db_event.end.isoformat(),
-            "description": db_event.description,
-            "category": db_event.category,
-            "frequency": db_event.frequency,
-            "location": db_event.location,
-            "calendarID": db_event.calendarID,
-        }
-    })
-    # await manager.broadcast(updated_event_data)
     
     return db_event
