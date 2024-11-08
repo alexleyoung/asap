@@ -1,6 +1,7 @@
 import json
 from sqlalchemy.orm import Session
 from ...database import schemas, models
+
 # from ...routers.events import manager
 from fastapi import APIRouter, Depends, WebSocket
 from ...utils.websocket_manager import manager
@@ -15,7 +16,7 @@ async def create_event(db: Session, event: schemas.EventCreate, userID: int):
         category=event.category,
         frequency=event.frequency,
         location=event.location,
-        userID=userID,
+        userID=event.userID,
         calendarID=event.calendarID,
     )
     db.add(db_event)
@@ -55,6 +56,16 @@ def get_events_by_calendar(
         .all()
     )
 
+
+# get a user's events by calendar
+def get_events_by_calendar(
+    db: Session, userID: int, calendarID: int
+) -> list[models.Event]:
+    return (
+        db.query(models.Event)
+        .filter(models.Event.userID == userID, models.Event.calendarID == calendarID)
+        .all()
+    )
 
 
 # edit event

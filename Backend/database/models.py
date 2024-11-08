@@ -1,4 +1,7 @@
+import enum as py_enum
+import enum as py_enum
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Enum as sql_enum
 from sqlalchemy.orm import relationship
 from .db import Base
 
@@ -18,7 +21,7 @@ class User(Base):
     calendars = relationship("Calendar", back_populates="owner")
     events = relationship("Event", back_populates="user")
     tasks = relationship("Task", back_populates="user")
-
+    membership = relationship("Membership", back_populates = "user") # what groups are you in?
 
 # calendars table
 class Calendar(Base):
@@ -29,12 +32,14 @@ class Calendar(Base):
     timezone = Column("timezone", String)
 
     # foreign key
-    userID = Column("ownerID", Integer, ForeignKey("users.id"))
+    userID = Column("ownerID", Integer, ForeignKey("users.id")) # multiple (should this be a relation table?)
+    #groupID = Column("groupID", Integer, ForeignKey("groups.id")) # resolving foreign key conflict
 
     # Relationship with User and Events/Tasks
     owner = relationship("User", back_populates="calendars")
     events = relationship("Event", back_populates="calendar")
     tasks = relationship("Task", back_populates="calendar")
+    group = relationship("Group", back_populates="calendar")
 
 
 # Events table
@@ -42,13 +47,11 @@ class Event(Base):
     __tablename__ = "events"
     id = Column("id", Integer, primary_key=True, index=True, unique=True)
     title = Column("title", String)
-    start = Column("start", DateTime)
-    end = Column("end", DateTime)
+    start = Column("start", DateTime(timezone=True))
+    end = Column("end", DateTime(timezone=True))
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String)
-    userID = Column("userID", Integer, ForeignKey("users.id"))
-    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"))
     location = Column("location", String)
 
     # foreign keys
@@ -65,12 +68,12 @@ class Task(Base):
     __tablename__ = "tasks"
     id = Column("id", Integer, primary_key=True, index=True, unique=True)
     title = Column("title", String)
-    start = Column("start", DateTime)
-    end = Column("end", DateTime)
+    start = Column("start", DateTime(timezone=True), nullable=True)
+    end = Column("end", DateTime(timezone=True), nullable=True)
     description = Column("description", String)
     category = Column("category", String)
     frequency = Column("frequency", String)
-    dueDate = Column("dueDate", DateTime)
+    dueDate = Column("dueDate", DateTime(timezone=True))
     priority = Column("priority", String)
     auto = Column("auto", Boolean)
     completed = Column("completed", Boolean)
@@ -85,3 +88,34 @@ class Task(Base):
     # Relationships with User and Calendar
     user = relationship("User", back_populates="tasks")
     calendar = relationship("Calendar", back_populates="tasks")
+
+# Groups table
+class Group(Base):
+    __tablename__ = "groups"
+    id = Column("id", Integer, primary_key=True, index=True, unique=True)
+    title = Column("title", String)
+   
+    #relationships
+    calendar = relationship("Calendar", back_populates="group")
+    membership = relationship("Membership", back_populates = "group") # what users do you have?
+    
+    #foreign keys
+    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"), nullable = False) # each group has one and only one calendar
+
+# Permissions enum
+class PermissionLevel(py_enum.Enum):
+    ADMIN = "admin" # can CRUD tasks and events
+    EDITOR = "editor" # can CRU tasks and events
+    VIEWER = "viewer" # can R tasks and events
+
+# Group and User relationship table
+class Membership(Base):
+    __tablename__ = "group_user"
+    id = Column(Integer, primary_key = True, index = True, unique = True)
+    group_id = Column("group_id", Integer, ForeignKey("groups.id"))
+    user_id = Column("user_id", Integer, ForeignKey("users.id"))
+    permission = Column(sql_enum(PermissionLevel), nullable = False)
+
+    #relationships
+    user = relationship("User", back_populates="group")
+    group = relationship("Group", back_populates = "user")

@@ -34,9 +34,9 @@ import {
 import { useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
-import { fetchCalendars } from "@/lib/scheduleCrud";
-import { useCalendarContext } from "@/contexts/CalendarsContext";
-import { Calendar } from "@/lib/types";
+import { getCalendars } from "@/lib/scheduleCrud";
+import { useCalendars } from "@/contexts/CalendarsContext";
+import { useUser } from "@/contexts/UserContext";
 
 interface User {
   id: string;
@@ -51,41 +51,16 @@ export default function Header() {
   const { currentDate, setCurrentDate } = useCurrentDate();
   const router = useRouter();
   const [isOpenProfile, setIsOpenProfile] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const { user, setUser } = useUser();
   const [isOpenManageCalendars, setIsOpenManageCalendars] = useState(false);
-  const [calendar, setCalendar] = useState<any>(null);
-  const [calendars, setCalendars] = useState<any>([]);
-  const { selectedCalendars, toggleCalendar, removeCalendar } =
-    useCalendarContext();
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("User");
-    console.log("Stored User: " + storedUser);
-
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        console.log("User data after parsing:", parsedUser);
-        setUser(parsedUser);
-        console.log("User data after parsing:", user);
-      } catch (error) {
-        console.error("Error parsing user data from localStorage:", error);
-
-        localStorage.removeItem("data");
-        router.push("/");
-      }
-      router.push("/dashboard");
-    } else {
-      router.push("/");
-    }
-  }, []);
+  const { calendars, setCalendars, selectedCalendars, toggleCalendar } =
+    useCalendars();
 
   const loadCalendars = async () => {
     try {
       if (!user) return;
-      const response = await fetchCalendars(user.id);
+      const response = await getCalendars(user.id);
       setCalendars(response);
-      console.log(calendars);
     } catch (error) {
       console.error("Failed to fetch calendars:", error);
     }
@@ -124,7 +99,7 @@ export default function Header() {
         )
       );
 
-      removeCalendar(deleteCalendar);
+      toggleCalendar(deleteCalendar);
 
       console.log("Calendar and associated events deleted successfully.");
     } catch (error) {
@@ -184,79 +159,75 @@ export default function Header() {
   };
 
   return (
-    <header className="px-5 py-3 border-b border-border flex items-center justify-between">
-      <h1 className="text-2xl font-bold">asap.</h1>
-      <div className="flex justify-between items-center gap-4">
-        <div className="flex gap-4 items-center">
+    <header className='px-5 py-3 border-b border-border flex items-center justify-between'>
+      <h1 className='text-2xl font-bold'>asap.</h1>
+      <div className='flex justify-between items-center gap-4'>
+        <div className='flex gap-4 items-center'>
           <ChevronLeft
             size={32}
-            className="rounded-full hover:bg-muted p-1 transition-colors"
+            className='rounded-full hover:bg-muted p-1 transition-colors'
             onClick={() => handleDateChange("prev")}
           />
           <ChevronRight
             size={32}
-            className="rounded-full hover:bg-muted p-1 transition-colors"
+            className='rounded-full hover:bg-muted p-1 transition-colors'
             onClick={() => handleDateChange("next")}
           />
-          <Button variant="outline" onClick={() => setCurrentDate(new Date())}>
+          <Button variant='outline' onClick={() => setCurrentDate(new Date())}>
             Today
           </Button>
-          <h2 className="font-medium text-xl">
+          <h2 className='font-medium text-xl'>
             {view === "day"
               ? format(currentDate, "MMMM d, yyyy")
               : format(currentDate, "MMMM yyyy")}
           </h2>
         </div>
-        <div className="flex gap-2">
+        <div className='flex gap-2'>
           <Select value={view} onValueChange={handleViewChange}>
             <SelectTrigger>
-              <SelectValue placeholder="View" className="text-sm" />
+              <SelectValue placeholder='View' className='text-sm' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="day">Day</SelectItem>
-              <SelectItem value="week">Week</SelectItem>
-              <SelectItem value="month">Month</SelectItem>
+              <SelectItem value='day'>Day</SelectItem>
+              <SelectItem value='week'>Week</SelectItem>
+              <SelectItem value='month'>Month</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
-      <div className="flex gap-4 items-center">
+      <div className='flex gap-4 items-center'>
         {user && (
           <Popover>
             <PopoverTrigger>
-              <Avatar className="hover:cursor-pointer relative group">
-                <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
+              <Avatar className='hover:cursor-pointer relative group'>
+                <div className='absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all' />
                 <AvatarImage src={user.avatar} alt={user.firstname} />
                 <AvatarFallback>{user.firstname[0]}</AvatarFallback>
               </Avatar>
             </PopoverTrigger>
             <PopoverContent
               sideOffset={5}
-              className="mr-4 p-2 flex flex-col gap-4 text-sm"
-            >
-              <h1 className="px-2 pt-1 font-medium">Hi {user.firstname}!</h1>
+              className='mr-4 p-2 flex flex-col gap-4 text-sm'>
+              <h1 className='px-2 pt-1 font-medium'>Hi {user.firstname}!</h1>
               <Separator />
               <Button
-                variant="ghost"
-                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                onClick={() => setIsOpenProfile(true)}
-              >
+                variant='ghost'
+                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
+                onClick={() => setIsOpenProfile(true)}>
                 View Profile
               </Button>
               <Button
-                variant="ghost"
-                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                onClick={loadCalendars}
-              >
+                variant='ghost'
+                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
+                onClick={loadCalendars}>
                 Manage Calendars
               </Button>
 
               <AlertDialog>
                 <AlertDialogTrigger>
                   <Button
-                    variant="ghost"
-                    className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                  >
+                    variant='ghost'
+                    className='w-full text-left px-2 py-2 font-normal items-center justify-start'>
                     Sign Out
                   </Button>
                 </AlertDialogTrigger>

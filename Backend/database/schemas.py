@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
+import enum as py_enum
 
 
 # For JWT token response
@@ -51,18 +52,53 @@ class CalendarBase(BaseModel):
 
 # for creating a calendar
 class CalendarCreate(CalendarBase):
-    pass
+    userID: int
 
-# for editing a calendar 
-class CalendarUpdate(CalendarBase):
+
+# for editing a calendar
+class CalendarUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+
 
 # main class
 class Calendar(CalendarBase):
     id: int
     userID: int
 
+    class Config:
+        from_attributes = True
+
+class PermissionLevel(py_enum.Enum):
+    ADMIN = "admin" # can CRUD tasks and events
+    EDITOR = "editor" # can CRU tasks and events
+    VIEWER = "viewer" # can R tasks and events
+
+###
+# Membership
+class MembershipBase(BaseModel):
+    user: UserBase
+    permission: PermissionLevel
+
+###
+# Group
+class GroupBase(BaseModel):
+    title: str
+    calendarID: int
+    members: Optional[List[MembershipBase]] = None
+
+# to create
+class GroupCreate(GroupBase):
+    pass
+
+# to update
+class GroupUpdate(BaseModel):
+    title : Optional[str] = None
+    members: Optional[List[MembershipBase]] = None
+
+# main class
+class Group(GroupBase):
+    id: int
     class Config:
         from_attributes = True
 
@@ -81,6 +117,7 @@ class EventBase(BaseModel):
 
 # to create
 class EventCreate(EventBase):
+    userID: int
     calendarID: int  # Foreign key
 
 
@@ -93,6 +130,7 @@ class EventUpdate(EventBase):
     category: Optional[str] = None
     frequency: Optional[str] = None
     location: Optional[str] = None
+    calendarID: Optional[int] = None
 
 
 # main class
@@ -109,8 +147,8 @@ class Event(EventBase):
 # Task
 class TaskBase(BaseModel):
     title: str
-    start: datetime
-    end: datetime
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
     description: str
     category: str
     frequency: str
@@ -127,19 +165,21 @@ class TaskBase(BaseModel):
 
 # to create
 class TaskCreate(BaseModel):
-    auto: bool
-    calendarID: int
-    category: str
-    description: str
-    difficulty: str
-    dueDate: datetime
-    duration: int
-    flexible: bool
-    frequency: str
-    completed: bool
-    priority: str
     title: str
+    description: str
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+    duration: int
+    dueDate: datetime
+    category: str
+    difficulty: str
+    frequency: str
+    priority: str
+    auto: bool
+    flexible: bool
+    completed: bool
     userID: int
+    calendarID: int
 
 
 # main class
