@@ -1,3 +1,4 @@
+import { permission } from "process";
 import {
   User,
   Event,
@@ -6,6 +7,8 @@ import {
   TaskPost,
   Calendar,
   CalendarPost,
+  Group,
+  GroupPost,
 } from "./types";
 
 // Users
@@ -310,6 +313,80 @@ export async function deleteCalendar(calendar: Calendar) {
     return await response.json();
   } catch (error) {
     console.error("Failed to delete the calendar");
+    throw error;
+  }
+}
+
+// Groups
+export async function getGroups(userID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/?userID=${userID}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get groups");
+    }
+
+    return (await response.json()) as Group[];
+  } catch (error) {
+    console.error("Failed to get groups");
+    throw error;
+  }
+}
+
+export async function createGroup(group: GroupPost) {
+  try {
+    const response = await fetch("http://localhost:8000/groups", {
+      method: "POST",
+      body: JSON.stringify(group),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create group");
+    }
+
+    return (await response.json()) as Group;
+  } catch (error) {
+    console.error("Failed to create group");
+    throw error;
+  }
+}
+
+export async function addMember(
+  groupID: number,
+  userID: number,
+  permissions: "ADMIN" | "VIEWER" | "EDITOR"
+): Promise<void> {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/${groupID}/members`,
+      {
+        method: "POST",
+        body: JSON.stringify({ userID: userID, permission: permissions }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to add member to group");
+    }
+  } catch (error) {
+    console.error("Failed to add member to group");
     throw error;
   }
 }

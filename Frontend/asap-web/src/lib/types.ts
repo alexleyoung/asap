@@ -87,3 +87,15 @@ export type CalendarPost = {
   timezone: string;
   userID: number;
 };
+
+// Groups
+export type Group = {
+  id: number;
+  title: string;
+  calendarID: number;
+};
+
+export type GroupPost = {
+  title: string;
+  calendarID: number;
+};

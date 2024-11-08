@@ -69,10 +69,12 @@ class Calendar(CalendarBase):
     class Config:
         from_attributes = True
 
+
 class PermissionLevel(str, py_enum.Enum):
-    ADMIN = "ADMIN" # can CRUD tasks and events
-    EDITOR = "EDITOR" # can CRU tasks and events
-    VIEWER = "VIEWER" # can R tasks and events
+    ADMIN = "ADMIN"  # can CRUD tasks and events
+    EDITOR = "EDITOR"  # can CRU tasks and events
+    VIEWER = "VIEWER"  # can R tasks and events
+
 
 ###
 # Membership
@@ -80,11 +82,14 @@ class MembershipBase(BaseModel):
     userID: int
     permission: PermissionLevel
 
+
 class MembershipCreate(MembershipBase):
     pass
 
+
 class MembershipUpdate(BaseModel):
     permission: PermissionLevel
+
 
 class Membership(MembershipBase):
     id: int
@@ -100,18 +105,22 @@ class GroupBase(BaseModel):
     title: str
     calendarID: int
 
+
 # to create
 class GroupCreate(GroupBase):
     members: Optional[List[MembershipCreate]] = None
 
+
 # to update
 class GroupUpdate(BaseModel):
-    title : Optional[str] = None
+    title: Optional[str] = None
     members: Optional[List[MembershipCreate]] = None
+
 
 # main class
 class Group(GroupBase):
     id: int
+
     class Config:
         from_attributes = True
 
