@@ -14,6 +14,7 @@ type EditEventDialogProps = {
   onClose: () => void;
   eventData: Event | null;
   onSubmit: (updatedEvent: Event) => void;
+  ws: WebSocket | null;
 };
 
 export default function EditEventDialog({
@@ -21,6 +22,7 @@ export default function EditEventDialog({
   onClose,
   eventData,
   onSubmit,
+  ws = null,
 }: EditEventDialogProps) {
   if (!eventData) return null;
 
@@ -37,6 +39,7 @@ export default function EditEventDialog({
           eventData={{ ...eventData }}
           onClose={onClose}
           onSubmit={onSubmit}
+          ws={ws}
         />
       </DialogContent>
     </Dialog>

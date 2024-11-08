@@ -209,6 +209,7 @@ export default function Schedule({
           onEventUpdate(updatedEvent);
           setIsEditing(false);
         }}
+        ws={ws}
       />
     </DndContext>
   );
