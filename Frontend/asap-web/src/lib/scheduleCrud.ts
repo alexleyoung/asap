@@ -405,7 +405,7 @@ export async function addMember(
   groupID: number,
   userID: number,
   permissions: "ADMIN" | "VIEWER" | "EDITOR"
-): Promise<void> {
+) {
   try {
     const response = await fetch(
       `http://localhost:8000/groups/${groupID}/members`,
@@ -422,6 +422,8 @@ export async function addMember(
     if (!response.ok) {
       throw new Error("Failed to add member to group");
     }
+
+    return (await response.json()) as Membership;
   } catch (error) {
     console.error("Failed to add member to group");
     throw error;
