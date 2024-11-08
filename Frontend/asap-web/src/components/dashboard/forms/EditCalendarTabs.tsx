@@ -1,17 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { DialogHeader } from "@/components/ui/dialog";
-import { EventForm } from "../forms/EventForm";
-import { TaskForm } from "../forms/TaskForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createEvent, createTask } from "@/lib/scheduleCrud";
-import { Event, Task, EventPost, TaskPost, Calendar } from "@/lib/types";
-import { useToast } from "@/hooks/use-toast";
-import { useUser } from "@/contexts/UserContext";
-import { useScheduleItems } from "@/contexts/ScheduleContext";
 import EditCalendarForm from "./EditCalendarForm";
 import { CalendarMembers } from "./CalendarMembers";
+import { Calendar } from "@/lib/types";
 
 interface EditCalendarTabsProps {
   calendar: Calendar;
@@ -30,21 +23,21 @@ export default function EditCalendarTabs({
   };
 
   return (
-    <Tabs defaultValue='details' className='w-full'>
+    <Tabs defaultValue="details" className="w-full">
       <DialogHeader>
-        <TabsList className='w-full flex mt-4'>
-          <TabsTrigger value='details' className='flex-1'>
+        <TabsList className="w-full flex mt-4">
+          <TabsTrigger value="details" className="flex-1">
             <span>Details</span>
           </TabsTrigger>
-          <TabsTrigger value='members' className='flex-1'>
+          <TabsTrigger value="members" className="flex-1">
             <span>Members</span>
           </TabsTrigger>
         </TabsList>
       </DialogHeader>
-      <TabsContent value='details'>
+      <TabsContent value="details">
         <EditCalendarForm calendar={calendar} onSave={handleSave} />
       </TabsContent>
-      <TabsContent value='members'>
+      <TabsContent value="members">
         <CalendarMembers />
       </TabsContent>
     </Tabs>
