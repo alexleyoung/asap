@@ -1,10 +1,13 @@
+import json
 from sqlalchemy.orm import Session
 from ...database import schemas, models
 
 # from ...routers.events import manager
+from fastapi import APIRouter, Depends, WebSocket
+from ...utils.websocket_manager import manager
 
 
-def create_event(db: Session, event: schemas.EventCreate):
+async def create_event(db: Session, event: schemas.EventCreate, userID: int):
     db_event = models.Event(
         title=event.title,
         start=event.start,
@@ -19,6 +22,7 @@ def create_event(db: Session, event: schemas.EventCreate):
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
+    #manager.broadcast(db_event)
     return db_event
 
 
@@ -28,12 +32,13 @@ def get_event(db: Session, eventID: int):
 
 
 # delete event
-def delete_event(db: Session, eventID: int):
+async def delete_event(db: Session, eventID: int):
     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
     if db_event is None:
         return None
     db.delete(db_event)
     db.commit()
+    #manager.broadcast(eventID)
     return db_event
 
 
@@ -64,14 +69,17 @@ def get_events_by_calendar(
 
 
 # edit event
-def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
+async def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdate):
     db_event = db.query(models.Event).filter(models.Event.id == eventID).first()
     if db_event is None:
         return None
 
+    # Update the event fields
     for key, value in event_update.model_dump(exclude_unset=True).items():
         setattr(db_event, key, value)
 
     db.commit()
     db.refresh(db_event)
+    
+    
     return db_event

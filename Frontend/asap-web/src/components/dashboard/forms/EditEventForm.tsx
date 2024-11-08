@@ -31,6 +31,7 @@ interface EditEventFormProps {
   onClose: () => void;
   eventData: Event;
   onSubmit: (updatedEvent: Event) => void;
+  ws?: WebSocket;
 }
 
 const eventSchema = z.object({
@@ -52,6 +53,7 @@ export function EditEventForm({
   onClose,
   eventData,
   onSubmit,
+  ws,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
   const [startString, setStartString] = useState(
@@ -89,6 +91,16 @@ export function EditEventForm({
         prevEvents.filter((event) => event.id !== eventData.id)
       );
       await deleteEvent(eventData.id);
+      // Send WebSocket message to notify other clients of the deletion
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(
+          JSON.stringify({ action: "delete_event", data: { eventId } })
+        );
+      } else {
+        console.log("WebSocket is not open. Cannot send message.");
+      }
+
+      onClose(); // Close the form after deletion
       toast({
         title: "Event deleted",
         description: "Your event has been deleted.",
@@ -122,6 +134,12 @@ export function EditEventForm({
           return event;
         })
       );
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        console.log("Sending edit event message...");
+        ws.send(JSON.stringify({ action: "edit_event", data: data }));
+      } else {
+        console.log("WebSocket is not open. Cannot send message.");
+      }
       onSubmit(data);
     } catch (error) {
       console.error("Failed to update event:", error);
