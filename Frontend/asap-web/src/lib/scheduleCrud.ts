@@ -391,6 +391,30 @@ export async function addMember(
   }
 }
 
+export async function getMembers(groupID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/${groupID}/members`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get members of group");
+    }
+
+    return (await response.json()) as User[];
+  } catch (error) {
+    console.error("Failed to get members of group");
+    throw error;
+  }
+}
+
 // Auto Schedule
 export async function scheduleTask(task: TaskPost) {
   try {
