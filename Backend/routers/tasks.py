@@ -1,9 +1,11 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import tasks as controller
 from ..utils.auth import get_current_user
+from ..utils.llm import get_user_context, query_with_file
 
 router = APIRouter(
     dependencies=[Depends(get_current_user)], prefix="/tasks", tags=["tasks"]
@@ -11,7 +13,18 @@ router = APIRouter(
 
 
 @router.post("/", response_model=schemas.Task)
-def create_task_endpoint(task: schemas.TaskCreate, db: Session = Depends(get_db)):
+def create_task_endpoint(task: schemas.TaskCreate, auto: Optional[bool] = False, db: Session = Depends(get_db)):
+    if auto:
+        user = task.userID
+        context = get_user_context(user, db)
+        #print(context)
+        #query_with_file(context, task)
+        new_task = query_with_file(context, task) # do the rest
+        print(new_task.description)
+        if not new_task:
+            raise HTTPException(status_code=400, detail="Task creation failed")
+        return controller.create_task(db, new_task) 
+       
     db_task = controller.create_task(db, task)
     if not db_task:
         raise HTTPException(status_code=400, detail="Task creation failed")
