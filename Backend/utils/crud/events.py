@@ -21,7 +21,7 @@ def create_event(db: Session, event: schemas.EventCreate, userID: int):
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
-    manager.broadcast_add_event(db_event)
+    #manager.broadcast(db_event)
     return db_event
 
 
@@ -37,7 +37,7 @@ def delete_event(db: Session, eventID: int):
         return None
     db.delete(db_event)
     db.commit()
-    manager.broadcast_delete_event(eventID)
+    #manager.broadcast(eventID)
     return db_event
 
 
