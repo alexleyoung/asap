@@ -112,7 +112,7 @@ class Membership(Base):
     id = Column(Integer, primary_key=True, index=True, unique=True)
     groupID = Column("groupID", Integer, ForeignKey("groups.id"))
     userID = Column("userID", Integer, ForeignKey("users.id"))
-    permission = Column(sql_enum(PermissionLevel), nullable=False)
+    permission = Column(sql_enum(PermissionLevel, name='permissionlevel', create_constraint=True), nullable=False)
 
     # relationships
     user = relationship("User", back_populates="memberships")

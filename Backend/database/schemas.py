@@ -69,7 +69,7 @@ class Calendar(CalendarBase):
     class Config:
         from_attributes = True
 
-class PermissionLevel(py_enum.Enum):
+class PermissionLevel(str, py_enum.Enum):
     ADMIN = "ADMIN" # can CRUD tasks and events
     EDITOR = "EDITOR" # can CRU tasks and events
     VIEWER = "VIEWER" # can R tasks and events

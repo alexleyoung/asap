@@ -33,11 +33,11 @@ def create_group(db: Session, group: schemas.GroupCreate, owner: models.User):  
         raise HTTPException(status_code=500, detail=str(e))
 
 # update group
-def update_group(db: Session, groupID: int, group_update: schemas.GroupUpdate, adminID: int):
+def update_group(db: Session, groupID: int, group_update: schemas.GroupUpdate, adminID: models.User):
     # Verify admin permission
     admin_membership = db.query(models.Membership).filter(
         models.Membership.groupID == groupID,
-        models.Membership.userID == adminID,
+        models.Membership.userID == adminID.id,
         models.Membership.permission == schemas.PermissionLevel.ADMIN.value
     ).first()
     
@@ -62,7 +62,7 @@ def update_group(db: Session, groupID: int, group_update: schemas.GroupUpdate, a
         # Remove existing members except admin
         db.query(models.Membership).filter(
             models.Membership.groupID == groupID,
-            models.Membership.userID != adminID
+            models.Membership.userID != adminID.id
         ).delete()
         
         # Add new members
@@ -81,11 +81,11 @@ def update_group(db: Session, groupID: int, group_update: schemas.GroupUpdate, a
     return db_group
 
 # delete group
-def delete_group(db: Session, groupID: int, userID: int):
+def delete_group(db: Session, groupID: int, user: models.User):
     # Check if group exists and user is admin
     membership = db.query(models.Membership).filter(
         models.Membership.groupID == groupID,
-        models.Membership.userID == userID,
+        models.Membership.userID == user.id,
         models.Membership.permission == schemas.PermissionLevel.ADMIN.value
     ).first()
     
@@ -108,11 +108,11 @@ def delete_group(db: Session, groupID: int, userID: int):
 
 
 # Membership CRUD Operations
-def add_member(db: Session, groupID: int, membership: schemas.MembershipCreate, adminID: int):
+def add_member(db: Session, groupID: int, membership: schemas.MembershipCreate, admin: models.User):
     # Verify admin permission
     admin_membership = db.query(models.Membership).filter(
         models.Membership.groupID == groupID,
-        models.Membership.userID == adminID,
+        models.Membership.userID == admin.id,
         models.Membership.permission == schemas.PermissionLevel.ADMIN.value
     ).first()
     
@@ -157,12 +157,12 @@ def update_member_permission(
     groupID: int, 
     memberID: int, 
     permission_update: schemas.MembershipUpdate, 
-    adminID: int
+    admin: models.User
 ):
     # Verify admin permission
     admin_membership = db.query(models.Membership).filter(
         models.Membership.groupID == groupID,
-        models.Membership.userID == adminID,
+        models.Membership.userID == admin.id,
         models.Membership.permission == schemas.PermissionLevel.ADMIN.value
     ).first()
     
@@ -188,11 +188,11 @@ def update_member_permission(
     return membership
 
 # remove member
-def remove_member(db: Session, groupID: int, memberID: int, adminID: int):
+def remove_member(db: Session, groupID: int, memberID: int, admin: models.User):
     # Verify admin permission
     admin_membership = db.query(models.Membership).filter(
         models.Membership.groupID == groupID,
-        models.Membership.userID == adminID,
+        models.Membership.userID == admin.id,
         models.Membership.permission == schemas.PermissionLevel.ADMIN.value
     ).first()
     
@@ -203,7 +203,7 @@ def remove_member(db: Session, groupID: int, memberID: int, adminID: int):
         )
     
     # Prevent removing the last admin
-    if memberID == adminID:
+    if memberID == admin.id:
         admin_count = db.query(models.Membership).filter(
             models.Membership.groupID == groupID,
             models.Membership.permission == schemas.PermissionLevel.ADMIN.value
