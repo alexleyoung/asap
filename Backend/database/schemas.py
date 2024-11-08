@@ -108,13 +108,14 @@ class GroupBase(BaseModel):
 
 # to create
 class GroupCreate(GroupBase):
-    members: Optional[List[MembershipCreate]] = None
+    pass
+    #members: Optional[List[MembershipCreate]] = None
 
 
 # to update
 class GroupUpdate(BaseModel):
-    title: Optional[str] = None
-    members: Optional[List[MembershipCreate]] = None
+    title : Optional[str] = None
+   #members: Optional[List[MembershipCreate]] = None
 
 
 # main class
