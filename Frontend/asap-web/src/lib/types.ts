@@ -99,3 +99,11 @@ export type GroupPost = {
   title: string;
   calendarID: number;
 };
+
+// Membership
+export type Membership = {
+  id: number;
+  groupID: number;
+  userID: number;
+  permission: "ADMIN" | "VIEWER" | "EDITOR";
+};

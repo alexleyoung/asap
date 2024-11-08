@@ -9,12 +9,28 @@ import {
   CalendarPost,
   Group,
   GroupPost,
+  Membership,
 } from "./types";
 
 // Users
 export async function getUserByEmail(email: string) {
   try {
     const response = await fetch(`http://localhost:8000/users/email/${email}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return (await response.json()) as User;
+  } catch (error) {
+    console.error("Failed to get user:", error);
+    throw error; // Re-throw the error after logging it
+  }
+}
+
+export async function getUserByID(userID: number) {
+  try {
+    const response = await fetch(`http://localhost:8000/users/${userID}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -408,7 +424,10 @@ export async function getMembers(groupID: number) {
       throw new Error("Failed to get members of group");
     }
 
-    return (await response.json()) as User[];
+    const memberships = (await response.json()) as Membership[];
+    return memberships.map(async (membership) => {
+      return await getUserByID(membership.userID);
+    });
   } catch (error) {
     console.error("Failed to get members of group");
     throw error;
