@@ -1,7 +1,7 @@
 "use client";
 
 import { Event } from "@/lib/types";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { updateEvent, deleteEvent } from "@/lib/scheduleCrud";
 import {
   Form,
@@ -18,14 +18,6 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useToast } from "@/hooks/use-toast";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-// import { useCalendars } from "@/hooks/useCalendars";
 
 interface EditEventFormProps {
   onClose: () => void;
@@ -149,15 +141,15 @@ export function EditEventForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name='title'
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder='Event title' {...field} />
+                <Input placeholder="Event title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -165,12 +157,12 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='description'
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder='Event Description' {...field} />
+                <Input placeholder="Event Description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -178,13 +170,13 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='start'
+          name="start"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Start Date</FormLabel>
               <FormControl>
                 <Input
-                  type='datetime-local'
+                  type="datetime-local"
                   {...field}
                   value={startString}
                   onChange={(e) => {
@@ -199,13 +191,13 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='end'
+          name="end"
           render={({ field }) => (
             <FormItem>
               <FormLabel>End Date</FormLabel>
               <FormControl>
                 <Input
-                  type='datetime-local'
+                  type="datetime-local"
                   {...field}
                   value={endString}
                   onChange={(e) => {
@@ -220,12 +212,12 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name='location'
+          name="location"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl>
-                <Input placeholder='Event Location' {...field} />
+                <Input placeholder="Event Location" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -259,15 +251,16 @@ export function EditEventForm({
             </FormItem>
           )}
         /> */}
-        <div className='flex justify-between'>
-          <Button type='submit' variant='secondary' disabled={loading}>
+        <div className="flex justify-between">
+          <Button type="submit" variant="secondary" disabled={loading}>
             Save Changes
           </Button>
           <Button
-            type='button'
+            type="button"
             onClick={handleDelete}
             disabled={loading}
-            variant='destructive'>
+            variant="destructive"
+          >
             Delete Event
           </Button>
         </div>

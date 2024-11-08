@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, EventPost } from "@/lib/types";
+import { EventPost } from "@/lib/types";
 import { useCalendars } from "@/contexts/CalendarsContext";
 
 const formSchema = z.object({
@@ -78,31 +78,31 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name='title'
+          name="title"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder='Event title' {...field} />
+                <Input placeholder="Event title" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className='flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 w-full'>
+        <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 w-full">
           <FormField
             control={form.control}
-            name='start'
+            name="start"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Start Date</FormLabel>
                 <FormControl>
                   <Input
-                    type='datetime-local'
+                    type="datetime-local"
                     {...field}
                     value={startString}
                     onChange={(e) => {
@@ -117,13 +117,13 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
           />
           <FormField
             control={form.control}
-            name='end'
+            name="end"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>End Date</FormLabel>
                 <FormControl>
                   <Input
-                    type='datetime-local'
+                    type="datetime-local"
                     {...field}
                     value={endString}
                     onChange={(e) => {
@@ -140,12 +140,12 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
 
         <FormField
           control={form.control}
-          name='description'
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder='Event description' {...field} />
+                <Textarea placeholder="Event description" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -154,21 +154,21 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
 
         <FormField
           control={form.control}
-          name='category'
+          name="category"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder='Select a category' />
+                    <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value='work'>Work</SelectItem>
-                  <SelectItem value='personal'>Personal</SelectItem>
-                  <SelectItem value='family'>Family</SelectItem>
-                  <SelectItem value='other'>Other</SelectItem>
+                  <SelectItem value="work">Work</SelectItem>
+                  <SelectItem value="personal">Personal</SelectItem>
+                  <SelectItem value="family">Family</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -178,22 +178,22 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
 
         <FormField
           control={form.control}
-          name='frequency'
+          name="frequency"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Frequency</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder='Select a frequency' />
+                    <SelectValue placeholder="Select a frequency" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value='once'>Once</SelectItem>
-                  <SelectItem value='daily'>Daily</SelectItem>
-                  <SelectItem value='weekly'>Weekly</SelectItem>
-                  <SelectItem value='monthly'>Monthly</SelectItem>
-                  <SelectItem value='yearly'>Yearly</SelectItem>
+                  <SelectItem value="once">Once</SelectItem>
+                  <SelectItem value="daily">Daily</SelectItem>
+                  <SelectItem value="weekly">Weekly</SelectItem>
+                  <SelectItem value="monthly">Monthly</SelectItem>
+                  <SelectItem value="yearly">Yearly</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -203,12 +203,12 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
 
         <FormField
           control={form.control}
-          name='location'
+          name="location"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl>
-                <Input placeholder='Event location' {...field} />
+                <Input placeholder="Event location" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -217,23 +217,25 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
 
         <FormField
           control={form.control}
-          name='calendarID'
+          name="calendarID"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calendar</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(parseInt(value))}
-                defaultValue={field.value.toString()}>
+                defaultValue={field.value.toString()}
+              >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder='Select a calendar' />
+                    <SelectValue placeholder="Select a calendar" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
                   {calendars.map((calendar) => (
                     <SelectItem
                       key={calendar.id}
-                      value={calendar.id.toString()}>
+                      value={calendar.id.toString()}
+                    >
                       {calendar.name}
                     </SelectItem>
                   ))}
@@ -244,8 +246,8 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
           )}
         />
 
-        <div className='flex justify-end'>
-          <Button type='submit' disabled={loading}>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={loading}>
             {loading ? "Creating Event..." : "Create Event"}
           </Button>
         </div>

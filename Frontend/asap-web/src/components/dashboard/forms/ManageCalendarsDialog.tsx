@@ -10,23 +10,9 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog,
-  AlertDialogTrigger,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
 import { useEffect, useState } from "react";
 import { Calendar } from "@/lib/types";
-import EditCalendarForm from "./EditCalendarForm";
-import { set } from "date-fns";
 import EditCalendarTabs from "./EditCalendarTabs";
-import { on } from "events";
 
 interface ManageCalendarsProps {
   calendars: Calendar[];
@@ -92,12 +78,14 @@ export const ManageCalendarsDialog = ({
                   <span>{calendar.name}</span>
                   <Button
                     onClick={() => handleEditClick(calendar)}
-                    className='m-3'>
+                    className="m-3"
+                  >
                     Edit
                   </Button>
                   <Button
                     onClick={() => handleDelete(calendar)}
-                    variant='destructive'>
+                    variant="destructive"
+                  >
                     Delete
                   </Button>
                 </div>
@@ -106,7 +94,7 @@ export const ManageCalendarsDialog = ({
           </DialogDescription>
           <DialogFooter>
             {isEditing && (
-              <Button variant='outline' onClick={() => setIsEditing(false)}>
+              <Button variant="outline" onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
             )}
