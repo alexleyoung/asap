@@ -20,7 +20,7 @@ def create_task_endpoint(task: schemas.TaskCreate, auto: Optional[bool] = False,
         #print(context)
         #query_with_file(context, task)
         new_task = query_with_file(context, task) # do the rest
-        #print(new_task)
+        print(new_task.description)
         return new_task
         
     db_task = controller.create_task(db, task)
