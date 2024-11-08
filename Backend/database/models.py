@@ -1,5 +1,4 @@
 import enum as py_enum
-import enum as py_enum
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy import Enum as sql_enum
 from sqlalchemy.orm import relationship
@@ -21,7 +20,7 @@ class User(Base):
     calendars = relationship("Calendar", back_populates="owner")
     events = relationship("Event", back_populates="user")
     tasks = relationship("Task", back_populates="user")
-    membership = relationship("Membership", back_populates = "user") # what groups are you in?
+    memberships = relationship("Membership", back_populates="user")  # Changed from membership to memberships
 
 # calendars table
 class Calendar(Base):
@@ -32,14 +31,13 @@ class Calendar(Base):
     timezone = Column("timezone", String)
 
     # foreign key
-    userID = Column("ownerID", Integer, ForeignKey("users.id")) # multiple (should this be a relation table?)
-    #groupID = Column("groupID", Integer, ForeignKey("groups.id")) # resolving foreign key conflict
+    userID = Column("ownerID", Integer, ForeignKey("users.id"))
 
-    # Relationship with User and Events/Tasks
+    # Relationships
     owner = relationship("User", back_populates="calendars")
     events = relationship("Event", back_populates="calendar")
     tasks = relationship("Task", back_populates="calendar")
-    group = relationship("Group", back_populates="calendar")
+    group = relationship("Group", back_populates="calendar", uselist=False)  # One-to-one relationship
 
 
 # Events table
@@ -58,7 +56,7 @@ class Event(Base):
     userID = Column("userID", Integer, ForeignKey("users.id"))
     calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"))
 
-    # Relationships with User and Calendar
+    # Relationships
     user = relationship("User", back_populates="events")
     calendar = relationship("Calendar", back_populates="events")
 
@@ -85,7 +83,7 @@ class Task(Base):
     userID = Column("userID", Integer, ForeignKey("users.id"))
     calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"))
 
-    # Relationships with User and Calendar
+    # Relationships
     user = relationship("User", back_populates="tasks")
     calendar = relationship("Calendar", back_populates="tasks")
 
@@ -95,27 +93,27 @@ class Group(Base):
     id = Column("id", Integer, primary_key=True, index=True, unique=True)
     title = Column("title", String)
    
-    #relationships
+    # relationships
     calendar = relationship("Calendar", back_populates="group")
-    membership = relationship("Membership", back_populates = "group") # what users do you have?
+    memberships = relationship("Membership", back_populates="group")  # Changed from membership to memberships
     
-    #foreign keys
-    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"), nullable = False) # each group has one and only one calendar
+    # foreign keys
+    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"), nullable=False)
 
 # Permissions enum
 class PermissionLevel(py_enum.Enum):
-    ADMIN = "admin" # can CRUD tasks and events
-    EDITOR = "editor" # can CRU tasks and events
-    VIEWER = "viewer" # can R tasks and events
+    ADMIN = "admin"
+    EDITOR = "editor"
+    VIEWER = "viewer"
 
 # Group and User relationship table
 class Membership(Base):
     __tablename__ = "group_user"
-    id = Column(Integer, primary_key = True, index = True, unique = True)
+    id = Column(Integer, primary_key=True, index=True, unique=True)
     group_id = Column("group_id", Integer, ForeignKey("groups.id"))
     user_id = Column("user_id", Integer, ForeignKey("users.id"))
-    permission = Column(sql_enum(PermissionLevel), nullable = False)
+    permission = Column(sql_enum(PermissionLevel), nullable=False)
 
-    #relationships
-    user = relationship("User", back_populates="group")
-    group = relationship("Group", back_populates = "user")
+    # relationships
+    user = relationship("User", back_populates="memberships")
+    group = relationship("Group", back_populates="memberships")

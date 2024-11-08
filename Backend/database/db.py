@@ -2,9 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-# URL_DATABASE = 'postgresql://postgres:toor!234@localhost:5433/kayleetest' # caiti
+URL_DATABASE = 'postgresql://postgres:toor!234@localhost:5433/groups' # caiti
 
-URL_DATABASE = 'postgresql://postgres:dslidder1@localhost:5432/divya' # divya
+# URL_DATABASE = 'postgresql://postgres:dslidder1@localhost:5432/divya' # divya
 
 #URL_DATABASE = 'postgresql://postgres:toor!234@localhost:5433/kayleetest' # caiti
 
