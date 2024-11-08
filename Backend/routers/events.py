@@ -210,7 +210,9 @@ async def delete_event_endpoint(
 
 # get a user's events
 @router.get("/", response_model=list[schemas.Event])
-def get_user_events(userID: int, calendarID: Optional[int] = None, db: Session = Depends(get_db)):
+def get_user_events(
+    userID: int, calendarID: Optional[int] = None, db: Session = Depends(get_db)
+):
     if not userID:
         raise HTTPException(status_code=400, detail="User ID is required")
     if calendarID:

@@ -30,9 +30,7 @@ interface ManageCalendarsProps {
   calendars: Calendar[];
   onClose: () => void; // Function to close or hide the manage view
   onUpdate: (updatedCalendar: {
-    // id: number;
     name: string;
-    // color: string;
     description: string;
     timezone: string;
   }) => void; // Function to update calendar
@@ -64,7 +62,6 @@ export const ManageCalendarsDialog = ({
   const handleSave = (updatedCalendar: {
     // id: number;
     name: string;
-    // color: string;
     description: string;
     timezone: string;
   }) => {
@@ -104,17 +101,14 @@ export const ManageCalendarsDialog = ({
               calendars.map((calendar) => (
                 <div key={calendar.id}>
                   <span>{calendar.name}</span>
-                  <span>{calendar.color}</span>
                   <Button
                     onClick={() => handleEditClick(calendar)}
-                    className="m-3"
-                  >
+                    className='m-3'>
                     Edit
                   </Button>
                   <Button
                     onClick={() => handleDelete(calendar)}
-                    variant="destructive"
-                  >
+                    variant='destructive'>
                     Delete
                   </Button>
                 </div>
@@ -123,7 +117,7 @@ export const ManageCalendarsDialog = ({
           </DialogDescription>
           <DialogFooter>
             {isEditing && (
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
+              <Button variant='outline' onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
             )}

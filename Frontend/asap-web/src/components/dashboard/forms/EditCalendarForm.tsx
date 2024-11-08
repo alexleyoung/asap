@@ -19,80 +19,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Calendar, CalendarPost } from "@/lib/types";
+import { updateCalendar } from "@/lib/scheduleCrud";
 
-const calendarSchema = z.object({
+const formSchema = z.object({
+  id: z.number(),
   name: z.string().min(1, "Calendar name is required"),
-  // color: z.string().optional(),
-  description: z.string().optional(),
-  timezone: z.string().optional(),
+  description: z.string(),
+  timezone: z.string(),
+  userID: z.number(),
 });
 
-type CalendarFormValues = z.infer<typeof calendarSchema>;
+type CalendarFormValues = z.infer<typeof formSchema>;
 
 interface EditCalendarFormProps {
-  calendar: {
-    id: number;
-    name: string;
-    // color: string;
-    description: string;
-    timezone: string;
-  };
-  onSave: (updatedCalendar: {
-    // id: number;
-    name: string;
-    // color: string;
-    description: string;
-    timezone: string;
-  }) => void;
+  calendar: Calendar;
+  onSave: (arg0: CalendarPost) => void;
 }
 
 const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
   const form = useForm<CalendarFormValues>({
-    resolver: zodResolver(calendarSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
+      id: calendar.id,
       name: calendar.name,
-      // color: calendar.color,
       description: calendar.description,
       timezone: calendar.timezone,
+      userID: calendar.userID,
     },
   });
 
-  useEffect(() => {
-    form.reset(calendar);
-  }, [calendar]);
-
-  const handleSubmit = async (data: Omit<CalendarFormValues, "id">) => {
+  const handleSubmit = async (values: CalendarFormValues) => {
     try {
-      const dataToSend = {
-        ...data,
-      };
-
-      const response = await fetch(
-        `http://localhost:8000/calendars/calendars/${calendar.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(dataToSend),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error updating profile:", errorData);
-
-        // Check if errorData has a detail property to give more context
-        const errorMessage = errorData.detail
-          ? JSON.stringify(errorData.detail)
-          : "Failed to update user profile";
-        throw new Error(errorMessage);
-      }
-      const updatedCalendar = await response.json();
-      onSave({ ...updatedCalendar, id: calendar.id });
-    } catch (error) {
-      console.error(error);
+      const updatedCalendar = await updateCalendar(values);
+      onSave(updatedCalendar);
+    } catch {
+      console.error("Failed to update calendar");
     }
   };
 
@@ -114,12 +76,12 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
         />
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Enter a description" {...field} />
+                <Input placeholder='Enter a description' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -163,8 +125,8 @@ const EditCalendarForm = ({ calendar, onSave }: EditCalendarFormProps) => {
             </FormItem>
           )}
         /> */}
-        <div className="flex justify-end">
-          <Button type="submit" variant="secondary">
+        <div className='flex justify-end'>
+          <Button type='submit' variant='secondary'>
             Save
           </Button>
         </div>

@@ -51,6 +51,7 @@ def edit_calendar_endpoint(
     updated_calendar = controller.edit_calendar(db, calendar_id, calendar_update)
     if not updated_calendar:
         raise HTTPException(status_code=404, detail="Calendar not found")
+    return updated_calendar
 
 
 # get all of a users calendars
