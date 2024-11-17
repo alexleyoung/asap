@@ -28,8 +28,8 @@ interface CalendarMembersProps {
 }
 
 export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
-  const [members, setMembers] = useState<Membership[]>([]);
   const [newMember, setNewMember] = useState("");
+  const [members, setMembers] = useState<Membership[]>([]);
   const [newMemberPermisison, setNewMemberPermisison] = useState<
     "ADMIN" | "VIEWER" | "EDITOR"
   >("VIEWER");
@@ -101,46 +101,48 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
   };
 
   return (
-    <div className='flex flex-col gap-6'>
-      <div className='space-y-2'>
+    <div className="flex flex-col gap-6">
+      <div className="space-y-2">
         <h1>Calendar Members</h1>
-        <div className='w-full grid grid-cols-12 gap-2'>
+        <div className="w-full grid grid-cols-12 gap-2">
           <Input
-            placeholder='Enter member email'
-            type='newMember'
+            placeholder="Enter member email"
+            type="newMember"
             onChange={(e) => setNewMember(e.target.value)}
-            className='col-span-7'
+            className="col-span-7"
           />
           <Select
-            defaultValue='VIEWER'
+            defaultValue="VIEWER"
             onValueChange={(value: "ADMIN" | "EDITOR" | "VIEWER") =>
               setNewMemberPermisison(value)
-            }>
-            <SelectTrigger className='col-span-4'>
-              <SelectValue placeholder='Permissions' />
+            }
+          >
+            <SelectTrigger className="col-span-4">
+              <SelectValue placeholder="Permissions" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Permissions</SelectLabel>
-                <SelectItem value='VIEWER'>Viewer</SelectItem>
-                <SelectItem value='EDITOR'>Editor</SelectItem>
-                <SelectItem value='ADMIN'>Admin</SelectItem>
+                <SelectItem value="VIEWER">Viewer</SelectItem>
+                <SelectItem value="EDITOR">Editor</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
           <Plus
-            className='hover:bg-muted size-9 p-1 rounded-full'
+            className="hover:bg-muted size-9 p-1 rounded-full"
             onClick={handleSubmit}
           />
         </div>
       </div>
-      <div className='space-y-2 w-full'>
+      <div className="space-y-2 w-full">
         <h2>Edit Members</h2>
-        <div className='flex flex-col gap-2 w-full'>
+        <div className="flex flex-col gap-2 w-full">
           {members.map((member) => (
             <div
               key={member.id}
-              className='flex gap-2 items-center justify-between w-full'>
+              className="flex gap-2 items-center justify-between w-full"
+            >
               <span>{member.userID}</span>
               <span>{member.permission}</span>
               <Button>Edit</Button>
