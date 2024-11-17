@@ -7,7 +7,6 @@ from passlib.context import CryptContext
 from datetime import timedelta, datetime, timezone
 from .crud import users
 import jwt
-from jwt import InvalidTokenError
 
 
 SECRET_KEY = "a38272605b0a04c4611d40465ccca814b136156707f32eb593fd60f46b7b219f"
@@ -61,7 +60,7 @@ def get_current_user(
                 detail="Could not validate credentials",
             )
         return user
-    except InvalidTokenError:
+    except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
