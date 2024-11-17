@@ -17,4 +17,4 @@ COPY __init__.py /code/__init__.py
 COPY main.py /code/main.py
 
 
-CMD ["fastapi", "run", "main.py", "--proxy-headers", "--port", "80"]
+CMD ["fastapi", "run", "main.py", "--proxy-headers", "--host","0.0.0.0","--port", "8000"]

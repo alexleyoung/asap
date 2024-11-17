@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: alexleyoung/asap-backend:1.0
     ports:
       - "80:80"
     depends_on:
