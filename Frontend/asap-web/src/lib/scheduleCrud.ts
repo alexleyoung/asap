@@ -131,3 +131,4 @@ export async function generateSchedule({ events, tasks }: ScheduleData) {
 
   return await response.json();
 }
+//crud operations for the schedule
