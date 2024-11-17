@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { Calendar } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { Plus } from "lucide-react";
 import { createCalendar, getCalendars } from "@/lib/scheduleCrud";

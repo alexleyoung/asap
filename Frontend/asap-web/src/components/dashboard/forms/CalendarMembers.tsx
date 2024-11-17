@@ -21,7 +21,7 @@ import {
 import { Calendar, Group, Membership } from "@/lib/types";
 import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "react-day-picker";
+import { Button } from "@/components/ui/button";
 
 interface CalendarMembersProps {
   calendar: Calendar;
@@ -37,22 +37,40 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!calendar) return;
+
     (async () => {
-      let group = await getGroupByCalendarID(calendar.id);
-      if (!group) {
-        group = await createGroup({
-          title: calendar.name,
-          calendarID: calendar.id,
+      try {
+        let group = await getGroupByCalendarID(calendar.id);
+        if (!group) {
+          group = await createGroup({
+            title: calendar.name,
+            calendarID: calendar.id,
+          });
+        }
+        setGroup(group);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load group",
+          duration: 3000,
         });
       }
-      setGroup(group);
+    })();
+  }, [calendar, toast]);
+
+  useEffect(() => {
+    if (!group) return;
+
+    (async () => {
       setMembers(await getMembers(group.id));
     })();
-  }, [calendar]);
+  }, [group]);
 
   const handleSubmit = async () => {
     if (!newMember) return;
     if (!group) return;
+    console.log("hello");
 
     const user = await getUserByEmail(newMember);
     if (!user) {
@@ -112,19 +130,23 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
           </Select>
           <Plus
             className='hover:bg-muted size-9 p-1 rounded-full'
-            onClick={() => handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </div>
-      <div>
+      <div className='space-y-2 w-full'>
         <h2>Edit Members</h2>
-        {members.map((member) => (
-          <div key={member.id}>
-            <span>{member.userID}</span>
-            <span>{member.permission}</span>
-            <Button>Edit</Button>
-          </div>
-        ))}
+        <div className='flex flex-col gap-2 w-full'>
+          {members.map((member) => (
+            <div
+              key={member.id}
+              className='flex gap-2 items-center justify-between w-full'>
+              <span>{member.userID}</span>
+              <span>{member.permission}</span>
+              <Button>Edit</Button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

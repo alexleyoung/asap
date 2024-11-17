@@ -368,6 +368,10 @@ export async function getGroupByCalendarID(calendarID: number) {
       },
     });
 
+    if (response.status === 404) {
+      return null;
+    }
+
     if (!response.ok) {
       throw new Error("Failed to get groups");
     }
