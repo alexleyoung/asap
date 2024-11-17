@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import schemas
 from ..database.db import get_db
 from ..utils.crud import groups as controller
 from ..utils.auth import get_current_user
 from ..database import models
-from ..utils.crud import users
 from typing import List
 
 
