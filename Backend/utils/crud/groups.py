@@ -3,6 +3,13 @@ from ...database import schemas, models
 from fastapi import HTTPException, status
 
 
+def get_group(db: Session, groupID: int):
+    group = db.query(models.Group).filter(models.Group.id == groupID).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    return group
+
+
 def create_group(
     db: Session, group: schemas.GroupCreate, owner: models.User
 ):  # Changed parameter name for clarity

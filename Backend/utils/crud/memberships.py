@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
-from ...database import schemas, models
-from fastapi import HTTPException, status
+from ...database import models
 
 
 # get user's memberships

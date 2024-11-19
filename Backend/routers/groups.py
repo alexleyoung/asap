@@ -8,7 +8,15 @@ from ..database import models
 from typing import List
 
 
-router = APIRouter(prefix="/groups", tags=["groups"])
+router = APIRouter(
+    prefix="/groups", tags=["groups"], dependencies=[Depends(get_current_user)]
+)
+
+
+# get group by id
+@router.get("/{groupID}", response_model=schemas.Group)
+def get_group_endpoint(groupID: int, db: Session = Depends(get_db)):
+    return controller.get_group(db, groupID)
 
 
 # create group

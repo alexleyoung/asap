@@ -239,7 +239,7 @@ export async function deleteTask(task: Task) {
 // Calendars
 export async function getCalendars(userID: number) {
   const response = await fetch(
-    `http://localhost:8000/calendars/calendars/?userID=${userID}`,
+    `http://localhost:8000/calendars/?userID=${userID}`,
     {
       method: "GET",
       headers: {
@@ -255,6 +255,24 @@ export async function getCalendars(userID: number) {
   }
 
   return (await response.json()) as Calendar[];
+}
+
+export async function getCalendar(calendarID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/calendars/${calendarID}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return (await response.json()) as Calendar;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function createCalendar(calendar: CalendarPost) {
@@ -282,7 +300,7 @@ export async function createCalendar(calendar: CalendarPost) {
 export async function updateCalendar(calendar: Calendar) {
   try {
     const response = await fetch(
-      `http://localhost:8000/calendars/calendars/${calendar.id}`,
+      `http://localhost:8000/calendars/${calendar.id}`,
       {
         method: "PUT",
         headers: {
@@ -312,7 +330,7 @@ export async function updateCalendar(calendar: Calendar) {
 export async function deleteCalendar(calendar: Calendar) {
   try {
     const response = await fetch(
-      `http://localhost:8000/calendars/calendars/${calendar.id}`,
+      `http://localhost:8000/calendars/${calendar.id}`,
       {
         method: "DELETE",
         headers: {
@@ -334,33 +352,9 @@ export async function deleteCalendar(calendar: Calendar) {
 }
 
 // Groups
-export async function getGroups(userID: number) {
+export async function getGroup(groupID: number) {
   try {
-    const response = await fetch(
-      `http://localhost:8000/groups/?userID=${userID}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to get groups");
-    }
-
-    return (await response.json()) as Group[];
-  } catch (error) {
-    console.error("Failed to get groups");
-    throw error;
-  }
-}
-
-export async function getGroupByCalendarID(calendarID: number) {
-  try {
-    const response = await fetch(`http://localhost:8000/groups/${calendarID}`, {
+    const response = await fetch(`http://localhost:8000/groups/${groupID}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -368,17 +362,13 @@ export async function getGroupByCalendarID(calendarID: number) {
       },
     });
 
-    if (response.status === 404) {
-      return null;
-    }
-
     if (!response.ok) {
-      throw new Error("Failed to get groups");
+      throw new Error("Failed to get group");
     }
 
     return (await response.json()) as Group;
   } catch (error) {
-    console.error("Failed to get groups");
+    console.error("Failed to get group");
     throw error;
   }
 }
@@ -408,7 +398,7 @@ export async function createGroup(group: GroupPost) {
 export async function getMemberships(userID: number) {
   try {
     const response = await fetch(
-      `http://localhost:8000/users/${userID}/memberships`,
+      `http://localhost:8000/memberships?userID=${userID}`,
       {
         method: "GET",
         headers: {
