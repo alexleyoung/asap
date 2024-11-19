@@ -68,6 +68,8 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
   }, [group]);
 
   const handleSubmit = async () => {
+    //add a websocket somewhere here to get real-time invites on other user end, so they can accept or decline
+
     if (!newMember) return;
     if (!group) return;
     console.log("hello");
