@@ -405,6 +405,30 @@ export async function createGroup(group: GroupPost) {
   }
 }
 
+export async function getMemberships(userID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/users/${userID}/memberships`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get memberships");
+    }
+
+    return (await response.json()) as Membership[];
+  } catch (error) {
+    console.error("Failed to get memberships");
+    throw error;
+  }
+}
+
 export async function addMember(
   groupID: number,
   userID: number,

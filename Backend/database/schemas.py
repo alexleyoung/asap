@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime
 import enum as py_enum
 
@@ -109,13 +109,15 @@ class GroupBase(BaseModel):
 # to create
 class GroupCreate(GroupBase):
     pass
-    #members: Optional[List[MembershipCreate]] = None
+    # members: Optional[List[MembershipCreate]] = None
 
 
 # to update
 class GroupUpdate(BaseModel):
-    title : Optional[str] = None
-   #members: Optional[List[MembershipCreate]] = None
+    title: Optional[str] = None
+
+
+# members: Optional[List[MembershipCreate]] = None
 
 
 # main class
