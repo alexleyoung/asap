@@ -27,6 +27,14 @@ export default function CreateItemTabs() {
       });
       return;
     }
+    //if(membership.permissions !== "ADMIN" || membership.permissions !== "EDITOR") {
+    //   toast({
+    //     title: "Error",
+    //     description: "You do not have permission to create an event.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     setLoading(true);
     try {
@@ -57,6 +65,14 @@ export default function CreateItemTabs() {
       });
       return;
     }
+    // if(membership.permissions !== "ADMIN" || membership.permissions !== "EDITOR") {
+    //   toast({
+    //     title: "Error",
+    //     description: "You do not have permission to create a task.",
+    //     variant: "destructive",
+    //   });
+    //   return;
+    // }
 
     setLoading(true);
     try {
