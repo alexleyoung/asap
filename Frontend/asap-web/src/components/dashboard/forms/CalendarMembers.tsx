@@ -72,6 +72,14 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
 
     if (!newMember) return;
     if (!group) return;
+    // if(membership.permissions !== "ADMIN") {
+    //   toast({
+    //     title: "Error",
+    //     description: "You do not have permission to add members",
+    //     duration: 3000,
+    //   });
+    //   return;
+    // }
     console.log("hello");
 
     const user = await getUserByEmail(newMember);

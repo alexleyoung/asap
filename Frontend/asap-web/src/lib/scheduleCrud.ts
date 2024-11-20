@@ -116,13 +116,6 @@ export async function updateEvent(event: Event) {
       },
     });
 
-    // if (!response.ok) {
-    //   const data = await response.json();
-    //   console.log("Error updating event:", data);
-    //   throw new Error(data.error || "Something went wrong");
-    // }
-
-    // return await response.json();
     return await response;
   } catch (error) {
     console.error("Failed to update event:", error);
