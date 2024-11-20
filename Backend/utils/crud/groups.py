@@ -2,10 +2,7 @@ from sqlalchemy.orm import Session
 from ...database import schemas, models
 from fastapi import HTTPException, status
 
-
-def create_group(
-    db: Session, group: schemas.GroupCreate, owner: models.User
-):  # Changed parameter name for clarity
+def create_group(db: Session, group: schemas.GroupCreate, owner: models.User):  # Changed parameter name for clarity
     # First verify the calendar exists and user has permission
     calendar = (
         db.query(models.Calendar).filter(models.Calendar.id == group.calendarID).first()
