@@ -35,6 +35,77 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
   >("VIEWER");
   const [group, setGroup] = useState<Group | null>(null);
   const { toast } = useToast();
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const ws = new WebSocket("ws://localhost:8000/invitations");
+
+    ws.onopen = () => {
+      console.log("Connected to WebSocket Invitations");
+    };
+
+    ws.onmessage = (user) => {
+      console.log("Received message:", user.data);
+      const invitation = JSON.parse(user.data);
+
+      if (invitation.type === "member_added") {
+        //send invitation to user
+      }
+
+      if (invitation.type === "invitation_accepted") {
+        setMembers((prevMembers) => {
+          return prevMembers.map((member) => {
+            if (member.id === invitation.data.id) {
+              const updatedMember = {
+                ...member,
+                status: "ACCEPTED",
+              };
+
+              return updatedMember;
+            }
+            return member;
+          });
+        });
+      }
+
+      if (invitation.type === "invitation_rejected") {
+        setMembers((prevMembers) => {
+          return prevMembers.filter(
+            (member) => member.id !== invitation.data.id
+          );
+        });
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+
+      // Reconnect only if the connection is closed and it's not already reconnecting
+      setTimeout(() => {
+        if (ws.readyState !== WebSocket.OPEN) {
+          console.log("Attempting to reconnect...");
+          // Open a new WebSocket connection only if the previous one was closed
+          const newWs = new WebSocket("ws://localhost:8000/notifications");
+          setWs(newWs); // Update the state with the new WebSocket connection
+        }
+      }, 5000);
+    };
+
+    // Set the WebSocket instance in state
+    setWs(ws);
+
+    // Cleanup WebSocket connection on component unmount
+    return () => {
+      if (ws.readyState === 1) {
+        ws.close();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!calendar) return;

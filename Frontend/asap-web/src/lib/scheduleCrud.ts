@@ -366,6 +366,27 @@ export async function getGroup(groupID: number) {
   }
 }
 
+export async function getGroupByCalendarID(calendarID: number) {
+  try {
+    const response = await fetch(`http://localhost:8000/groups/${calendarID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to get group");
+    }
+
+    return (await response.json()) as Group;
+  } catch (error) {
+    console.error("Failed to get group");
+    throw error;
+  }
+}
+
 export async function createGroup(group: GroupPost) {
   try {
     const response = await fetch("http://localhost:8000/groups", {

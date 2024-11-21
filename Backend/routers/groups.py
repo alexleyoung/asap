@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from ..database import schemas
 from ..database.db import get_db
@@ -6,11 +6,40 @@ from ..utils.crud import groups as controller
 from ..utils.auth import get_current_user
 from ..database import models
 from typing import List
+from ..utils.websocket_manager import manager
+import json
 
 
 router = APIRouter(
     prefix="/groups", tags=["groups"], dependencies=[Depends(get_current_user)]
 )
+
+newRouter = APIRouter(tags=["groups"])
+
+# websocket endpoint for real-time notifications
+@newRouter.websocket("/invitations")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            message = await websocket.receive_text()  # Keep connection alive
+            data = json.loads(message)
+            if data["action"] == "add_member":
+                data["type"] = "member_added"
+                # response = {"status": "success", "message": "Event edited successfully"}
+                await websocket.send_text(json.dumps(data))
+            if data["action"] == "accept_invitation":
+                data["type"] = "invitation_accepted"
+                # response = {"status": "success", "message": "Event deleted successfully"}
+                await websocket.send_text(json.dumps(data))
+            if data["action"] == "reject_invitation":
+                data["type"] = "invitation_rejected"
+                # response = {"status": "success", "message": "Event created successfully"}
+                await websocket.send_text(json.dumps(data))
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        print(f"Error occurred: {e}")
 
 
 # get group by id
@@ -41,12 +70,15 @@ def delete_group_endpoint(
 
 # add member
 @router.post("/{groupID}/members", response_model=schemas.Membership)
-def add_member_endpoint(
+async def add_member_endpoint(
     groupID: int,
     membership: schemas.MembershipCreate,
     current_userID: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+            
+    await manager.broadcast(json.dumps({"action": "add_member", "groupID": groupID}))
+
     return controller.add_member(db, groupID, membership, current_userID)
 
 
