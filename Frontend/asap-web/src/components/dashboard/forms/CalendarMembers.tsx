@@ -51,6 +51,31 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
 
       if (invitation.type === "member_added") {
         //send invitation to user
+        toast({
+          title: "Invitation",
+          description: `You have been invited to join ${calendar.name}`,
+          action: (
+            <div className="flex gap-2">
+              <button
+                className="bg-green-500 text-white px-2 py-1 rounded"
+                onClick={() =>
+                  handleInvitationResponse("accept", invitation.data)
+                }
+              >
+                Accept
+              </button>
+              <button
+                className="bg-red-500 text-white px-2 py-1 rounded"
+                onClick={() =>
+                  handleInvitationResponse("deny", invitation.data)
+                }
+              >
+                Deny
+              </button>
+            </div>
+          ),
+          duration: 10000,
+        });
       }
 
       if (invitation.type === "invitation_accepted") {
@@ -106,6 +131,28 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
       }
     };
   }, []);
+
+  function handleInvitationResponse(response: "accept" | "deny", data: any) {
+    if (response === "accept") {
+      ws?.send(
+        JSON.stringify({
+          action: "accept_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    } else {
+      ws?.send(
+        JSON.stringify({
+          action: "reject_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    }
+  }
 
   useEffect(() => {
     if (!calendar) return;
