@@ -11,7 +11,7 @@ backend-build:
   tags:
     - backend
   script: cd Backend
-    docker compose build
+    sudo docker compose build
   only:
     refs:
       - main
@@ -34,7 +34,7 @@ backend-deploy:
   tags:
     - backend
   script: cd Backend
-    docker compose up -d
+    sudo docker compose up -d
   only:
     refs:
       - main
@@ -47,7 +47,7 @@ frontend-build:
     - frontend
   script: cd frontend
     cd asap-web
-    docker build -t asap-web .
+    sudo docker build -t asap-web .
   only:
     refs:
       - main
@@ -72,7 +72,7 @@ frontend-deploy:
     - frontend
   script: cd frontend
     cd asap-web
-    docker run -p 3000:3000 -d asap-web
+    sudo docker run -p 3000:3000 -d asap-web
   only:
     refs:
       - main
