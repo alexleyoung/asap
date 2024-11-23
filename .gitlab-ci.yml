@@ -9,7 +9,7 @@ stages:
 backend-build:
   stage: backendbuild
   tags:
-    - backend
+    - main_backend
   script:
     - cd Backend
     - docker compose build
@@ -22,7 +22,7 @@ backend-build:
 backend-test:
   stage: backendtest
   tags:
-    - backend
+    - main_backend
   script:
     - cd Backend
   only:
@@ -34,7 +34,7 @@ backend-test:
 backend-deploy:
   stage: backenddeploy
   tags:
-    - backend
+    - main_backend
   script:
     - cd Backend
     - docker compose up -d
@@ -47,7 +47,7 @@ backend-deploy:
 frontend-build:
   stage: frontendbuild
   tags:
-    - frontend
+    - main_frontend
   script:
     - cd frontend
     - cd asap-web
@@ -61,7 +61,7 @@ frontend-build:
 frontend-test:
   stage: frontendtest
   tags:
-    - frontend
+    - main_frontend
   script:
     - cd frontend
     - cd asap-web
@@ -74,7 +74,7 @@ frontend-test:
 frontend-deploy:
   stage: frontenddeploy
   tags:
-    - frontend
+    - main_frontend
   script:
     - cd frontend
     - cd asap-web
