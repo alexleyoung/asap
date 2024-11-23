@@ -49,7 +49,7 @@ frontend-build:
   tags:
     - main_frontend
   script:
-    - cd frontend
+    - cd Frontend
     - cd asap-web
     - docker build -t asap-web .
   only:
@@ -63,7 +63,7 @@ frontend-test:
   tags:
     - main_frontend
   script:
-    - cd frontend
+    - cd Frontend
     - cd asap-web
   only:
     refs:
@@ -76,7 +76,7 @@ frontend-deploy:
   tags:
     - main_frontend
   script:
-    - cd frontend
+    - cd Frontend
     - cd asap-web
     - docker run -p 3000:3000 -d asap-web
   only:
