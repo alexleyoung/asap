@@ -20,7 +20,7 @@ import {
 } from "@/lib/scheduleCrud";
 import { Calendar, Group, Membership } from "@/lib/types";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface CalendarMembersProps {
