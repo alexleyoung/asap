@@ -10,8 +10,9 @@ backend-build:
   stage: backendbuild
   tags:
     - backend
-  script: cd Backend
-    docker compose build
+  script:
+    - cd Backend
+    - docker compose build
   only:
     refs:
       - main
@@ -22,7 +23,8 @@ backend-test:
   stage: backendtest
   tags:
     - backend
-  script: cd Backend
+  script:
+    - cd Backend
   only:
     refs:
       - main
@@ -33,8 +35,9 @@ backend-deploy:
   stage: backenddeploy
   tags:
     - backend
-  script: cd Backend
-    docker compose up -d
+  script:
+    - cd Backend
+    - docker compose up -d
   only:
     refs:
       - main
@@ -45,9 +48,10 @@ frontend-build:
   stage: frontendbuild
   tags:
     - frontend
-  script: cd frontend
-    cd asap-web
-    docker build -t asap-web .
+  script:
+    - cd frontend
+    - cd asap-web
+    - docker build -t asap-web .
   only:
     refs:
       - main
@@ -58,8 +62,9 @@ frontend-test:
   stage: frontendtest
   tags:
     - frontend
-  script: cd frontend
-    cd asap-web
+  script:
+    - cd frontend
+    - cd asap-web
   only:
     refs:
       - main
@@ -70,9 +75,10 @@ frontend-deploy:
   stage: frontenddeploy
   tags:
     - frontend
-  script: cd frontend
-    cd asap-web
-    docker run -p 3000:3000 -d asap-web
+  script:
+    - cd frontend
+    - cd asap-web
+    - docker run -p 3000:3000 -d asap-web
   only:
     refs:
       - main
