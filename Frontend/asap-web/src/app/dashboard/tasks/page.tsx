@@ -13,27 +13,46 @@ import { Task } from "@/lib/types";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Clock, Pen, Trash } from "lucide-react";
+import { Archive, Pen } from "lucide-react";
 import { deleteTask, getTasks, updateTask } from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { EditTaskForm } from "@/components/dashboard/forms/EditTaskForm";
+import { Pagination } from "@/components/dashboard/pagination/Pagination";
 
 export default function Tasks() {
   const { user } = useUser();
-  const { tasks, setTasks } = useScheduleItems();
+  const [tasks, setTasks] = React.useState<Task[]>([]);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [totalPages, setTotalPages] = React.useState(1);
+  const itemsPerPage = 10;
 
   React.useEffect(() => {
     (async () => {
       if (user) {
-        const fetchedTasks = await getTasks(user.id);
+        const fetchedTasks = await getTasks(
+          user.id,
+          itemsPerPage,
+          (currentPage - 1) * itemsPerPage
+        );
         if (!fetchedTasks) {
           return;
         }
-        setTasks(fetchedTasks);
+        setTasks(fetchedTasks.tasks);
+        setTotalPages(Math.ceil(fetchedTasks.total / itemsPerPage));
       }
     })();
-  }, [user, setTasks]);
+  }, [user, currentPage]);
 
   if (!user) {
     return <div>Loading...</div>;
@@ -110,7 +129,8 @@ export default function Tasks() {
                       size='icon'
                       className='h-8 w-8'
                       onClick={() => {
-                        console.log(task);
+                        setSelectedTask(task);
+                        setDialogOpen(true);
                       }}>
                       <Pen className='h-4 w-4' />
                     </Button>
@@ -122,7 +142,8 @@ export default function Tasks() {
                         deleteTask(task);
                         setTasks(tasks.filter((t) => t.id !== task.id));
                       }}>
-                      <Trash className='h-4 w-4' />
+                      <span className='sr-only'>Archive</span>
+                      <Archive className='h-4 w-4' />
                     </Button>
                   </div>
                 </TableCell>
@@ -131,49 +152,37 @@ export default function Tasks() {
           </TableBody>
         </Table>
       </div>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+        }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Task</DialogTitle>
+            <DialogDescription className='sr-only'>
+              Edit task form
+            </DialogDescription>
+          </DialogHeader>
+          {selectedTask && (
+            <EditTaskForm
+              task={selectedTask}
+              onSuccess={() => setDialogOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <div className='mt-4'>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </div>
     </div>
   );
 }
-
-// Mock data for initial rendering
-const mockTasks: Task[] = [
-  {
-    id: 1,
-    title: "Complete Project Proposal",
-    description: "Write and submit the project proposal document",
-    start: new Date("2024-02-20T09:00:00"),
-    end: new Date("2024-02-20T11:00:00"),
-    dueDate: new Date("2024-02-20T17:00:00"),
-    category: "work",
-    difficulty: "medium",
-    duration: 120,
-    frequency: "once",
-    completed: false,
-    priority: "high",
-    auto: false,
-    flexible: true,
-    userID: 1,
-    calendarID: 1,
-  },
-  {
-    id: 2,
-    title: "Review Code Changes",
-    description: "Review and provide feedback on team's code changes",
-    start: null,
-    end: null,
-    dueDate: new Date("2024-02-21T15:00:00"),
-    category: "work",
-    difficulty: "hard",
-    duration: 60,
-    frequency: "daily",
-    completed: true,
-    priority: "medium",
-    auto: true,
-    flexible: false,
-    userID: 1,
-    calendarID: 1,
-  },
-];
 
 function getPriorityColor(priority: string) {
   switch (priority.toLowerCase()) {

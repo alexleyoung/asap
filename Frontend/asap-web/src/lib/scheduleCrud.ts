@@ -154,10 +154,10 @@ export async function deleteEvent(eventId: number) {
 }
 
 // Tasks
-export async function getTasks(userID: number) {
+export async function getTasks(userID: number, limit = 100, offset = 0) {
   try {
     const response = await fetch(
-      `http://localhost:8000/tasks?userID=${userID}`,
+      `http://localhost:8000/tasks?userID=${userID}&limit=${limit}&offset=${offset}`,
       {
         method: "GET",
         headers: {
@@ -166,7 +166,8 @@ export async function getTasks(userID: number) {
         },
       }
     );
-    return (await response.json()) as Task[];
+    const res = await response.json();
+    return res as { tasks: Task[]; total: number };
   } catch (error) {
     console.error(error);
   }
