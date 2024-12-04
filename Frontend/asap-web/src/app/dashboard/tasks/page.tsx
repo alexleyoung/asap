@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Table,
@@ -11,7 +13,130 @@ import { Task } from "@/lib/types";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Clock, X } from "lucide-react";
+import { Check, Clock, Trash, X } from "lucide-react";
+import { deleteTask, getTasks, updateTask } from "@/lib/scheduleCrud";
+import { useUser } from "@/contexts/UserContext";
+import { useScheduleItems } from "@/contexts/ScheduleContext";
+
+export default function Tasks() {
+  const { user } = useUser();
+  const { tasks, setTasks } = useScheduleItems();
+
+  React.useEffect(() => {
+    (async () => {
+      if (user) {
+        const fetchedTasks = await getTasks(user.id);
+        if (!fetchedTasks) {
+          return;
+        }
+        setTasks(fetchedTasks);
+      }
+    })();
+  }, [user, setTasks]);
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className='p-8'>
+      <div className='flex justify-between items-center mb-8'>
+        <h1 className='text-3xl font-bold'>Tasks</h1>
+      </div>
+      <div className='rounded-md border'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className='w-[50px]'>Status</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Due Date</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Difficulty</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead className='w-[100px]'>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tasks.map((task) => (
+              <TableRow key={task.id}>
+                <TableCell>
+                  {task.completed ? (
+                    <Check className='h-5 w-5 text-green-500' />
+                  ) : (
+                    <Clock className='h-5 w-5 text-yellow-500' />
+                  )}
+                </TableCell>
+                <TableCell className='font-medium'>{task.title}</TableCell>
+                <TableCell>
+                  {format(task.dueDate, "MMM d, yyyy h:mm a")}
+                </TableCell>
+                <TableCell>{task.duration} min</TableCell>
+                <TableCell>
+                  <Badge
+                    variant='secondary'
+                    className={getPriorityColor(task.priority)}>
+                    {task.priority}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge
+                    variant='secondary'
+                    className={getDifficultyColor(task.difficulty)}>
+                    {task.difficulty}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant='outline' className='capitalize'>
+                    {task.category}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className='flex items-center gap-2'>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8'
+                      onClick={() => {
+                        updateTask({ ...task, completed: true });
+                        setTasks(
+                          tasks.map((t) => (t.id === task.id ? task : t))
+                        );
+                      }}>
+                      <Check className='h-4 w-4' />
+                    </Button>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8'
+                      onClick={() => {
+                        updateTask({ ...task, completed: false });
+                        setTasks(
+                          tasks.map((t) => (t.id === task.id ? task : t))
+                        );
+                      }}>
+                      <X className='h-4 w-4' />
+                    </Button>
+                    <Button
+                      variant='ghost'
+                      size='icon'
+                      className='h-8 w-8'
+                      onClick={() => {
+                        deleteTask(task);
+                        setTasks(tasks.filter((t) => t.id !== task.id));
+                      }}>
+                      <Trash className='h-4 w-4' />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}
 
 // Mock data for initial rendering
 const mockTasks: Task[] = [
@@ -77,77 +202,4 @@ function getDifficultyColor(difficulty: string) {
     default:
       return "bg-gray-500/10 text-gray-500 hover:bg-gray-500/20";
   }
-}
-
-export default async function Tasks() {
-  return (
-    <div className='p-8'>
-      <div className='flex justify-between items-center mb-8'>
-        <h1 className='text-3xl font-bold'>Tasks</h1>
-      </div>
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className='w-[50px]'>Status</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Difficulty</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className='w-[100px]'>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockTasks.map((task) => (
-              <TableRow key={task.id}>
-                <TableCell>
-                  {task.completed ? (
-                    <Check className='h-5 w-5 text-green-500' />
-                  ) : (
-                    <Clock className='h-5 w-5 text-yellow-500' />
-                  )}
-                </TableCell>
-                <TableCell className='font-medium'>{task.title}</TableCell>
-                <TableCell>
-                  {format(task.dueDate, "MMM d, yyyy h:mm a")}
-                </TableCell>
-                <TableCell>{task.duration} min</TableCell>
-                <TableCell>
-                  <Badge
-                    variant='secondary'
-                    className={getPriorityColor(task.priority)}>
-                    {task.priority}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant='secondary'
-                    className={getDifficultyColor(task.difficulty)}>
-                    {task.difficulty}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant='outline' className='capitalize'>
-                    {task.category}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-2'>
-                    <Button variant='ghost' size='icon' className='h-8 w-8'>
-                      <Check className='h-4 w-4' />
-                    </Button>
-                    <Button variant='ghost' size='icon' className='h-8 w-8'>
-                      <X className='h-4 w-4' />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  );
 }
