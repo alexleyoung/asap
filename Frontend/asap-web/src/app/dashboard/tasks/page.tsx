@@ -63,122 +63,121 @@ export default function Tasks() {
       <div className='flex justify-between items-center mb-8'>
         <h1 className='text-3xl font-bold'>Tasks</h1>
       </div>
-      <div className='rounded-md border'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className='w-[50px]'>Status</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Difficulty</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className='w-[100px]'>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tasks.map((task) => (
-              <TableRow key={task.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={task.completed}
-                    onCheckedChange={(checked) => {
-                      updateTask({
-                        ...task,
-                        completed: checked ? true : false,
-                      });
-                      setTasks(
-                        tasks.map((t) =>
-                          t.id === task.id
-                            ? { ...t, completed: checked ? true : false }
-                            : t
-                        )
-                      );
-                    }}
-                  />
-                </TableCell>
-                <TableCell className='font-medium'>{task.title}</TableCell>
-                <TableCell>
-                  {format(task.dueDate, "MMM d, yyyy h:mm a")}
-                </TableCell>
-                <TableCell>{task.duration} min</TableCell>
-                <TableCell>
-                  <Badge
-                    variant='secondary'
-                    className={getPriorityColor(task.priority)}>
-                    {task.priority}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant='secondary'
-                    className={getDifficultyColor(task.difficulty)}>
-                    {task.difficulty}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant='outline' className='capitalize'>
-                    {task.category}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-2'>
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='h-8 w-8'
-                      onClick={() => {
-                        setSelectedTask(task);
-                        setDialogOpen(true);
-                      }}>
-                      <Pen className='h-4 w-4' />
-                    </Button>
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='h-8 w-8'
-                      onClick={() => {
-                        deleteTask(task);
-                        setTasks(tasks.filter((t) => t.id !== task.id));
-                      }}>
-                      <span className='sr-only'>Archive</span>
-                      <Archive className='h-4 w-4' />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      <Dialog
-        open={dialogOpen}
-        onOpenChange={(open) => {
-          setDialogOpen(open);
-        }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Task</DialogTitle>
-            <DialogDescription className='sr-only'>
-              Edit task form
-            </DialogDescription>
-          </DialogHeader>
-          {selectedTask && (
-            <EditTaskForm
-              task={selectedTask}
-              onSuccess={() => setDialogOpen(false)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <div className='mt-4'>
+      <div>
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
         />
+        <div className='mt-4'>
+          <Table className='rounded-md border'>
+            <TableHeader>
+              <TableRow>
+                <TableHead className='w-[50px]'>Status</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>Difficulty</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead className='w-[100px]'>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tasks.map((task) => (
+                <TableRow key={task.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={task.completed}
+                      onCheckedChange={(checked) => {
+                        updateTask({
+                          ...task,
+                          completed: checked ? true : false,
+                        });
+                        setTasks(
+                          tasks.map((t) =>
+                            t.id === task.id
+                              ? { ...t, completed: checked ? true : false }
+                              : t
+                          )
+                        );
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell className='font-medium'>{task.title}</TableCell>
+                  <TableCell>
+                    {format(task.dueDate, "MMM d, yyyy h:mm a")}
+                  </TableCell>
+                  <TableCell>{task.duration} min</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant='secondary'
+                      className={getPriorityColor(task.priority)}>
+                      {task.priority}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant='secondary'
+                      className={getDifficultyColor(task.difficulty)}>
+                      {task.difficulty}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant='outline' className='capitalize'>
+                      {task.category}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        className='h-8 w-8'
+                        onClick={() => {
+                          setSelectedTask(task);
+                          setDialogOpen(true);
+                        }}>
+                        <Pen className='h-4 w-4' />
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        className='h-8 w-8'
+                        onClick={() => {
+                          deleteTask(task);
+                          setTasks(tasks.filter((t) => t.id !== task.id));
+                        }}>
+                        <span className='sr-only'>Archive</span>
+                        <Archive className='h-4 w-4' />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        <Dialog
+          open={dialogOpen}
+          onOpenChange={(open) => {
+            setDialogOpen(open);
+          }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Task</DialogTitle>
+              <DialogDescription className='sr-only'>
+                Edit task form
+              </DialogDescription>
+            </DialogHeader>
+            {selectedTask && (
+              <EditTaskForm
+                task={selectedTask}
+                onSuccess={() => setDialogOpen(false)}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
