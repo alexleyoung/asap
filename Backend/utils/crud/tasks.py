@@ -39,8 +39,18 @@ def get_task(db: Session, task_id: int):
     return db.query(models.Task).filter(models.Task.id == task_id).first()
 
 
-def get_tasks(db: Session, userID: int, limit: int = 10):
-    return db.query(models.Task).filter(models.Task.userID == userID).limit(limit).all()
+def get_tasks(db: Session, userID: int, limit: int = 100, offset: int = 0):
+    return (
+        db.query(models.Task)
+        .filter(models.Task.userID == userID)
+        .limit(limit)
+        .offset(offset)
+        .all()
+    )
+
+
+def count_tasks(db: Session, userID: int):
+    return db.query(models.Task).filter(models.Task.userID == userID).count()
 
 
 def update_task(db: Session, task_id: int, task_update: schemas.TaskCreate):
