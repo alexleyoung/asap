@@ -233,7 +233,7 @@ export async function deleteTask(task: Task) {
 // Calendars
 export async function getCalendars(userID: number) {
   const response = await fetch(
-    `http://localhost:8000/calendars/?userID=${userID}`,
+    `http://localhost:8000/calendars/user/${userID}`,
     {
       method: "GET",
       headers: {
@@ -247,8 +247,9 @@ export async function getCalendars(userID: number) {
     const data = await response.json();
     throw new Error(data.error || "Something went wrong");
   }
-
-  return (await response.json()) as Calendar[];
+  const calendars = (await response.json()) as Calendar[];
+  console.log(calendars);
+  return calendars;
 }
 
 export async function getCalendar(calendarID: number) {
