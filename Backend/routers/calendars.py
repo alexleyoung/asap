@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database import schemas
 from ..database.db import get_db
@@ -55,8 +55,8 @@ def edit_calendar_endpoint(
 
 
 # get all of a users calendars
-@router.get("/user/{userID}", response_model=list[schemas.Calendar])
-def get_calendars(userID: int , db: Session = Depends(get_db)):
+@router.get("/", response_model=list[schemas.Calendar])
+def get_calendars(userID: int, db: Session = Depends(get_db)):
     calendars = controller.get_calendars_by_user(db, userID=userID)
     if not calendars:
         raise HTTPException(status_code=404, detail="No calendars found for this user")
