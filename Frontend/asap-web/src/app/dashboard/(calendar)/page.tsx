@@ -29,7 +29,7 @@ export default function Dashboard() {
           return;
         }
         setEvents((await getEvents(user.id)) || []);
-        setTasks((await getTasks(user.id)) || []);
+        setTasks((await getTasks(user.id))?.tasks || []);
         setCalendars((await getCalendars(user.id)) || []);
       } catch (error) {
         console.error("Failed to fetch schedule items:", error);
