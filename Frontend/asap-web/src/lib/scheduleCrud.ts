@@ -233,7 +233,7 @@ export async function deleteTask(task: Task) {
 // Calendars
 export async function getCalendars(userID: number) {
   const response = await fetch(
-    `http://localhost:8000/calendars/user/${userID}`,
+    `http://localhost:8000/calendars?userID=${userID}`,
     {
       method: "GET",
       headers: {
@@ -272,7 +272,7 @@ export async function getCalendar(calendarID: number) {
 
 export async function createCalendar(calendar: CalendarPost) {
   try {
-    const response = await fetch("http://localhost:8000/calendars", {
+    const response = await fetch(`http://localhost:8000/calendars`, {
       method: "POST",
       body: JSON.stringify(calendar),
       headers: {
