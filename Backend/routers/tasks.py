@@ -13,18 +13,22 @@ router = APIRouter(
 
 
 @router.post("/", response_model=schemas.Task)
-def create_task_endpoint(task: schemas.TaskCreate, auto: Optional[bool] = False, db: Session = Depends(get_db)):
+def create_task_endpoint(
+    task: schemas.TaskCreate,
+    auto: Optional[bool] = False,
+    db: Session = Depends(get_db),
+):
     if auto:
         user = task.userID
         context = get_user_context(user, db)
-        #print(context)
-        #query_with_file(context, task)
-        new_task = query_with_file(context, task) # do the rest
+        # print(context)
+        # query_with_file(context, task)
+        new_task = query_with_file(context, task)  # do the rest
         print(new_task.description)
         if not new_task:
             raise HTTPException(status_code=400, detail="Task creation failed")
-        return controller.create_task(db, new_task) 
-       
+        return controller.create_task(db, new_task)
+
     db_task = controller.create_task(db, task)
     if not db_task:
         raise HTTPException(status_code=400, detail="Task creation failed")
@@ -47,13 +51,16 @@ def read_task_endpoint(task_id: int, db: Session = Depends(get_db)):
     return task
 
 
-@router.get("/", response_model=list[schemas.Task])
-def read_user_endpoint(userID: int, db: Session = Depends(get_db), limit: int = 999999):
+@router.get("/")
+def read_user_endpoint(
+    userID: int, db: Session = Depends(get_db), limit: int = 100, offset: int = 0
+):
     if not userID:
         raise HTTPException(status_code=400, detail="User ID is required")
-    tasks = controller.get_tasks(db, userID, limit)
+    tasks = controller.get_tasks(db, userID, limit, offset)
+    total = controller.count_tasks(db, userID)
     # handle errors here ...
-    return tasks
+    return {"tasks": tasks, "total": total}
 
 
 # takes entire TaskCreate instead of partial
