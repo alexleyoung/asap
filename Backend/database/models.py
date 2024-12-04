@@ -20,7 +20,10 @@ class User(Base):
     calendars = relationship("Calendar", back_populates="owner")
     events = relationship("Event", back_populates="user")
     tasks = relationship("Task", back_populates="user")
-    memberships = relationship("Membership", back_populates="user")  # Changed from membership to memberships
+    memberships = relationship(
+        "Membership", back_populates="user"
+    )  # Changed from membership to memberships
+
 
 # calendars table
 class Calendar(Base):
@@ -37,7 +40,9 @@ class Calendar(Base):
     owner = relationship("User", back_populates="calendars")
     events = relationship("Event", back_populates="calendar")
     tasks = relationship("Task", back_populates="calendar")
-    group = relationship("Group", back_populates="calendar", uselist=False)  # One-to-one relationship
+    group = relationship(
+        "Group", back_populates="calendar", uselist=False
+    )  # One-to-one relationship
 
 
 # Events table
@@ -87,18 +92,24 @@ class Task(Base):
     user = relationship("User", back_populates="tasks")
     calendar = relationship("Calendar", back_populates="tasks")
 
+
 # Groups table
 class Group(Base):
     __tablename__ = "groups"
     id = Column("id", Integer, primary_key=True, index=True, unique=True)
     title = Column("title", String)
-   
+
     # relationships
     calendar = relationship("Calendar", back_populates="group")
-    memberships = relationship("Membership", back_populates="group")  # Changed from membership to memberships
-    
+    memberships = relationship(
+        "Membership", back_populates="group"
+    )  # Changed from membership to memberships
+
     # foreign keys
-    calendarID = Column("calendarID", Integer, ForeignKey("calendars.id"), nullable=False)
+    calendarID = Column(
+        "calendarID", Integer, ForeignKey("calendars.id"), nullable=False
+    )
+
 
 # Permissions enum
 class PermissionLevel(py_enum.Enum):
@@ -106,13 +117,17 @@ class PermissionLevel(py_enum.Enum):
     EDITOR = "EDITOR"
     VIEWER = "VIEWER"
 
+
 # Group and User relationship table
 class Membership(Base):
     __tablename__ = "group_user"
     id = Column(Integer, primary_key=True, index=True, unique=True)
     groupID = Column("groupID", Integer, ForeignKey("groups.id"))
     userID = Column("userID", Integer, ForeignKey("users.id"))
-    permission = Column(sql_enum(PermissionLevel, name='permissionlevel', create_constraint=True), nullable=False)
+    permission = Column(
+        sql_enum(PermissionLevel, name="permissionlevel", create_constraint=True),
+        nullable=False,
+    )
 
     # relationships
     user = relationship("User", back_populates="memberships")

@@ -111,6 +111,14 @@ export function EditEventForm({
 
   const handleSubmit = async (data: EventFormValues) => {
     try {
+      // if(membership.permissions !== "ADMIN" || membership.permissions !== "EDITOR") {
+      //   toast({
+      //     title: "Error",
+      //     description: "You do not have permission to edit event",
+      //     duration: 3000,
+      //   });
+      //   return;
+      // }
       setLoading(true);
       const response = await updateEvent(data);
       if (!response.ok) {

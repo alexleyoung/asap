@@ -46,6 +46,14 @@ export const EditCalendarForm = ({
 
   const handleSubmit = async (values: CalendarFormValues) => {
     try {
+      // if(membership.permissions !== "ADMIN") {
+      //   toast({
+      //     title: "Error",
+      //     description: "You do not have permission to edit calendar",
+      //     duration: 3000,
+      //   });
+      //   return;
+      // }
       const updatedCalendar = await updateCalendar(values);
       if (!updatedCalendar) return;
       onSave(updatedCalendar);
@@ -98,7 +106,7 @@ export const EditCalendarForm = ({
 
 
 
-          
+
         /> */}
         {/* <FormField
           control={form.control}
