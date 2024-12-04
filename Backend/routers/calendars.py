@@ -22,7 +22,7 @@ def create_calendar(Calendar: schemas.CalendarCreate, db: Session = Depends(get_
 
 
 # Get calendar details by ID
-@router.get("/calendars/{calendar_id}", response_model=schemas.Calendar)
+@router.get("/{calendar_id}", response_model=schemas.Calendar)
 def get_calendar_endpoint(
     calendar_id: int,
     db: Session = Depends(get_db),
@@ -38,7 +38,7 @@ def get_calendar_endpoint(
 
 
 # Edit calendar details
-@router.put("/calendars/{calendar_id}", response_model=schemas.Calendar)
+@router.put("/{calendar_id}", response_model=schemas.Calendar)
 def edit_calendar_endpoint(
     calendar_id: int,
     calendar_update: schemas.CalendarUpdate,
@@ -55,8 +55,8 @@ def edit_calendar_endpoint(
 
 
 # get all of a users calendars
-@router.get("/calendars/", response_model=list[schemas.Calendar])
-def get_calendars(userID: int = Query(...), db: Session = Depends(get_db)):
+@router.get("/{userID}", response_model=list[schemas.Calendar])
+def get_calendars(userID: int , db: Session = Depends(get_db)):
     calendars = controller.get_calendars_by_user(db, userID=userID)
     if not calendars:
         raise HTTPException(status_code=404, detail="No calendars found for this user")
@@ -64,7 +64,7 @@ def get_calendars(userID: int = Query(...), db: Session = Depends(get_db)):
 
 
 # Endpoint to create a new calendar
-@router.post("/calendars", response_model=schemas.Calendar)
+@router.post("/{userID}", response_model=schemas.Calendar)
 def create_calendar_endpoint(
     userID: int, calendar: schemas.CalendarCreate, db: Session = Depends(get_db)
 ):
@@ -77,7 +77,7 @@ def create_calendar_endpoint(
 
 
 # delete calendar
-@router.delete("/calendars/{calendarID}", status_code=204)
+@router.delete("/{calendarID}", status_code=204)
 def delete_calendar_endpoint(
     calendarID: int,
     db: Session = Depends(get_db),

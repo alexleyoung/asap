@@ -70,6 +70,14 @@ export default function Header() {
   };
 
   const handleDeleteCalendar = async (calendar: Calendar) => {
+    // if(membership.permissions !== "ADMIN") {
+    //   toast({
+    //     title: "Error",
+    //     description: "You do not have permission to delete calendar",
+    //     duration: 3000,
+    //   });
+    //   return;
+    // }
     try {
       deleteCalendar(calendar);
       setCalendars((prevCalendars) =>
@@ -170,35 +178,39 @@ export default function Header() {
         {user && (
           <Popover>
             <PopoverTrigger>
-              <Avatar className='hover:cursor-pointer relative group'>
-                <div className='absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all' />
+              <Avatar className="hover:cursor-pointer relative group">
+                <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
                 <AvatarImage src={user.avatar} alt={user.firstname} />
                 <AvatarFallback>{user.firstname[0]}</AvatarFallback>
               </Avatar>
             </PopoverTrigger>
             <PopoverContent
               sideOffset={5}
-              className='mr-4 p-2 flex flex-col gap-4 text-sm'>
-              <h1 className='px-2 pt-1 font-medium'>Hi {user.firstname}!</h1>
+              className="mr-4 p-2 flex flex-col gap-4 text-sm"
+            >
+              <h1 className="px-2 pt-1 font-medium">Hi {user.firstname}!</h1>
               <Separator />
               <Button
-                variant='ghost'
-                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
-                onClick={() => setIsOpenProfile(true)}>
+                variant="ghost"
+                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                onClick={() => setIsOpenProfile(true)}
+              >
                 View Profile
               </Button>
               <Button
-                variant='ghost'
-                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
-                onClick={loadCalendars}>
+                variant="ghost"
+                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                onClick={loadCalendars}
+              >
                 Manage Calendars
               </Button>
 
               <AlertDialog>
                 <AlertDialogTrigger>
                   <Button
-                    variant='ghost'
-                    className='w-full text-left px-2 py-2 font-normal items-center justify-start'>
+                    variant="ghost"
+                    className="w-full text-left px-2 py-2 font-normal items-center justify-start"
+                  >
                     Sign Out
                   </Button>
                 </AlertDialogTrigger>

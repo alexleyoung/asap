@@ -20,7 +20,7 @@ import {
 } from "@/lib/scheduleCrud";
 import { Calendar, Group, Membership } from "@/lib/types";
 import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 interface CalendarMembersProps {
@@ -35,6 +35,124 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
   >("VIEWER");
   const [group, setGroup] = useState<Group | null>(null);
   const { toast } = useToast();
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  useEffect(() => {
+    // Initialize WebSocket connection
+    const ws = new WebSocket("ws://localhost:8000/invitations");
+
+    ws.onopen = () => {
+      console.log("Connected to WebSocket Invitations");
+    };
+
+    ws.onmessage = (user) => {
+      console.log("Received message:", user.data);
+      const invitation = JSON.parse(user.data);
+
+      if (invitation.type === "member_added") {
+        //send invitation to user
+        toast({
+          title: "Invitation",
+          description: `You have been invited to join ${calendar.name}`,
+          action: (
+            <div className="flex gap-2">
+              <button
+                className="bg-green-500 text-white px-2 py-1 rounded"
+                onClick={() =>
+                  handleInvitationResponse("accept", invitation.data)
+                }
+              >
+                Accept
+              </button>
+              <button
+                className="bg-red-500 text-white px-2 py-1 rounded"
+                onClick={() =>
+                  handleInvitationResponse("deny", invitation.data)
+                }
+              >
+                Deny
+              </button>
+            </div>
+          ),
+          duration: 10000,
+        });
+      }
+
+      if (invitation.type === "invitation_accepted") {
+        setMembers((prevMembers) => {
+          return prevMembers.map((member) => {
+            if (member.id === invitation.data.id) {
+              const updatedMember = {
+                ...member,
+                status: "ACCEPTED",
+              };
+
+              return updatedMember;
+            }
+            return member;
+          });
+        });
+      }
+
+      if (invitation.type === "invitation_rejected") {
+        setMembers((prevMembers) => {
+          return prevMembers.filter(
+            (member) => member.id !== invitation.data.id
+          );
+        });
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+
+      // Reconnect only if the connection is closed and it's not already reconnecting
+      setTimeout(() => {
+        if (ws.readyState !== WebSocket.OPEN) {
+          console.log("Attempting to reconnect...");
+          // Open a new WebSocket connection only if the previous one was closed
+          const newWs = new WebSocket("ws://localhost:8000/notifications");
+          setWs(newWs); // Update the state with the new WebSocket connection
+        }
+      }, 5000);
+    };
+
+    // Set the WebSocket instance in state
+    setWs(ws);
+
+    // Cleanup WebSocket connection on component unmount
+    return () => {
+      if (ws.readyState === 1) {
+        ws.close();
+      }
+    };
+  }, []);
+
+  function handleInvitationResponse(response: "accept" | "deny", data: any) {
+    if (response === "accept") {
+      ws?.send(
+        JSON.stringify({
+          action: "accept_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    } else {
+      ws?.send(
+        JSON.stringify({
+          action: "reject_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    }
+  }
 
   useEffect(() => {
     if (!calendar) return;
@@ -68,8 +186,18 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
   }, [group]);
 
   const handleSubmit = async () => {
+    //add a websocket somewhere here to get real-time invites on other user end, so they can accept or decline
+
     if (!newMember) return;
     if (!group) return;
+    // if(membership.permissions !== "ADMIN") {
+    //   toast({
+    //     title: "Error",
+    //     description: "You do not have permission to add members",
+    //     duration: 3000,
+    //   });
+    //   return;
+    // }
     console.log("hello");
 
     const user = await getUserByEmail(newMember);
