@@ -1,7 +1,6 @@
 "use client";
 import { useCurrentDate, useView } from "@/contexts/ScheduleContext";
 import { addDays, addMonths, format, set } from "date-fns";
-import { useHotkeys } from "react-hotkeys-hook";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Popover,
@@ -19,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +37,7 @@ import { deleteCalendar, deleteUser, getCalendars } from "@/lib/scheduleCrud";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { useUser } from "@/contexts/UserContext";
 import { Calendar } from "@/lib/types";
+import Link from "next/link";
 
 export default function Header() {
   const { view, setView } = useView();
@@ -46,8 +46,9 @@ export default function Header() {
   const [isOpenProfile, setIsOpenProfile] = useState(false);
   const { user, setUser } = useUser();
   const [isOpenManageCalendars, setIsOpenManageCalendars] = useState(false);
-  const { calendars, setCalendars, selectedCalendars, toggleCalendar } =
-    useCalendars();
+  const { calendars, setCalendars, toggleCalendar } = useCalendars();
+  const pathname = usePathname();
+  const isCalendar = pathname === "/dashboard";
 
   const loadCalendars = async () => {
     try {
@@ -124,41 +125,47 @@ export default function Header() {
 
   return (
     <header className='px-5 py-3 border-b border-border flex items-center justify-between'>
-      <h1 className='text-2xl font-bold'>asap.</h1>
-      <div className='flex justify-between items-center gap-4'>
-        <div className='flex gap-4 items-center'>
-          <ChevronLeft
-            size={32}
-            className='rounded-full hover:bg-muted p-1 transition-colors'
-            onClick={() => handleDateChange("prev")}
-          />
-          <ChevronRight
-            size={32}
-            className='rounded-full hover:bg-muted p-1 transition-colors'
-            onClick={() => handleDateChange("next")}
-          />
-          <Button variant='outline' onClick={() => setCurrentDate(new Date())}>
-            Today
-          </Button>
-          <h2 className='font-medium text-xl'>
-            {view === "day"
-              ? format(currentDate, "MMMM d, yyyy")
-              : format(currentDate, "MMMM yyyy")}
-          </h2>
+      <Link className='text-2xl font-bold' href='/dashboard'>
+        asap.
+      </Link>
+      {isCalendar && (
+        <div className='flex justify-between items-center gap-4'>
+          <div className='flex gap-4 items-center'>
+            <ChevronLeft
+              size={32}
+              className='rounded-full hover:bg-muted p-1 transition-colors'
+              onClick={() => handleDateChange("prev")}
+            />
+            <ChevronRight
+              size={32}
+              className='rounded-full hover:bg-muted p-1 transition-colors'
+              onClick={() => handleDateChange("next")}
+            />
+            <Button
+              variant='outline'
+              onClick={() => setCurrentDate(new Date())}>
+              Today
+            </Button>
+            <h2 className='font-medium text-xl'>
+              {view === "day"
+                ? format(currentDate, "MMMM d, yyyy")
+                : format(currentDate, "MMMM yyyy")}
+            </h2>
+          </div>
+          <div className='flex gap-2'>
+            <Select value={view} onValueChange={handleViewChange}>
+              <SelectTrigger>
+                <SelectValue placeholder='View' className='text-sm' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='day'>Day</SelectItem>
+                <SelectItem value='week'>Week</SelectItem>
+                <SelectItem value='month'>Month</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className='flex gap-2'>
-          <Select value={view} onValueChange={handleViewChange}>
-            <SelectTrigger>
-              <SelectValue placeholder='View' className='text-sm' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='day'>Day</SelectItem>
-              <SelectItem value='week'>Week</SelectItem>
-              <SelectItem value='month'>Month</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      )}
       <div className='flex gap-4 items-center'>
         {user && (
           <Popover>
