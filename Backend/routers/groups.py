@@ -116,11 +116,22 @@ def get_group_members(groupID: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Group not found or has no members")
     return members
 
-
 # get group by calendarID
 @router.get("/{calendarID}", response_model=schemas.Group)
-def get_group_by_calendar(calendarID: int, db: Session = Depends(get_db)):
-    group = db.query(models.Group).filter(models.Group.calendarID == calendarID).first()
+def get_group_by_calendar(
+    calendarID: int,
+    db: Session = Depends(get_db)
+):
+    # Build query based on whether members should be included
+    query = db.query(models.Group)
+    
+    # Get the group
+    group = query.filter(models.Group.calendarID == calendarID).first()
+    
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No group found for calendar ID: {calendarID}"
+        )
+    
     return group

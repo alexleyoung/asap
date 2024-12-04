@@ -83,7 +83,6 @@ def delete_calendar_endpoint(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    # Optional: Add permission check if needed
     # controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
 
     try:

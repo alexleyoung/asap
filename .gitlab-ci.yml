@@ -1,0 +1,86 @@
+stages:
+  - backendbuild
+  - backendtest
+  - backenddeploy
+  - frontendbuild
+  - frontendtest
+  - frontenddeploy
+
+backend-build:
+  stage: backendbuild
+  tags:
+    - main_backend
+  script:
+    - cd Backend
+    - docker compose build
+  only:
+    refs:
+      - main
+    changes:
+      - Backend/**/*
+
+backend-test:
+  stage: backendtest
+  tags:
+    - main_backend
+  script:
+    - cd Backend
+  only:
+    refs:
+      - main
+    changes:
+      - Backend/**/*
+
+backend-deploy:
+  stage: backenddeploy
+  tags:
+    - main_backend
+  script:
+    - cd Backend
+    - docker compose up -d
+  only:
+    refs:
+      - main
+    changes:
+      - Backend/**/*
+
+frontend-build:
+  stage: frontendbuild
+  tags:
+    - main_frontend
+  script:
+    - cd Frontend
+    - cd asap-web
+    - docker build -t asap-web .
+  only:
+    refs:
+      - main
+    changes:
+      - Frontend/asap-web/**/*
+
+frontend-test:
+  stage: frontendtest
+  tags:
+    - main_frontend
+  script:
+    - cd Frontend
+    - cd asap-web
+  only:
+    refs:
+      - main
+    changes:
+      - Frontend/asap-web/**/*
+
+frontend-deploy:
+  stage: frontenddeploy
+  tags:
+    - main_frontend
+  script:
+    - cd Frontend
+    - cd asap-web
+    - docker run -p 3000:3000 -d asap-web
+  only:
+    refs:
+      - main
+    changes:
+      - Frontend/asap-web/**/*
