@@ -13,11 +13,11 @@ export default function DashboardLayout({
     <UserProvider>
       <ScheduleProvider>
         <CalendarProvider>
-          <div className='flex h-screen w-screen flex-col overflow-hidden'>
+          <div className="flex h-screen w-screen flex-col overflow-hidden">
             <Header />
-            <div className='flex flex-grow h-[50%]'>
+            <div className="flex flex-grow h-[50%]">
               <Sidebar />
-              <main className='flex-grow'>{children}</main>
+              <main className="flex-grow">{children}</main>
             </div>
           </div>
         </CalendarProvider>

@@ -26,10 +26,27 @@ export default function CalendarsCollapsible() {
   const [newCalendarName, setNewCalendarName] = useState("");
   const { user } = useUser();
 
+  // useEffect(() => {
+  //   if (!user) return;
+  //   (async () => {
+  //     const calendarArray = await getCalendars(user.id);
+  //     setCalendars(calendarArray);
+  //   })();
+  // }, [setCalendars, user]);
   useEffect(() => {
     if (!user) return;
-    (async () => setCalendars(await getCalendars(user.id)))();
-  }, [setCalendars, user]);
+
+    const fetchCalendars = async () => {
+      try {
+        const calendarArray = await getCalendars(user.id);
+        setCalendars(calendarArray);
+      } catch (error) {
+        console.error("Error fetching calendars:", error);
+      }
+    };
+
+    fetchCalendars();
+  }, [user]);
 
   const handleAddCalendar = async () => {
     if (!user) return;
@@ -54,16 +71,16 @@ export default function CalendarsCollapsible() {
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
       <CollapsibleTrigger asChild>
-        <Button variant='ghost' className='w-full justify-between'>
-          <span className='font-semibold'>Calendars</span>
+        <Button variant="ghost" className="w-full justify-between">
+          <span className="font-semibold">Calendars</span>
           {open ? <ChevronUp /> : <ChevronDown />}
         </Button>
       </CollapsibleTrigger>
 
-      <CollapsibleContent className='w-[240px] mt-3 px-2 space-y-2'>
+      <CollapsibleContent className="w-[240px] mt-3 px-2 space-y-2">
         {calendars.map((calendar, i) => (
           <Label htmlFor={calendar.id.toString()} key={calendar.id}>
-            <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md'>
+            <div className="flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md">
               <Checkbox
                 id={calendar.id.toString()}
                 checked={selectedCalendars.some((c) => c.id === calendar.id)}
@@ -83,22 +100,23 @@ export default function CalendarsCollapsible() {
           </Label>
         ))}
         <Button
-          variant='ghost'
-          className='w-full flex items-center gap-2 mt-2'
-          onClick={() => setIsAddingCalendar((prev) => !prev)}>
-          <Plus className='text-gray-500' /> Add Calendar
+          variant="ghost"
+          className="w-full flex items-center gap-2 mt-2"
+          onClick={() => setIsAddingCalendar((prev) => !prev)}
+        >
+          <Plus className="text-gray-500" /> Add Calendar
         </Button>
 
         {/* New Calendar Input */}
         {isAddingCalendar && (
-          <div className='flex gap-2 items-center mt-2'>
+          <div className="flex gap-2 items-center mt-2">
             <Input
-              placeholder='New Calendar Name'
+              placeholder="New Calendar Name"
               value={newCalendarName}
               onChange={(e) => setNewCalendarName(e.target.value)}
-              className='flex-1'
+              className="flex-1"
             />
-            <Button onClick={handleAddCalendar} variant='default'>
+            <Button onClick={handleAddCalendar} variant="default">
               Add
             </Button>
           </div>
