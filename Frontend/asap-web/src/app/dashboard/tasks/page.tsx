@@ -13,10 +13,11 @@ import { Task } from "@/lib/types";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, Clock, Trash, X } from "lucide-react";
+import { Check, Clock, Pen, Trash } from "lucide-react";
 import { deleteTask, getTasks, updateTask } from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function Tasks() {
   const { user } = useUser();
@@ -61,11 +62,22 @@ export default function Tasks() {
             {tasks.map((task) => (
               <TableRow key={task.id}>
                 <TableCell>
-                  {task.completed ? (
-                    <Check className='h-5 w-5 text-green-500' />
-                  ) : (
-                    <Clock className='h-5 w-5 text-yellow-500' />
-                  )}
+                  <Checkbox
+                    checked={task.completed}
+                    onCheckedChange={(checked) => {
+                      updateTask({
+                        ...task,
+                        completed: checked ? true : false,
+                      });
+                      setTasks(
+                        tasks.map((t) =>
+                          t.id === task.id
+                            ? { ...t, completed: checked ? true : false }
+                            : t
+                        )
+                      );
+                    }}
+                  />
                 </TableCell>
                 <TableCell className='font-medium'>{task.title}</TableCell>
                 <TableCell>
@@ -98,24 +110,9 @@ export default function Tasks() {
                       size='icon'
                       className='h-8 w-8'
                       onClick={() => {
-                        updateTask({ ...task, completed: true });
-                        setTasks(
-                          tasks.map((t) => (t.id === task.id ? task : t))
-                        );
+                        console.log(task);
                       }}>
-                      <Check className='h-4 w-4' />
-                    </Button>
-                    <Button
-                      variant='ghost'
-                      size='icon'
-                      className='h-8 w-8'
-                      onClick={() => {
-                        updateTask({ ...task, completed: false });
-                        setTasks(
-                          tasks.map((t) => (t.id === task.id ? task : t))
-                        );
-                      }}>
-                      <X className='h-4 w-4' />
+                      <Pen className='h-4 w-4' />
                     </Button>
                     <Button
                       variant='ghost'
