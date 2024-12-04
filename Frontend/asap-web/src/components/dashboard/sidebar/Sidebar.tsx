@@ -18,12 +18,19 @@ export default function Sidebar() {
   return (
     <aside className='border-r border-border p-4 flex flex-col gap-4'>
       <CreateItemDialog />
-      <Link href='/dashboard/tasks'>
-        <Button variant='outline' className='w-full font-semibold min-w-64'>
-          See Tasks
-        </Button>
-      </Link>
-
+      {isCalendar ? (
+        <Link href='/dashboard/tasks'>
+          <Button variant='outline' className='w-full font-semibold min-w-64'>
+            See Tasks
+          </Button>
+        </Link>
+      ) : (
+        <Link href='/dashboard/'>
+          <Button variant='outline' className='w-full font-semibold min-w-64'>
+            See Schedule
+          </Button>
+        </Link>
+      )}
       {isCalendar && (
         <>
           <Calendar
