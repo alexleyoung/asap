@@ -9,8 +9,10 @@ from dotenv import load_dotenv
 URL_DATABASE = 'postgresql://postgres:toor!234@localhost:5433/groups' # caiti
 
 # URL_DATABASE = "postgresql://postgres:4618@localhost:5432"  # alex
-load_dotenv()
-URL_DATABASE = os.getenv("DATABASE_URL")
+
+# for testing
+# load_dotenv()
+# URL_DATABASE = os.getenv("DATABASE_URL")
 
 # URL_DATABASE = 'postgresql://postgres:Jacob1214@localhost:5433/CalendarDB' # kaylee
 
