@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 
 # URL_DATABASE = 'postgresql://postgres:dslidder1@localhost:5432/divya' # divya
 
-# URL_DATABASE = 'postgresql://postgres:toor!234@localhost:5433/groups' # caiti
+URL_DATABASE = 'postgresql://postgres:toor!234@localhost:5433/groups' # caiti
 
+# URL_DATABASE = "postgresql://postgres:4618@localhost:5432"  # alex
 load_dotenv()
 URL_DATABASE = os.getenv("DATABASE_URL")
 
