@@ -147,10 +147,10 @@ export async function deleteEvent(eventId: number) {
 }
 
 // Tasks
-export async function getTasks(userID: number) {
+export async function getTasks(userID: number, limit = 100, offset = 0) {
   try {
     const response = await fetch(
-      `http://localhost:8000/tasks?userID=${userID}`,
+      `http://localhost:8000/tasks?userID=${userID}&limit=${limit}&offset=${offset}`,
       {
         method: "GET",
         headers: {
@@ -159,7 +159,8 @@ export async function getTasks(userID: number) {
         },
       }
     );
-    return (await response.json()) as Task[];
+    const res = await response.json();
+    return res as { tasks: Task[]; total: number };
   } catch (error) {
     console.error(error);
   }
@@ -232,7 +233,7 @@ export async function deleteTask(task: Task) {
 // Calendars
 export async function getCalendars(userID: number) {
   const response = await fetch(
-    `http://localhost:8000/calendars/?userID=${userID}`,
+    `http://localhost:8000/calendars?userID=${userID}`,
     {
       method: "GET",
       headers: {
@@ -246,8 +247,9 @@ export async function getCalendars(userID: number) {
     const data = await response.json();
     throw new Error(data.error || "Something went wrong");
   }
-
-  return (await response.json()) as Calendar[];
+  const calendars = (await response.json()) as Calendar[];
+  console.log(calendars);
+  return calendars;
 }
 
 export async function getCalendar(calendarID: number) {
@@ -270,7 +272,7 @@ export async function getCalendar(calendarID: number) {
 
 export async function createCalendar(calendar: CalendarPost) {
   try {
-    const response = await fetch("http://localhost:8000/calendars", {
+    const response = await fetch(`http://localhost:8000/calendars`, {
       method: "POST",
       body: JSON.stringify(calendar),
       headers: {

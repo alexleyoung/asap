@@ -84,15 +84,15 @@ export function EditProfileForm({ user, onSave }: EditProfileFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-6'>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name='firstname'
+          name="firstname"
           render={({ field }) => (
             <FormItem>
               <FormLabel>First Name</FormLabel>
               <FormControl>
-                <Input placeholder='Enter your first name' {...field} />
+                <Input placeholder="Enter your first name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -100,12 +100,12 @@ export function EditProfileForm({ user, onSave }: EditProfileFormProps) {
         />
         <FormField
           control={form.control}
-          name='lastname'
+          name="lastname"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Last Name</FormLabel>
               <FormControl>
-                <Input placeholder='Enter your last name' {...field} />
+                <Input placeholder="Enter your last name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -113,12 +113,12 @@ export function EditProfileForm({ user, onSave }: EditProfileFormProps) {
         />
         <FormField
           control={form.control}
-          name='email'
+          name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type='email' placeholder='Enter your email' {...field} />
+                <Input type="email" placeholder="Enter your email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,19 +126,19 @@ export function EditProfileForm({ user, onSave }: EditProfileFormProps) {
         />
         <FormField
           control={form.control}
-          name='avatar'
+          name="avatar"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Avatar URL</FormLabel>
               <FormControl>
-                <Input placeholder='Enter link to avatar' {...field} />
+                <Input placeholder="Enter link to avatar" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className='flex justify-end'>
-          <Button type='submit' variant='secondary'>
+        <div className="flex justify-end">
+          <Button type="submit" variant="secondary">
             Save Changes
           </Button>
         </div>

@@ -51,7 +51,8 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
         setCalendars,
         selectedCalendars,
         toggleCalendar,
-      }}>
+      }}
+    >
       {children}
     </CalendarContext.Provider>
   );
