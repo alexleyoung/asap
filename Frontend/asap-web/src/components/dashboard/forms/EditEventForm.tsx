@@ -18,6 +18,13 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface EditEventFormProps {
   onClose: () => void;
@@ -35,6 +42,7 @@ const eventSchema = z.object({
   category: z.string(),
   frequency: z.string(),
   location: z.string(),
+  color: z.string(),
   userID: z.number(),
   calendarID: z.number(),
 });
@@ -72,6 +80,7 @@ export function EditEventForm({
       category: eventData.category,
       frequency: eventData.frequency,
       location: eventData.location,
+      color: eventData.color,
       userID: eventData.userID,
       calendarID: eventData.calendarID,
     },
@@ -149,15 +158,15 @@ export function EditEventForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-4'>
         <FormField
           control={form.control}
-          name="title"
+          name='title'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="Event title" {...field} />
+                <Input placeholder='Event title' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -165,12 +174,12 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Event Description" {...field} />
+                <Input placeholder='Event Description' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -178,13 +187,13 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name="start"
+          name='start'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Start Date</FormLabel>
               <FormControl>
                 <Input
-                  type="datetime-local"
+                  type='datetime-local'
                   {...field}
                   value={startString}
                   onChange={(e) => {
@@ -199,13 +208,13 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name="end"
+          name='end'
           render={({ field }) => (
             <FormItem>
               <FormLabel>End Date</FormLabel>
               <FormControl>
                 <Input
-                  type="datetime-local"
+                  type='datetime-local'
                   {...field}
                   value={endString}
                   onChange={(e) => {
@@ -220,12 +229,95 @@ export function EditEventForm({
         />
         <FormField
           control={form.control}
-          name="location"
+          name='location'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location</FormLabel>
               <FormControl>
-                <Input placeholder="Event Location" {...field} />
+                <Input placeholder='Event Location' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='color'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Color</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Blue' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value='red'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-red-500' />
+                        Red
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='yellow'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-yellow-500' />
+                        Yellow
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='green'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-green-500' />
+                        Green
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='blue'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-blue-500' />
+                        Blue
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='purple'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-purple-500' />
+                        Purple
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='orange'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-orange-500' />
+                        Orange
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='lime'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-lime-500' />
+                        Lime
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='pink'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-pink-500' />
+                        Pink
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='indigo'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-indigo-500' />
+                        Indigo
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='cyan'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-cyan-500' />
+                        Cyan
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -259,16 +351,15 @@ export function EditEventForm({
             </FormItem>
           )}
         /> */}
-        <div className="flex justify-between">
-          <Button type="submit" variant="secondary" disabled={loading}>
+        <div className='flex justify-between'>
+          <Button type='submit' variant='secondary' disabled={loading}>
             Save Changes
           </Button>
           <Button
-            type="button"
+            type='button'
             onClick={handleDelete}
             disabled={loading}
-            variant="destructive"
-          >
+            variant='destructive'>
             Delete Event
           </Button>
         </div>

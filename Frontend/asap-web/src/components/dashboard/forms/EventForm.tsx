@@ -33,6 +33,7 @@ const formSchema = z.object({
   category: z.string(),
   frequency: z.string(),
   location: z.string(),
+  color: z.string(),
   userID: z.number(),
   calendarID: z.number(),
 });
@@ -53,16 +54,26 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
   );
   const { calendars } = useCalendars();
 
+  const now = new Date();
+  // Round to nearest 30 minutes
+  now.setMinutes(Math.round(now.getMinutes() / 30) * 30);
+  now.setSeconds(0);
+  now.setMilliseconds(0);
+
+  const oneHourLater = new Date(now);
+  oneHourLater.setHours(now.getHours() + 1);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      start: new Date(),
-      end: new Date(Date.now() + 60 * 60 * 1000),
       description: "",
+      start: now,
+      end: oneHourLater,
       category: "",
       frequency: "",
       location: "",
+      color: "blue",
       userID: -1,
       calendarID: calendars[0].id, // temp default
     },
@@ -209,6 +220,90 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
               <FormLabel>Location</FormLabel>
               <FormControl>
                 <Input placeholder='Event location' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='color'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Color</FormLabel>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Blue' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value='red'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-red-500' />
+                        Red
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='yellow'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-yellow-500' />
+                        Yellow
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='green'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-green-500' />
+                        Green
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='blue'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-blue-500' />
+                        Blue
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='purple'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-purple-500' />
+                        Purple
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='orange'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-orange-500' />
+                        Orange
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='lime'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-lime-500' />
+                        Lime
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='pink'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-pink-500' />
+                        Pink
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='indigo'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-indigo-500' />
+                        Indigo
+                      </div>
+                    </SelectItem>
+                    <SelectItem value='cyan'>
+                      <div className='flex items-center gap-2'>
+                        <div className='w-4 h-4 rounded-full bg-cyan-500' />
+                        Cyan
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

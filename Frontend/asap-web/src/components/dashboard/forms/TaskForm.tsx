@@ -4,27 +4,17 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
 
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -36,6 +26,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { TaskPost } from "@/lib/types";
+import { useCalendars } from "@/contexts/CalendarsContext";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -55,6 +46,7 @@ const formSchema = z.object({
   flexible: z.boolean(),
   userID: z.number(),
   calendarID: z.number(),
+  color: z.string(),
 });
 
 interface TaskFormProps {
@@ -66,6 +58,7 @@ export function TaskForm({ onSubmit, loading }: TaskFormProps) {
   const [dateString, setDateString] = useState(
     new Date().toISOString().substring(0, 10)
   );
+  const { calendars } = useCalendars();
 
   const form = useForm<TaskPost>({
     resolver: zodResolver(formSchema),
@@ -81,7 +74,8 @@ export function TaskForm({ onSubmit, loading }: TaskFormProps) {
       flexible: false,
       completed: false,
       userID: -1,
-      calendarID: 1, // temp default
+      calendarID: calendars[0].id, // temp default
+      color: "blue",
     },
   });
 
