@@ -6,6 +6,7 @@ from ..utils.crud import groups as controller
 from ..utils.auth import get_current_user
 from ..database import models
 from typing import List
+from fastapi import status
 from ..utils.websocket_manager import manager
 import json
 
@@ -16,9 +17,9 @@ router = APIRouter(
 
 newRouter = APIRouter(tags=["groups"])
 
-# websocket endpoint for real-time notifications
+# websocket endpoint for real-time invitations
 @newRouter.websocket("/invitations")
-async def websocket_endpoint(websocket: WebSocket):
+async def websocket_invitations(websocket: WebSocket):
     await manager.connect(websocket)
     try:
         while True:
@@ -77,7 +78,7 @@ async def add_member_endpoint(
     db: Session = Depends(get_db),
 ):
             
-    await manager.broadcast(json.dumps({"action": "add_member", "groupID": groupID}))
+    await manager.broadcast(json.dumps({"type": "member_added", "groupID": groupID, "userID": membership.userID}))
 
     return controller.add_member(db, groupID, membership, current_userID)
 
@@ -117,7 +118,7 @@ def get_group_members(groupID: int, db: Session = Depends(get_db)):
     return members
 
 # get group by calendarID
-@router.get("/{calendarID}", response_model=schemas.Group)
+@router.get("/", response_model=schemas.Group)
 def get_group_by_calendar(
     calendarID: int,
     db: Session = Depends(get_db)
@@ -135,3 +136,5 @@ def get_group_by_calendar(
         )
     
     return group
+
+

@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session
 from ..database.db import get_db
 from ..utils.crud import memberships as controller
 from ..utils.auth import get_current_user
-from ..database import models, schemas
+from ..database import schemas
 from typing import List
 
 router = APIRouter(
-    prefix="/members",
-    tags=["members"],
+    prefix="/memberships",
+    tags=["memberships"],
     dependencies=[Depends(get_current_user)],
 )
 
@@ -19,4 +19,5 @@ def get_memberships(
     userID: int,
     db: Session = Depends(get_db),
 ):
-    return controller.get_memberships(db, userID)
+    memberships = controller.get_memberships(db, userID)
+    return memberships

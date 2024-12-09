@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { format, differenceInMinutes } from "date-fns";
 import { useDraggable } from "@dnd-kit/core";
 import { Event, Task } from "@/lib/types";
-import { isEvent, isTask } from "@/lib/utils";
+import { getColor, isEvent, isTask } from "@/lib/utils";
 
 type DraggableItemProps = {
   item: Event | Task;
@@ -42,8 +42,8 @@ export default function DraggableItem({
       left: `${columnOffset * columnWidth}%`,
       width: `${columnWidth}%`,
       cursor: isDragging ? "grabbing" : "grab",
-      zIndex: isDragging ? 20 : 10,
-      opacity: isDragging ? 0.8 : 1,
+      zIndex: isDragging ? 99999999 : 10,
+      opacity: isDragging ? 0 : 1,
       transform: transform
         ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
         : undefined,
@@ -80,7 +80,9 @@ export default function DraggableItem({
         e.stopPropagation();
         onItemClick(item);
       }}
-      className='scale-95 rounded-sm transition-transform p-2 text-white bg-blue-500'>
+      className={`scale-95 rounded-sm transition-transform p-2 text-white bg-${getColor(
+        item.color || ""
+      )}`}>
       <h3 className='font-medium truncate'>{title}</h3>
       <p className='text-xs'>
         {startTime} - {endTime}

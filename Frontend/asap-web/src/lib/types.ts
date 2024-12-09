@@ -20,6 +20,7 @@ export type Event = {
   userID: number;
   calendarID: number;
   location: string;
+  color: string;
 };
 
 export type EventPost = {
@@ -32,6 +33,7 @@ export type EventPost = {
   location: string;
   userID: number;
   calendarID: number;
+  color: string;
 };
 
 // Tasks
@@ -44,14 +46,15 @@ export type Task = {
   category: string;
   frequency: string;
   dueDate: Date;
-  priority: string;
+  priority: "high" | "medium" | "low";
   auto: boolean;
   completed: boolean;
-  difficulty: string;
+  difficulty: "easy" | "medium" | "hard";
   duration: number;
   flexible: boolean;
   userID: number;
   calendarID: number;
+  color: string;
 };
 
 export type TaskPost = {
@@ -70,6 +73,7 @@ export type TaskPost = {
   flexible: boolean;
   userID: number;
   calendarID: number;
+  color: string;
 };
 
 // Calendars
@@ -78,6 +82,7 @@ export type Calendar = {
   name: string;
   description: string;
   timezone: string;
+  color: string;
   userID: number;
 };
 
@@ -85,6 +90,7 @@ export type CalendarPost = {
   name: string;
   description: string;
   timezone: string;
+  color: string;
   userID: number;
 };
 

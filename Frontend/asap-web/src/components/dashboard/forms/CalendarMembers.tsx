@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
+  deleteMember,
   addMember,
   createGroup,
   getGroupByCalendarID,
@@ -39,7 +40,7 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
 
   useEffect(() => {
     // Initialize WebSocket connection
-    const ws = new WebSocket("ws://localhost:8000/invitations");
+    const ws = new WebSocket(`ws://localhost:8000/invitations`);
 
     ws.onopen = () => {
       console.log("Connected to WebSocket Invitations");
@@ -48,35 +49,6 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
     ws.onmessage = (user) => {
       console.log("Received message:", user.data);
       const invitation = JSON.parse(user.data);
-
-      if (invitation.type === "member_added") {
-        //send invitation to user
-        toast({
-          title: "Invitation",
-          description: `You have been invited to join ${calendar.name}`,
-          action: (
-            <div className="flex gap-2">
-              <button
-                className="bg-green-500 text-white px-2 py-1 rounded"
-                onClick={() =>
-                  handleInvitationResponse("accept", invitation.data)
-                }
-              >
-                Accept
-              </button>
-              <button
-                className="bg-red-500 text-white px-2 py-1 rounded"
-                onClick={() =>
-                  handleInvitationResponse("deny", invitation.data)
-                }
-              >
-                Deny
-              </button>
-            </div>
-          ),
-          duration: 10000,
-        });
-      }
 
       if (invitation.type === "invitation_accepted") {
         setMembers((prevMembers) => {
@@ -100,6 +72,7 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
             (member) => member.id !== invitation.data.id
           );
         });
+        handleDeleteMember(invitation.data.groupID, invitation.data.memberID);
       }
     };
 
@@ -115,7 +88,7 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
         if (ws.readyState !== WebSocket.OPEN) {
           console.log("Attempting to reconnect...");
           // Open a new WebSocket connection only if the previous one was closed
-          const newWs = new WebSocket("ws://localhost:8000/notifications");
+          const newWs = new WebSocket(`ws://localhost:8000/invitations`);
           setWs(newWs); // Update the state with the new WebSocket connection
         }
       }, 5000);
@@ -132,42 +105,47 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
     };
   }, []);
 
-  function handleInvitationResponse(response: "accept" | "deny", data: any) {
-    if (response === "accept") {
-      ws?.send(
-        JSON.stringify({
-          action: "accept_invitation",
-          data: {
-            id: data.id,
-          },
-        })
-      );
-    } else {
-      ws?.send(
-        JSON.stringify({
-          action: "reject_invitation",
-          data: {
-            id: data.id,
-          },
-        })
-      );
+  async function handleDeleteMember(groupID: number, memberID: number) {
+    if (!group) {
+      return;
+    }
+    try {
+      await deleteMember(groupID, memberID);
+    } catch (error) {
+      console.error("Failed to remove member:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove member",
+        variant: "destructive",
+      });
     }
   }
 
   useEffect(() => {
     if (!calendar) return;
 
+    console.log("Calendar changed, loading group...");
     (async () => {
       try {
-        let group = await getGroupByCalendarID(calendar.id);
+        console.log("Loading group...");
+        let group;
+        try {
+          group = await getGroupByCalendarID(calendar.id);
+        } catch (error) {
+          console.log("Group not found, proceeding to create one");
+        }
+
         if (!group) {
+          console.log("Creating a new group...");
           group = await createGroup({
             title: calendar.name,
             calendarID: calendar.id,
           });
         }
+
         setGroup(group);
       } catch (error) {
+        console.error("Error occurred:", error);
         toast({
           title: "Error",
           description: "Failed to load group",
@@ -186,8 +164,6 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
   }, [group]);
 
   const handleSubmit = async () => {
-    //add a websocket somewhere here to get real-time invites on other user end, so they can accept or decline
-
     if (!newMember) return;
     if (!group) return;
     // if(membership.permissions !== "ADMIN") {
@@ -198,7 +174,6 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
     //   });
     //   return;
     // }
-    console.log("hello");
 
     const user = await getUserByEmail(newMember);
     if (!user) {
@@ -218,6 +193,13 @@ export const CalendarMembers = ({ calendar }: CalendarMembersProps) => {
       );
       setMembers((prevMembers) => [...prevMembers, membership]);
       setNewMember("");
+      ws?.send(
+        JSON.stringify({
+          action: "add_member",
+          data: membership,
+          calendarName: calendar.name,
+        })
+      );
     } catch (error) {
       console.error("Failed to add member:", error);
       toast({

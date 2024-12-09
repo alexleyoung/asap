@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
 import { deleteCalendar, deleteUser, getCalendars } from "@/lib/scheduleCrud";
@@ -38,6 +38,7 @@ import { useCalendars } from "@/contexts/CalendarsContext";
 import { useUser } from "@/contexts/UserContext";
 import { Calendar } from "@/lib/types";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Header() {
   const { view, setView } = useView();
@@ -49,12 +50,94 @@ export default function Header() {
   const { calendars, setCalendars, toggleCalendar } = useCalendars();
   const pathname = usePathname();
   const isCalendar = pathname === "/dashboard";
+  const { toast } = useToast();
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  //open invite websocket to be able to recieve invites
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8000/invitations");
+
+    ws.onopen = () => {
+      console.log("Connected to WebSocket for invitations");
+    };
+
+    ws.onmessage = (event) => {
+      const invitation = JSON.parse(event.data);
+
+      if (invitation.type === "member_added") {
+        // Trigger the toast globally
+        //this is something that cannot be used here, since you cannot have two user ids in local storage.
+        // const loggedInUser = JSON.parse(localStorage.getItem("User") || "{}");
+        // if (invitation.userID === loggedInUser.id) {
+        toast({
+          title: "Invitation!",
+          description: `You have been invited to join ${invitation.calendarName}`,
+          action: (
+            <div className='flex gap-2'>
+              <button
+                className='bg-green-500 text-white px-2 py-1 rounded'
+                onClick={() =>
+                  handleInvitationResponse("accept", invitation.data)
+                }>
+                Accept
+              </button>
+              <button
+                className='bg-red-500 text-white px-2 py-1 rounded'
+                onClick={() =>
+                  handleInvitationResponse("deny", invitation.data)
+                }>
+                Deny
+              </button>
+            </div>
+          ),
+          duration: 10000,
+        });
+      }
+      //}
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      if (ws.readyState === 1) {
+        ws.close();
+      }
+    };
+  }, []);
+
+  function handleInvitationResponse(response: "accept" | "deny", data: any) {
+    if (response === "accept") {
+      ws?.send(
+        JSON.stringify({
+          action: "accept_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    } else {
+      ws?.send(
+        JSON.stringify({
+          action: "reject_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    }
+  }
 
   const loadCalendars = async () => {
     try {
       if (!user) return;
-      const response = await getCalendars(user.id);
-      setCalendars(response);
+      const calendars = await getCalendars(user.id);
+      setCalendars(calendars);
     } catch (error) {
       console.error("Failed to fetch calendars:", error);
     }
@@ -70,18 +153,11 @@ export default function Header() {
   };
 
   const handleDeleteCalendar = async (calendar: Calendar) => {
-    // if(membership.permissions !== "ADMIN") {
-    //   toast({
-    //     title: "Error",
-    //     description: "You do not have permission to delete calendar",
-    //     duration: 3000,
-    //   });
-    //   return;
-    // }
     try {
-      deleteCalendar(calendar);
+      await deleteCalendar(calendar);
+
       setCalendars((prevCalendars) =>
-        prevCalendars.filter((calendar) => calendar.id !== calendar.id)
+        prevCalendars.filter((c) => c.id !== calendar.id)
       );
 
       toggleCalendar(calendar);
@@ -178,39 +254,35 @@ export default function Header() {
         {user && (
           <Popover>
             <PopoverTrigger>
-              <Avatar className="hover:cursor-pointer relative group">
-                <div className="absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all" />
+              <Avatar className='hover:cursor-pointer relative group'>
+                <div className='absolute size-12 rounded-full bg-black opacity-0 group-hover:opacity-20 transition-all' />
                 <AvatarImage src={user.avatar} alt={user.firstname} />
                 <AvatarFallback>{user.firstname[0]}</AvatarFallback>
               </Avatar>
             </PopoverTrigger>
             <PopoverContent
               sideOffset={5}
-              className="mr-4 p-2 flex flex-col gap-4 text-sm"
-            >
-              <h1 className="px-2 pt-1 font-medium">Hi {user.firstname}!</h1>
+              className='mr-4 p-2 flex flex-col gap-4 text-sm'>
+              <h1 className='px-2 pt-1 font-medium'>Hi {user.firstname}!</h1>
               <Separator />
               <Button
-                variant="ghost"
-                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                onClick={() => setIsOpenProfile(true)}
-              >
+                variant='ghost'
+                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
+                onClick={() => setIsOpenProfile(true)}>
                 View Profile
               </Button>
               <Button
-                variant="ghost"
-                className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                onClick={loadCalendars}
-              >
+                variant='ghost'
+                className='w-full text-left px-2 py-2 font-normal items-center justify-start'
+                onClick={loadCalendars}>
                 Manage Calendars
               </Button>
 
               <AlertDialog>
                 <AlertDialogTrigger>
                   <Button
-                    variant="ghost"
-                    className="w-full text-left px-2 py-2 font-normal items-center justify-start"
-                  >
+                    variant='ghost'
+                    className='w-full text-left px-2 py-2 font-normal items-center justify-start'>
                     Sign Out
                   </Button>
                 </AlertDialogTrigger>

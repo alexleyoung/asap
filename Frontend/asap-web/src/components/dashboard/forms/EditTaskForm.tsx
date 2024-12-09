@@ -43,6 +43,7 @@ const formSchema = z.object({
   userID: z.number(),
   calendarID: z.number(),
   completed: z.boolean(),
+  color: z.string(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -73,6 +74,7 @@ export function EditTaskForm({ task, onSuccess }: EditTaskFormProps) {
       userID: task.userID,
       calendarID: task.calendarID,
       completed: task.completed,
+      color: task.color,
     },
   });
 

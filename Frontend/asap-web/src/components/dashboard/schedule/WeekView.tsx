@@ -8,6 +8,7 @@ import {
   isSameDay,
   startOfDay,
   addMinutes,
+  differenceInMinutes,
 } from "date-fns";
 import { Event, Task, Calendar } from "@/lib/types";
 import TimeSlots from "./TimeSlots";
@@ -15,6 +16,7 @@ import DraggableItem from "./DraggableItem";
 import CurrentTimeLine from "./CurrentTimeLine";
 import GhostLine from "./GhostLine";
 import { useCalendars } from "@/contexts/CalendarsContext";
+import { getCssColor } from "@/lib/utils";
 
 type WeekViewProps = {
   currentDate: Date;
@@ -24,6 +26,8 @@ type WeekViewProps = {
   onEditEvent: (event: Event) => void;
   onEditTask: (task: Task) => void;
   scheduleRef: React.RefObject<HTMLDivElement>;
+  draggedItem: Event | Task | null;
+  previewDate: Date | null;
 };
 
 export default function WeekView({
@@ -34,6 +38,8 @@ export default function WeekView({
   onEditEvent,
   onEditTask,
   scheduleRef,
+  draggedItem,
+  previewDate,
 }: WeekViewProps) {
   const startDate = startOfWeek(currentDate);
   const endDate = endOfWeek(currentDate);
@@ -45,31 +51,8 @@ export default function WeekView({
   } | null>(null);
   const [ghostLineDay, setGhostLineDay] = useState<Date | null>(null);
 
-  // const handleMouseMove = useCallback(
-  //   (e: React.MouseEvent<HTMLDivElement>, day: Date) => {
-  //     if (scheduleRef.current) {
-  //       const rect = scheduleRef.current.getBoundingClientRect();
-  //       const scrollTop = scheduleRef.current.scrollTop;
-  //       const y = e.clientY - rect.top + scrollTop;
-  //       const totalMinutes = Math.floor(
-  //         (y / scheduleRef.current.scrollHeight) * 1440
-  //       );
-  //       const roundedMinutes = Math.round(totalMinutes / 15) * 15;
-  //       const ghostTime = addMinutes(startOfDay(day), roundedMinutes);
-  //       setGhostLinePosition({
-  //         top: (roundedMinutes / 1440) * scheduleRef.current.scrollHeight,
-  //         time: ghostTime,
-  //       });
-  //       setGhostLineDay(day);
-  //     }
-  //   },
-  //   [scheduleRef]
-  // );
-
-  // const handleMouseLeave = useCallback(() => {
-  //   setGhostLinePosition(null);
-  //   setGhostLineDay(null);
-  // }, []);
+  const isEvent = (item: Event | Task): item is Event =>
+    "start" in item && "end" in item;
 
   const renderItems = useCallback(
     (day: Date) => {
@@ -80,13 +63,72 @@ export default function WeekView({
           selectedCalendars.some((cal) => cal.id === event.calendarID)
       );
       const dayTasks = tasks.filter((task) => {
-        // only render scheduled tasks
         if (task.start) {
-          isSameDay(task.start, day) &&
-            selectedCalendars.some((cal) => cal.id === task.calendarID);
-          return task;
+          return (
+            isSameDay(task.start, day) &&
+            selectedCalendars.some((cal) => cal.id === task.calendarID)
+          );
         }
+        return false;
       });
+
+      // Render preview if we're dragging
+      const previewItem =
+        draggedItem && previewDate && isSameDay(day, previewDate) ? (
+          <div
+            style={{
+              position: "absolute",
+              top: `${
+                (differenceInMinutes(previewDate, dayStart) / 1440) * 100
+              }%`,
+              height: `${
+                (differenceInMinutes(
+                  isEvent(draggedItem)
+                    ? draggedItem.end
+                    : addMinutes(
+                        draggedItem.start!,
+                        draggedItem.duration || 30
+                      ),
+                  isEvent(draggedItem) ? draggedItem.start : draggedItem.start!
+                ) /
+                  1440) *
+                100
+              }%`,
+              left: "0",
+              right: "0",
+              backgroundColor: draggedItem.color
+                ? `${getCssColor(draggedItem.color)}33`
+                : "rgba(var(--accent) / 0.2)",
+              border: `2px dashed ${
+                draggedItem.color
+                  ? getCssColor(draggedItem.color)
+                  : "rgb(var(--accent))"
+              }`,
+              borderRadius: "4px",
+              pointerEvents: "none",
+            }}>
+            <div
+              className='p-2 text-xs'
+              style={{
+                color: draggedItem.color
+                  ? getCssColor(draggedItem.color)
+                  : "rgb(var(--accent-foreground))",
+              }}>
+              {draggedItem.title}
+              <br />
+              {format(previewDate, "h:mm a")} -{" "}
+              {format(
+                isEvent(draggedItem)
+                  ? addMinutes(
+                      previewDate,
+                      differenceInMinutes(draggedItem.end, draggedItem.start)
+                    )
+                  : addMinutes(previewDate, draggedItem.duration || 30),
+                "h:mm a"
+              )}
+            </div>
+          </div>
+        ) : null;
 
       return (
         <>
@@ -112,10 +154,19 @@ export default function WeekView({
               columnOffset={0}
             />
           ))}
+          {previewItem}
         </>
       );
     },
-    [events, tasks, selectedCalendars, onEditEvent, onEditTask]
+    [
+      events,
+      tasks,
+      selectedCalendars,
+      onEditEvent,
+      onEditTask,
+      draggedItem,
+      previewDate,
+    ]
   );
 
   return (

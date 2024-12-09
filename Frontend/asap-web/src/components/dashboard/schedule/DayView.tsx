@@ -10,6 +10,7 @@ import { Event, Task, Calendar } from "@/lib/types";
 import TimeSlots from "./TimeSlots";
 import DraggableItem from "./DraggableItem";
 import GhostLine from "./GhostLine";
+import { getCssColor } from "@/lib/utils";
 
 type DayViewProps = {
   currentDate: Date;
@@ -19,6 +20,8 @@ type DayViewProps = {
   onEditEvent: (event: Event) => void;
   onEditTask: (task: Task) => void;
   scheduleRef: React.RefObject<HTMLDivElement>;
+  draggedItem: Event | Task | null;
+  previewDate: Date | null;
 };
 
 export default function DayView({
@@ -29,11 +32,16 @@ export default function DayView({
   onEditEvent,
   onEditTask,
   scheduleRef,
+  draggedItem,
+  previewDate,
 }: DayViewProps) {
   const [ghostLinePosition, setGhostLinePosition] = useState<{
     top: number;
     time: Date;
   } | null>(null);
+
+  const isEvent = (item: Event | Task): item is Event =>
+    "start" in item && "end" in item;
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -62,17 +70,73 @@ export default function DayView({
   const renderItems = useCallback(
     (containerHeight: number) => {
       const dayStart = startOfDay(currentDate);
-      const dayEvents = events.filter(
-        (event) => isSameDay(event.start, currentDate)
-        // &&  selectedCalendars.some((cal) => cal.id === event.calendarID) temporarily disable until calendars implemented
+      const dayEvents = events.filter((event) =>
+        isSameDay(event.start, currentDate)
       );
       const dayTasks = tasks.filter((task) => {
-        if (!("start" in task)) {
+        if (!task.start) {
           return false;
         }
-        isSameDay(task.dueDate, currentDate) &&
-          selectedCalendars.some((cal) => cal.id === task.calendarID);
+        return isSameDay(task.start, currentDate);
       });
+
+      // Render preview if we're dragging
+      const previewItem =
+        draggedItem && previewDate && isSameDay(currentDate, previewDate) ? (
+          <div
+            style={{
+              position: "absolute",
+              top: `${
+                (differenceInMinutes(previewDate, dayStart) / 1440) * 100
+              }%`,
+              height: `${
+                (differenceInMinutes(
+                  isEvent(draggedItem)
+                    ? draggedItem.end
+                    : addMinutes(
+                        draggedItem.start!,
+                        draggedItem.duration || 30
+                      ),
+                  isEvent(draggedItem) ? draggedItem.start : draggedItem.start!
+                ) /
+                  1440) *
+                100
+              }%`,
+              left: "0",
+              right: "0",
+              backgroundColor: draggedItem.color
+                ? `${getCssColor(draggedItem.color)}33`
+                : "rgba(var(--accent) / 0.2)",
+              border: `2px dashed ${
+                draggedItem.color
+                  ? getCssColor(draggedItem.color)
+                  : "rgb(var(--accent))"
+              }`,
+              borderRadius: "4px",
+              pointerEvents: "none",
+            }}>
+            <div
+              className='p-2 text-xs'
+              style={{
+                color: draggedItem.color
+                  ? getCssColor(draggedItem.color)
+                  : "rgb(var(--accent-foreground))",
+              }}>
+              {draggedItem.title}
+              <br />
+              {format(previewDate, "h:mm a")} -{" "}
+              {format(
+                isEvent(draggedItem)
+                  ? addMinutes(
+                      previewDate,
+                      differenceInMinutes(draggedItem.end, draggedItem.start)
+                    )
+                  : addMinutes(previewDate, draggedItem.duration || 30),
+                "h:mm a"
+              )}
+            </div>
+          </div>
+        ) : null;
 
       return (
         <>
@@ -98,37 +162,40 @@ export default function DayView({
               columnOffset={0}
             />
           ))}
+          {previewItem}
         </>
       );
     },
-    [currentDate, events, tasks, selectedCalendars, onEditEvent, onEditTask]
+    [
+      events,
+      tasks,
+      onEditEvent,
+      onEditTask,
+      draggedItem,
+      previewDate,
+      currentDate,
+    ]
   );
 
   return (
-    <div className='flex flex-col h-full'>
-      <div className='flex'>
-        <div className='w-16' />
-        <div className='flex-1 py-2'>{format(currentDate, "EEE d")}</div>
+    <div className='flex flex-1 overflow-hidden'>
+      <div className='w-16 flex-shrink-0 bg-background z-10'>
+        <TimeSlots showLabels={true} day={currentDate} />
       </div>
-      <div className='flex flex-col h-full'>
-        <div
-          className='flex-1 overflow-y-auto relative'
-          ref={scheduleRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}>
-          <div className='flex h-[1440px]'>
-            <div className='w-16 flex-shrink-0 bg-background z-10'>
-              <TimeSlots showLabels={true} day={currentDate} />
-            </div>
-            <div className='flex-1 relative'>
-              <TimeSlots showLabels={false} day={currentDate} />
-              {scheduleRef.current &&
-                renderItems(scheduleRef.current.scrollHeight)}
-              <CurrentTimeLine day={currentDate} />
-              <GhostLine position={ghostLinePosition} />
-            </div>
-          </div>
-        </div>
+      <div
+        className='flex-1 border-l border-border relative'
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}>
+        <TimeSlots showLabels={false} day={currentDate} />
+        {scheduleRef.current && renderItems(scheduleRef.current.scrollHeight)}
+        {ghostLinePosition && (
+          <GhostLine
+            position={{
+              top: ghostLinePosition.top,
+              time: ghostLinePosition.time,
+            }}
+          />
+        )}
       </div>
     </div>
   );

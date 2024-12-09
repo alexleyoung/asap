@@ -64,10 +64,27 @@ export async function deleteUser(userID: number) {
 }
 
 // Events
-export async function getEvents(userID: number) {
+export async function getEvents(calendars: Calendar[]) {
+  try {
+    const events = await Promise.all(
+      calendars.map((calendar) =>
+        getCalendarEvents(calendar.id).then((events) => {
+          return events;
+        })
+      )
+    );
+
+    return events.flat();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getCalendarEvents(calendarID: number) {
   try {
     const response = await fetch(
-      `http://localhost:8000/events/?userID=${userID}`,
+      `http://localhost:8000/events?calendarID=${calendarID}`,
       {
         method: "GET",
         headers: {
@@ -79,6 +96,7 @@ export async function getEvents(userID: number) {
     return (await response.json()) as Event[];
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }
 
@@ -248,8 +266,25 @@ export async function getCalendars(userID: number) {
     throw new Error(data.error || "Something went wrong");
   }
   const calendars = (await response.json()) as Calendar[];
-  console.log(calendars);
+  const groupCalendars = await getGroupCalendars(userID);
+  calendars.push(...groupCalendars);
   return calendars;
+}
+
+export async function getGroupCalendars(userID: number) {
+  try {
+    const memberships = await getMemberships(userID);
+    const groups = await Promise.all(
+      memberships.map((membership) => getGroup(membership.groupID))
+    );
+    const calendars = await Promise.all(
+      groups.map((group) => getCalendar(group.calendarID))
+    );
+    return calendars.filter((calendar) => calendar.userID !== userID);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function getCalendar(calendarID: number) {
@@ -267,6 +302,7 @@ export async function getCalendar(calendarID: number) {
     return (await response.json()) as Calendar;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }
 
@@ -338,8 +374,6 @@ export async function deleteCalendar(calendar: Calendar) {
     if (!response.ok) {
       throw new Error("Failed to delete the calendar");
     }
-
-    return await response.json();
   } catch (error) {
     console.error("Failed to delete the calendar");
     throw error;
@@ -370,13 +404,16 @@ export async function getGroup(groupID: number) {
 
 export async function getGroupByCalendarID(calendarID: number) {
   try {
-    const response = await fetch(`http://localhost:8000/groups/${calendarID}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await fetch(
+      `http://localhost:8000/groups/?calendarID=${calendarID}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to get group");
@@ -454,12 +491,12 @@ export async function addMember(
     );
 
     if (!response.ok) {
-      throw new Error("Failed to add member to group");
+      throw new Error("Failed! to add member to group");
     }
 
     return (await response.json()) as Membership;
   } catch (error) {
-    console.error("Failed to add member to group");
+    console.error("Failed :( to add member to group");
     throw error;
   }
 }
@@ -485,6 +522,30 @@ export async function getMembers(groupID: number) {
     return memberships;
   } catch (error) {
     console.error("Failed to get members of group");
+    throw error;
+  }
+}
+
+export async function deleteMember(groupID: number, userID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/${groupID}/members/${userID}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delete member");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete member");
     throw error;
   }
 }

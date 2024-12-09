@@ -78,14 +78,12 @@ export const ManageCalendarsDialog = ({
                   <span>{calendar.name}</span>
                   <Button
                     onClick={() => handleEditClick(calendar)}
-                    className="m-3"
-                  >
+                    className='m-3'>
                     Edit
                   </Button>
                   <Button
                     onClick={() => handleDelete(calendar)}
-                    variant="destructive"
-                  >
+                    variant='destructive'>
                     Delete
                   </Button>
                 </div>
@@ -94,7 +92,7 @@ export const ManageCalendarsDialog = ({
           </DialogDescription>
           <DialogFooter>
             {isEditing && (
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
+              <Button variant='outline' onClick={() => setIsEditing(false)}>
                 Cancel
               </Button>
             )}
