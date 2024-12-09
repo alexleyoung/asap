@@ -46,12 +46,6 @@ type EventFormProps = {
 };
 
 export function EventForm({ onSubmit, loading = false }: EventFormProps) {
-  const [startString, setStartString] = useState(
-    new Date().toISOString().substring(0, 14) + "00"
-  );
-  const [endString, setEndString] = useState(
-    new Date(Date.now() + 60 * 60 * 1000).toISOString().substring(0, 14) + "00"
-  );
   const { calendars } = useCalendars();
 
   const now = new Date();
@@ -62,6 +56,19 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
 
   const oneHourLater = new Date(now);
   oneHourLater.setHours(now.getHours() + 1);
+
+  // Format for datetime-local input (YYYY-MM-DDThh:mm)
+  const formatDateForInput = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const [startString, setStartString] = useState(formatDateForInput(now));
+  const [endString, setEndString] = useState(formatDateForInput(oneHourLater));
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -115,6 +122,7 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
                   <Input
                     type='datetime-local'
                     {...field}
+                    defaultValue={startString}
                     value={startString}
                     onChange={(e) => {
                       setStartString(e.target.value);
