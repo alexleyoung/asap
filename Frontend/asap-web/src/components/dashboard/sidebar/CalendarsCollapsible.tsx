@@ -139,77 +139,36 @@ export default function CalendarsCollapsible() {
         </Button>
       </CollapsibleTrigger>
 
-      <CollapsibleContent className='px-2 space-y-2'>
+      <CollapsibleContent className='px-2 space-y-1'>
         {calendars.map((calendar) => {
           return (
-            <ContextMenu key={calendar.id}>
-              <ContextMenuTrigger>
-                <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md group'>
-                  <Checkbox
-                    id={calendar.id.toString()}
-                    checked={selectedCalendars.some(
-                      (c) => c.id === calendar.id
-                    )}
-                    onCheckedChange={() => toggleCalendar(calendar)}
-                    className={
-                      colorClasses[
-                        calendar.color as keyof typeof colorClasses
-                      ] || colorClasses.blue
-                    }
-                  />
-                  <Label htmlFor={calendar.id.toString()} className='flex-1'>
-                    {calendar.name}
-                  </Label>
-                  <Button
-                    variant='ghost'
-                    size='icon'
-                    className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSelectedCalendarForEdit(calendar);
-                      setEditDialogOpen(true);
-                    }}
-                    aria-label={`Edit ${calendar.name}`}>
-                    <MoreHorizontal className='h-4 w-4' />
-                  </Button>
-                </div>
-              </ContextMenuTrigger>
-              <ContextMenuContent>
-                <ContextMenuItem
-                  onClick={() => {
-                    setSelectedCalendarForEdit(calendar);
-                    setEditDialogOpen(true);
-                  }}>
-                  Edit Calendar
-                </ContextMenuItem>
-                <ContextMenuSeparator />
-                <ContextMenuItem
-                  className='text-red-600'
-                  onClick={async () => {
-                    try {
-                      await deleteCalendar(calendar);
-                      setCalendars((prevCalendars) =>
-                        prevCalendars.filter((c) => c.id !== calendar.id)
-                      );
-                      toast({
-                        title: "Success",
-                        description: "Calendar deleted successfully",
-                        duration: 3000,
-                      });
-                    } catch (error) {
-                      toast({
-                        title: "Error",
-                        description: "Failed to delete calendar",
-                        duration: 3000,
-                      });
-                      console.error("Failed to delete calendar:", error);
-                    }
-                  }}>
-                  Delete Calendar
-                </ContextMenuItem>
-              </ContextMenuContent>
-            </ContextMenu>
+            <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md group'>
+              <Checkbox
+                id={calendar.id.toString()}
+                checked={selectedCalendars.some((c) => c.id === calendar.id)}
+                onCheckedChange={() => toggleCalendar(calendar)}
+                className={
+                  colorClasses[calendar.color as keyof typeof colorClasses] ||
+                  colorClasses.blue
+                }
+              />
+              <Label htmlFor={calendar.id.toString()} className='flex-1'>
+                {calendar.name}
+              </Label>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSelectedCalendarForEdit(calendar);
+                  setEditDialogOpen(true);
+                }}
+                aria-label={`Edit ${calendar.name}`}>
+                <MoreHorizontal className='h-4 w-4' />
+              </Button>
+            </div>
           );
         })}
 

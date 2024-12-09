@@ -29,11 +29,13 @@ type CalendarFormValues = z.infer<typeof formSchema>;
 interface EditCalendarFormProps {
   calendar: Calendar;
   onSave: (arg0: Calendar) => void;
+  onDelete?: (arg0: Calendar) => void;
 }
 
 export const EditCalendarForm = ({
   calendar,
   onSave,
+  onDelete,
 }: EditCalendarFormProps) => {
   const form = useForm<CalendarFormValues>({
     resolver: zodResolver(formSchema),
@@ -132,7 +134,15 @@ export const EditCalendarForm = ({
             </FormItem>
           )}
         />
-        <div className='flex justify-end'>
+        <div className='flex justify-between space-x-2'>
+          {onDelete && (
+            <Button
+              type='button'
+              variant='destructive'
+              onClick={() => onDelete(calendar)}>
+              Delete
+            </Button>
+          )}
           <Button type='submit' variant='secondary'>
             Save
           </Button>

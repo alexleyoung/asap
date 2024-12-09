@@ -5,6 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import EditCalendarForm from "./EditCalendarForm";
 import { CalendarMembers } from "./CalendarMembers";
 import { Calendar } from "@/lib/types";
+import { deleteCalendar } from "@/lib/scheduleCrud";
+import { useCalendars } from "@/contexts/CalendarsContext";
+import { useToast } from "@/hooks/use-toast";
 
 interface EditCalendarTabsProps {
   calendar: Calendar;
@@ -21,6 +24,36 @@ export default function EditCalendarTabs({
     onSave(updatedCalendar);
     onClose();
   };
+  const { toast } = useToast();
+
+  const { setCalendars, toggleCalendar } = useCalendars();
+
+  const handleDeleteCalendar = async (calendar: Calendar) => {
+    try {
+      await deleteCalendar(calendar);
+
+      setCalendars((prevCalendars) =>
+        prevCalendars.filter((c) => c.id !== calendar.id)
+      );
+
+      toggleCalendar(calendar);
+
+      toast({
+        title: "Calendar and associated events deleted successfully.",
+        duration: 3000,
+      });
+
+      console.log("Calendar and associated events deleted successfully.");
+    } catch (error) {
+      toast({
+        title: "Error deleting calendar and events.",
+        description: "Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      console.error("Error deleting calendar and events:", error);
+    }
+  };
 
   return (
     <Tabs defaultValue='details' className='w-full'>
@@ -35,7 +68,11 @@ export default function EditCalendarTabs({
         </TabsList>
       </DialogHeader>
       <TabsContent value='details'>
-        <EditCalendarForm calendar={calendar} onSave={handleSave} />
+        <EditCalendarForm
+          calendar={calendar}
+          onSave={handleSave}
+          onDelete={handleDeleteCalendar}
+        />
       </TabsContent>
       <TabsContent value='members'>
         <CalendarMembers calendar={calendar} />

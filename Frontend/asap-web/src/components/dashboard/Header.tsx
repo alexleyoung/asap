@@ -155,8 +155,9 @@ export default function Header() {
   const handleDeleteCalendar = async (calendar: Calendar) => {
     try {
       await deleteCalendar(calendar);
+
       setCalendars((prevCalendars) =>
-        prevCalendars.filter((calendar) => calendar.id !== calendar.id)
+        prevCalendars.filter((c) => c.id !== calendar.id)
       );
 
       toggleCalendar(calendar);
