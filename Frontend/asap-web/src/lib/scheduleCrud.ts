@@ -248,7 +248,6 @@ export async function getCalendars(userID: number) {
     throw new Error(data.error || "Something went wrong");
   }
   const calendars = (await response.json()) as Calendar[];
-  console.log(calendars);
   return calendars;
 }
 
