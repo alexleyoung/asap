@@ -43,7 +43,7 @@ export default function DraggableItem({
       width: `${columnWidth}%`,
       cursor: isDragging ? "grabbing" : "grab",
       zIndex: isDragging ? 20 : 10,
-      opacity: isDragging ? 0.8 : 1,
+      opacity: isDragging ? 0 : 1,
       transform: transform
         ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
         : undefined,

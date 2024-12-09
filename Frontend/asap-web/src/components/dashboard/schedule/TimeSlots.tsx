@@ -1,6 +1,6 @@
 import React from "react";
 import { format, setHours, setMinutes } from "date-fns";
-import { useDroppable } from "@dnd-kit/core";
+import DroppableTimeSlot from "./DroppableTimeSlot";
 
 type TimeSlotsProps = {
   showLabels: boolean;
@@ -9,21 +9,23 @@ type TimeSlotsProps = {
 
 export default function TimeSlots({ showLabels, day }: TimeSlotsProps) {
   return (
-    <>
+    <div className='grid grid-rows-[repeat(96,1fr)] h-full'>
       {Array.from({ length: 24 * 4 }, (_, i) => {
         const hour = Math.floor(i / 4);
         const minute = (i % 4) * 15;
+        const isHourSlot = minute === 0;
         return (
           <TimeSlot
             key={i}
             day={day}
             hour={hour}
             minute={minute}
-            showLabel={hour === 0 ? false : showLabels}
+            showLabel={showLabels && isHourSlot}
+            isHourSlot={isHourSlot}
           />
         );
       })}
-    </>
+    </div>
   );
 }
 
@@ -32,26 +34,23 @@ type TimeSlotProps = {
   hour: number;
   minute: number;
   showLabel: boolean;
+  isHourSlot: boolean;
 };
 
-function TimeSlot({ day, hour, minute, showLabel }: TimeSlotProps) {
-  const { setNodeRef } = useDroppable({
-    id: `${format(day, "yyyy-MM-dd")}-${hour * 60 + minute}`,
-  });
-
-  const isHourMark = minute === 0;
+function TimeSlot({ day, hour, minute, showLabel, isHourSlot }: TimeSlotProps) {
+  const slotDate = setHours(setMinutes(day, minute), hour);
 
   return (
-    <div
-      ref={setNodeRef}
-      className={`h-[15px] ${
-        isHourMark ? "border-t border-border" : ""
+    <DroppableTimeSlot
+      date={slotDate}
+      className={`min-h-[15px] ${
+        isHourSlot ? "border-t border-border" : ""
       } relative`}>
-      {showLabel && isHourMark && (
-        <span className='absolute bg-background -top-2 left-0 text-xs text-accent-foreground'>
-          {format(setHours(setMinutes(day, minute), hour), "h a")}
+      {showLabel && hour !== 0 && (
+        <span className='absolute -top-2 text-xs text-muted-foreground bg-background whitespace-nowrap'>
+          {format(slotDate, "h:mm a").toLowerCase()}
         </span>
       )}
-    </div>
+    </DroppableTimeSlot>
   );
 }

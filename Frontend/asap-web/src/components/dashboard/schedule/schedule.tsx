@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   DndContext,
   DragEndEvent,
+  DragStartEvent,
+  DragOverEvent,
+  DragCancelEvent,
   useSensor,
   PointerSensor,
 } from "@dnd-kit/core";
@@ -23,6 +26,8 @@ import MonthView from "./MonthView";
 import EditEventDialog from "./EditEventDialog";
 import { snapToTimeSlot } from "@/lib/utils";
 import { useHotkeys } from "react-hotkeys-hook";
+import { differenceInMinutes, addMinutes, format } from "date-fns"; // Import date-fns functions
+import { isEvent, isTask } from "@/lib/utils"; // Import type guards
 
 export type ScheduleProps = {
   events: Event[];
@@ -128,6 +133,9 @@ export default function Schedule({
     };
   }, []);
 
+  const [draggedItem, setDraggedItem] = useState<Event | Task | null>(null);
+  const [previewDate, setPreviewDate] = useState<Date | null>(null);
+
   const handleEditEvent = (event: Event) => {
     setEditingEvent(event);
     setIsEditing(true);
@@ -136,8 +144,66 @@ export default function Schedule({
     throw new Error("Function not implemented.");
   }
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    // Implement drag end logic here
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const item = event.active.data.current as Event | Task;
+    setDraggedItem(item);
+  }, []);
+
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    if (!event.over) return;
+
+    const dropZoneId = event.over.id as string;
+    const [, dateStr] = dropZoneId.split("dropzone-");
+    const [year, month, day, hour, minute] = dateStr.split("-").map(Number);
+    const dropDate = new Date(year, month - 1, day, hour, minute);
+    setPreviewDate(dropDate);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setDraggedItem(null);
+      setPreviewDate(null);
+
+      if (!over) return;
+
+      const draggedItem = active.data.current as Event | Task;
+      const dropZoneId = over.id as string;
+
+      const [, dateStr] = dropZoneId.split("dropzone-");
+      const [year, month, day, hour, minute] = dateStr.split("-").map(Number);
+
+      const dropDate = new Date(year, month - 1, day, hour, minute);
+      console.log("Dropping at:", format(dropDate, "yyyy-MM-dd HH:mm"));
+
+      if (isEvent(draggedItem)) {
+        const duration = differenceInMinutes(
+          draggedItem.end,
+          draggedItem.start
+        );
+        const updatedEvent: Event = {
+          ...draggedItem,
+          start: dropDate,
+          end: addMinutes(dropDate, duration),
+        };
+        console.log("Updating event:", updatedEvent);
+        onEventUpdate(updatedEvent);
+      } else if (isTask(draggedItem)) {
+        const updatedTask: Task = {
+          ...draggedItem,
+          start: dropDate,
+          end: addMinutes(dropDate, draggedItem.duration || 30),
+        };
+        console.log("Updating task:", updatedTask);
+        onTaskUpdate(updatedTask);
+      }
+    },
+    [onEventUpdate, onTaskUpdate]
+  );
+
+  const handleDragCancel = useCallback((event: DragCancelEvent) => {
+    setDraggedItem(null);
+    setPreviewDate(null);
   }, []);
 
   const pointerSensor = useSensor(PointerSensor, {
@@ -149,13 +215,15 @@ export default function Schedule({
 
   return (
     <DndContext
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
       modifiers={[snapToTimeSlot]}
       sensors={[pointerSensor]}
-      autoScroll={false}
-    >
-      <div className="flex-grow h-full flex flex-col p-4 bg-background text-foreground">
-        <ScrollArea className="h-full">
+      autoScroll={false}>
+      <div className='flex-grow h-full flex flex-col p-4 bg-background text-foreground'>
+        <ScrollArea className='h-full'>
           {view === "day" && (
             <DayView
               currentDate={currentDate}
@@ -165,6 +233,8 @@ export default function Schedule({
               onEditEvent={handleEditEvent}
               onEditTask={handleEditTask}
               scheduleRef={scheduleRef}
+              draggedItem={draggedItem}
+              previewDate={previewDate}
             />
           )}
           {view === "week" && (
@@ -176,6 +246,8 @@ export default function Schedule({
               onEditEvent={handleEditEvent}
               onEditTask={handleEditTask}
               scheduleRef={scheduleRef}
+              draggedItem={draggedItem}
+              previewDate={previewDate}
             />
           )}
           {view === "month" && (
@@ -186,13 +258,15 @@ export default function Schedule({
               selectedCalendars={selectedCalendars}
               onEditEvent={handleEditEvent}
               onEditTask={handleEditTask}
+              draggedItem={draggedItem}
+              previewDate={previewDate}
             />
           )}
         </ScrollArea>
         <Dialog open={newItem !== null} onOpenChange={() => setNewItem(null)}>
           <DialogHeader>
-            <DialogTitle className="sr-only">Create New Item</DialogTitle>
-            <DialogDescription className="sr-only">
+            <DialogTitle className='sr-only'>Create New Item</DialogTitle>
+            <DialogDescription className='sr-only'>
               Create a new item
             </DialogDescription>
           </DialogHeader>

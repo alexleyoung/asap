@@ -4,7 +4,12 @@ import Schedule from "@/components/dashboard/schedule";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
 import { Task, Event, Calendar } from "@/lib/types";
-import { getEvents, getCalendars, getTasks } from "@/lib/scheduleCrud";
+import {
+  getEvents,
+  getCalendars,
+  getTasks,
+  updateEvent,
+} from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { useRouter } from "next/navigation";
@@ -17,7 +22,31 @@ export default function Dashboard() {
 
   const router = useRouter();
 
-  const handleEventUpdate = (updatedEvent: Event) => {};
+  const handleEventUpdate = (updatedEvent: Event) => {
+    let old: Event;
+    setEvents((prevEvents) => {
+      return prevEvents.map((event) => {
+        if (event.id === updatedEvent.id) {
+          old = event;
+          return updatedEvent;
+        }
+        return event;
+      });
+    });
+    try {
+      updateEvent(updatedEvent);
+    } catch (error) {
+      setEvents((prevEvents) =>
+        prevEvents.filter((e) => {
+          if (e.id === updatedEvent.id) {
+            return old;
+          }
+          return e;
+        })
+      );
+      console.error("Failed to update event:", error);
+    }
+  };
   const handleTaskUpdate = (updatedTask: Task) => {};
 
   useEffect(() => {

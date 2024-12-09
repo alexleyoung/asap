@@ -60,3 +60,30 @@ export function getColor(color: string) {
       return "blue-500";
   }
 }
+
+export function getCssColor(color: string) {
+  switch (color.toLowerCase()) {
+    case "red":
+      return "#ef4444"; // red-500
+    case "yellow":
+      return "#eab308"; // yellow-500
+    case "green":
+      return "#22c55e"; // green-500
+    case "blue":
+      return "#3b82f6"; // blue-500
+    case "purple":
+      return "#a855f7"; // purple-500
+    case "orange":
+      return "#f97316"; // orange-500
+    case "lime":
+      return "#84cc16"; // lime-500
+    case "pink":
+      return "#ec4899"; // pink-500
+    case "indigo":
+      return "#6366f1"; // indigo-500
+    case "cyan":
+      return "#06b6d4"; // cyan-500
+    default:
+      return "#3b82f6"; // blue-500
+  }
+}
