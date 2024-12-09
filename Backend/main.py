@@ -35,6 +35,7 @@ app.include_router(events.newRouter)
 app.include_router(tasks.router)
 app.include_router(calendars.router)
 app.include_router(groups.router)
+app.include_router(groups.newRouter)
 
 
 # Unprocessable Entity error handler
