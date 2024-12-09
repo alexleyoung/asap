@@ -3,11 +3,10 @@
 import Schedule from "@/components/dashboard/schedule";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
-import { Task, Event } from "@/lib/types";
-import { getEvents, getTasks } from "@/lib/scheduleCrud";
+import { Task, Event, Calendar } from "@/lib/types";
+import { getEvents, getCalendars, getTasks } from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
 import { useCalendars } from "@/contexts/CalendarsContext";
-import { getCalendars } from "@/lib/scheduleCrud";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
@@ -28,9 +27,10 @@ export default function Dashboard() {
           // router.push("/");
           return;
         }
-        setEvents((await getEvents(user.id)) || []);
         setTasks((await getTasks(user.id))?.tasks || []);
-        setCalendars((await getCalendars(user.id)) || []);
+        const calendars = await getCalendars(user.id);
+        setCalendars(calendars);
+        setEvents(await getEvents(calendars));
       } catch (error) {
         console.error("Failed to fetch schedule items:", error);
       } finally {

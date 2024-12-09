@@ -64,10 +64,27 @@ export async function deleteUser(userID: number) {
 }
 
 // Events
-export async function getEvents(userID: number) {
+export async function getEvents(calendars: Calendar[]) {
+  try {
+    const events = await Promise.all(
+      calendars.map((calendar) =>
+        getCalendarEvents(calendar.id).then((events) => {
+          return events;
+        })
+      )
+    );
+
+    return events.flat();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getCalendarEvents(calendarID: number) {
   try {
     const response = await fetch(
-      `http://localhost:8000/events/?userID=${userID}`,
+      `http://localhost:8000/events?calendarID=${calendarID}`,
       {
         method: "GET",
         headers: {
@@ -79,6 +96,7 @@ export async function getEvents(userID: number) {
     return (await response.json()) as Event[];
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }
 
@@ -248,7 +266,25 @@ export async function getCalendars(userID: number) {
     throw new Error(data.error || "Something went wrong");
   }
   const calendars = (await response.json()) as Calendar[];
+  const groupCalendars = await getGroupCalendars(userID);
+  calendars.push(...groupCalendars);
   return calendars;
+}
+
+export async function getGroupCalendars(userID: number) {
+  try {
+    const memberships = await getMemberships(userID);
+    const groups = await Promise.all(
+      memberships.map((membership) => getGroup(membership.groupID))
+    );
+    const calendars = await Promise.all(
+      groups.map((group) => getCalendar(group.calendarID))
+    );
+    return calendars.filter((calendar) => calendar.userID !== userID);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function getCalendar(calendarID: number) {
@@ -266,6 +302,7 @@ export async function getCalendar(calendarID: number) {
     return (await response.json()) as Calendar;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 }
 
