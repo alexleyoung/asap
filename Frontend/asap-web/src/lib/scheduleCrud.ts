@@ -369,13 +369,16 @@ export async function getGroup(groupID: number) {
 
 export async function getGroupByCalendarID(calendarID: number) {
   try {
-    const response = await fetch(`http://localhost:8000/groups/${calendarID}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await fetch(
+      `http://localhost:8000/groups/?calendarID=${calendarID}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to get group");
@@ -453,12 +456,12 @@ export async function addMember(
     );
 
     if (!response.ok) {
-      throw new Error("Failed to add member to group");
+      throw new Error("Failed! to add member to group");
     }
 
     return (await response.json()) as Membership;
   } catch (error) {
-    console.error("Failed to add member to group");
+    console.error("Failed :( to add member to group");
     throw error;
   }
 }
@@ -484,6 +487,30 @@ export async function getMembers(groupID: number) {
     return memberships;
   } catch (error) {
     console.error("Failed to get members of group");
+    throw error;
+  }
+}
+
+export async function deleteMember(groupID: number, userID: number) {
+  try {
+    const response = await fetch(
+      `http://localhost:8000/groups/${groupID}/members/${userID}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to delete member");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to delete member");
     throw error;
   }
 }

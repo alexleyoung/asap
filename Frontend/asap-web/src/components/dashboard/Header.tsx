@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { ViewProfileDialog } from "@/components/dashboard/forms/ViewProfileDialog";
 import { ManageCalendarsDialog } from "./forms/ManageCalendarsDialog";
 import { deleteCalendar, deleteUser, getCalendars } from "@/lib/scheduleCrud";
@@ -38,6 +38,7 @@ import { useCalendars } from "@/contexts/CalendarsContext";
 import { useUser } from "@/contexts/UserContext";
 import { Calendar } from "@/lib/types";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Header() {
   const { view, setView } = useView();
@@ -49,6 +50,90 @@ export default function Header() {
   const { calendars, setCalendars, toggleCalendar } = useCalendars();
   const pathname = usePathname();
   const isCalendar = pathname === "/dashboard";
+  const { toast } = useToast();
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  //open invite websocket to be able to recieve invites
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:8000/invitations");
+
+    ws.onopen = () => {
+      console.log("Connected to WebSocket for invitations");
+    };
+
+    ws.onmessage = (event) => {
+      const invitation = JSON.parse(event.data);
+
+      if (invitation.type === "member_added") {
+        // Trigger the toast globally
+        //this is something that cannot be used here, since you cannot have two user ids in local storage.
+        // const loggedInUser = JSON.parse(localStorage.getItem("User") || "{}");
+        // if (invitation.userID === loggedInUser.id) {
+        toast({
+          title: "Invitation!",
+          description: `You have been invited to join ${invitation.calendarName}`,
+          action: (
+            <div className="flex gap-2">
+              <button
+                className="bg-green-500 text-white px-2 py-1 rounded"
+                onClick={() =>
+                  handleInvitationResponse("accept", invitation.data)
+                }
+              >
+                Accept
+              </button>
+              <button
+                className="bg-red-500 text-white px-2 py-1 rounded"
+                onClick={() =>
+                  handleInvitationResponse("deny", invitation.data)
+                }
+              >
+                Deny
+              </button>
+            </div>
+          ),
+          duration: 10000,
+        });
+      }
+      //}
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    return () => {
+      if (ws.readyState === 1) {
+        ws.close();
+      }
+    };
+  }, []);
+
+  function handleInvitationResponse(response: "accept" | "deny", data: any) {
+    if (response === "accept") {
+      ws?.send(
+        JSON.stringify({
+          action: "accept_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    } else {
+      ws?.send(
+        JSON.stringify({
+          action: "reject_invitation",
+          data: {
+            id: data.id,
+          },
+        })
+      );
+    }
+  }
 
   const loadCalendars = async () => {
     try {
@@ -132,49 +217,50 @@ export default function Header() {
   };
 
   return (
-    <header className='px-5 py-3 border-b border-border flex items-center justify-between'>
-      <Link className='text-2xl font-bold' href='/dashboard'>
+    <header className="px-5 py-3 border-b border-border flex items-center justify-between">
+      <Link className="text-2xl font-bold" href="/dashboard">
         asap.
       </Link>
       {isCalendar && (
-        <div className='flex justify-between items-center gap-4'>
-          <div className='flex gap-4 items-center'>
+        <div className="flex justify-between items-center gap-4">
+          <div className="flex gap-4 items-center">
             <ChevronLeft
               size={32}
-              className='rounded-full hover:bg-muted p-1 transition-colors'
+              className="rounded-full hover:bg-muted p-1 transition-colors"
               onClick={() => handleDateChange("prev")}
             />
             <ChevronRight
               size={32}
-              className='rounded-full hover:bg-muted p-1 transition-colors'
+              className="rounded-full hover:bg-muted p-1 transition-colors"
               onClick={() => handleDateChange("next")}
             />
             <Button
-              variant='outline'
-              onClick={() => setCurrentDate(new Date())}>
+              variant="outline"
+              onClick={() => setCurrentDate(new Date())}
+            >
               Today
             </Button>
-            <h2 className='font-medium text-xl'>
+            <h2 className="font-medium text-xl">
               {view === "day"
                 ? format(currentDate, "MMMM d, yyyy")
                 : format(currentDate, "MMMM yyyy")}
             </h2>
           </div>
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             <Select value={view} onValueChange={handleViewChange}>
               <SelectTrigger>
-                <SelectValue placeholder='View' className='text-sm' />
+                <SelectValue placeholder="View" className="text-sm" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='day'>Day</SelectItem>
-                <SelectItem value='week'>Week</SelectItem>
-                <SelectItem value='month'>Month</SelectItem>
+                <SelectItem value="day">Day</SelectItem>
+                <SelectItem value="week">Week</SelectItem>
+                <SelectItem value="month">Month</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
       )}
-      <div className='flex gap-4 items-center'>
+      <div className="flex gap-4 items-center">
         {user && (
           <Popover>
             <PopoverTrigger>
