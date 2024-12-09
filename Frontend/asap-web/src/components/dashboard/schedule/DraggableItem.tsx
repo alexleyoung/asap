@@ -42,7 +42,7 @@ export default function DraggableItem({
       left: `${columnOffset * columnWidth}%`,
       width: `${columnWidth}%`,
       cursor: isDragging ? "grabbing" : "grab",
-      zIndex: isDragging ? 20 : 10,
+      zIndex: isDragging ? 99999999 : 10,
       opacity: isDragging ? 0 : 1,
       transform: transform
         ? `translate3d(${transform.x}px, ${transform.y}px, 0)`

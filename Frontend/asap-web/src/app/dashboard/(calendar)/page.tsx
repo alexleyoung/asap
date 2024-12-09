@@ -44,7 +44,6 @@ export default function Dashboard() {
           return e;
         })
       );
-      console.error("Failed to update event:", error);
     }
   };
   const handleTaskUpdate = (updatedTask: Task) => {};

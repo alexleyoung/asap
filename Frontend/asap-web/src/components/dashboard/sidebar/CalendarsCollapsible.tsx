@@ -139,10 +139,12 @@ export default function CalendarsCollapsible() {
         </Button>
       </CollapsibleTrigger>
 
-      <CollapsibleContent className='px-2 space-y-1'>
+      <CollapsibleContent className='px-2 space-y-2'>
         {calendars.map((calendar) => {
           return (
-            <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md group'>
+            <div
+              className='flex gap-2 items-center w-full hover:bg-muted transition-colors px-1 rounded-md group'
+              key={calendar.id}>
               <Checkbox
                 id={calendar.id.toString()}
                 checked={selectedCalendars.some((c) => c.id === calendar.id)}

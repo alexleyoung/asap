@@ -174,7 +174,6 @@ export default function Schedule({
       const [year, month, day, hour, minute] = dateStr.split("-").map(Number);
 
       const dropDate = new Date(year, month - 1, day, hour, minute);
-      console.log("Dropping at:", format(dropDate, "yyyy-MM-dd HH:mm"));
 
       if (isEvent(draggedItem)) {
         const duration = differenceInMinutes(
@@ -186,7 +185,6 @@ export default function Schedule({
           start: dropDate,
           end: addMinutes(dropDate, duration),
         };
-        console.log("Updating event:", updatedEvent);
         onEventUpdate(updatedEvent);
       } else if (isTask(draggedItem)) {
         const updatedTask: Task = {
@@ -194,7 +192,6 @@ export default function Schedule({
           start: dropDate,
           end: addMinutes(dropDate, draggedItem.duration || 30),
         };
-        console.log("Updating task:", updatedTask);
         onTaskUpdate(updatedTask);
       }
     },
@@ -258,8 +255,6 @@ export default function Schedule({
               selectedCalendars={selectedCalendars}
               onEditEvent={handleEditEvent}
               onEditTask={handleEditTask}
-              draggedItem={draggedItem}
-              previewDate={previewDate}
             />
           )}
         </ScrollArea>
