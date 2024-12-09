@@ -73,7 +73,7 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
       category: "",
       frequency: "",
       location: "",
-      color: "blue",
+      color: calendars[0].color,
       userID: -1,
       calendarID: calendars[0].id, // temp default
     },
@@ -233,9 +233,7 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
             <FormItem>
               <FormLabel>Color</FormLabel>
               <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder='Blue' />
@@ -317,7 +315,17 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
             <FormItem>
               <FormLabel>Calendar</FormLabel>
               <Select
-                onValueChange={(value) => field.onChange(parseInt(value))}
+                onValueChange={(value) => {
+                  const calendarId = parseInt(value);
+                  field.onChange(calendarId);
+                  // Find the selected calendar and update the color
+                  const selectedCalendar = calendars.find(
+                    (cal) => cal.id === calendarId
+                  );
+                  if (selectedCalendar) {
+                    form.setValue("color", selectedCalendar.color);
+                  }
+                }}
                 defaultValue={field.value.toString()}>
                 <FormControl>
                   <SelectTrigger>

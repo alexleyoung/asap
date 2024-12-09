@@ -33,3 +33,30 @@ export const isEvent = (item: Event | Task): item is Event => {
 export const isTask = (item: Event | Task): item is Task => {
   return "duration" in item;
 };
+
+export function getColor(color: string) {
+  switch (color) {
+    case "red":
+      return "red-500";
+    case "yellow":
+      return "yellow-500";
+    case "green":
+      return "green-500";
+    case "blue":
+      return "blue-500";
+    case "purple":
+      return "purple-500";
+    case "orange":
+      return "orange-500";
+    case "lime":
+      return "lime-500";
+    case "pink":
+      return "pink-500";
+    case "indigo":
+      return "indigo-500";
+    case "cyan":
+      return "cyan-500";
+    default:
+      return "blue-500";
+  }
+}

@@ -82,6 +82,7 @@ export type Calendar = {
   name: string;
   description: string;
   timezone: string;
+  color: string;
   userID: number;
 };
 
@@ -89,6 +90,7 @@ export type CalendarPost = {
   name: string;
   description: string;
   timezone: string;
+  color: string;
   userID: number;
 };
 

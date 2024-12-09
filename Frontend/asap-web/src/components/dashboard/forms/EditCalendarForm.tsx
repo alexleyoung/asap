@@ -13,12 +13,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/lib/types";
 import { updateCalendar } from "@/lib/scheduleCrud";
+import { getColor } from "@/lib/utils";
 
 const formSchema = z.object({
   id: z.number(),
   name: z.string().min(1, "Calendar name is required"),
   description: z.string(),
   timezone: z.string(),
+  color: z.string(),
   userID: z.number(),
 });
 
@@ -39,6 +41,7 @@ export const EditCalendarForm = ({
       id: calendar.id,
       name: calendar.name,
       description: calendar.description,
+      color: calendar.color,
       timezone: calendar.timezone,
       userID: calendar.userID,
     },
@@ -64,15 +67,15 @@ export const EditCalendarForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
-          name="name"
+          name='name'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calendar Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter a calendar name" {...field} />
+                <Input placeholder='Enter a calendar name' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,61 +83,57 @@ export const EditCalendarForm = ({
         />
         <FormField
           control={form.control}
-          name="description"
+          name='description'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Input placeholder="Enter a description" {...field} />
+                <Input placeholder='Enter a description' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {/* <FormField
+        <FormField
           control={form.control}
-          name="timezone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Timezone</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter a timezone" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-
-
-
-
-        /> */}
-        {/* <FormField
-          control={form.control}
-          name="color"
+          name='color'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Calendar Color</FormLabel>
               <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select a color' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='red'>Red</SelectItem>
-                    <SelectItem value='green'>Green</SelectItem>
-                    <SelectItem value='blue'>Blue</SelectItem>
-                    <SelectItem value='yellow'>Yellow</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className='flex gap-2'>
+                  {[
+                    "red",
+                    "yellow",
+                    "green",
+                    "blue",
+                    "purple",
+                    "orange",
+                    "lime",
+                    "pink",
+                    "indigo",
+                    "cyan",
+                  ].map((color) => (
+                    <button
+                      key={color}
+                      type='button'
+                      onClick={() => field.onChange(color)}
+                      className={`w-8 h-8 rounded-full bg-${color}-500 ${
+                        field.value === color
+                          ? `ring-2 ring-offset-2 ring-${color}-500`
+                          : ""
+                      }`}
+                      aria-label={`Select ${color} color`}
+                    />
+                  ))}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
-        /> */}
-        <div className="flex justify-end">
-          <Button type="submit" variant="secondary">
+        />
+        <div className='flex justify-end'>
+          <Button type='submit' variant='secondary'>
             Save
           </Button>
         </div>
