@@ -95,21 +95,21 @@ export default function CreateItemTabs() {
   };
 
   return (
-    <Tabs defaultValue="event" className="w-full">
+    <Tabs defaultValue='event' className='w-full'>
       <DialogHeader>
-        <TabsList className="w-full flex mt-4">
-          <TabsTrigger value="event" className="flex-1">
+        <TabsList className='w-full flex mt-4'>
+          <TabsTrigger value='event' className='flex-1'>
             <span>Event</span>
           </TabsTrigger>
-          <TabsTrigger value="task" className="flex-1">
+          <TabsTrigger value='task' className='flex-1'>
             <span>Task</span>
           </TabsTrigger>
         </TabsList>
       </DialogHeader>
-      <TabsContent value="event">
+      <TabsContent value='event'>
         <EventForm onSubmit={handleEventSubmit} loading={loading} />
       </TabsContent>
-      <TabsContent value="task">
+      <TabsContent value='task'>
         <TaskForm onSubmit={handleTaskSubmit} loading={loading} />
       </TabsContent>
     </Tabs>

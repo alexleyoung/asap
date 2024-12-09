@@ -186,14 +186,18 @@ export async function getTasks(userID: number, limit = 100, offset = 0) {
 
 export async function createTask(task: TaskPost) {
   try {
-    const response = await fetch("http://localhost:8000/tasks", {
-      method: "POST",
-      body: JSON.stringify(task),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    console.log(task);
+    const response = await fetch(
+      `http://localhost:8000/tasks?auto=${task.auto}`,
+      {
+        method: "POST",
+        body: JSON.stringify(task),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Something went wrong");
@@ -550,26 +554,4 @@ export async function deleteMember(groupID: number, userID: number) {
   }
 }
 
-// Auto Schedule
-export async function scheduleTask(task: TaskPost) {
-  try {
-    const response = await fetch("http://localhost:8000/tasks?auto=true", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(task),
-    });
-
-    if (!response.ok) {
-      throw new Error("Something went wrong");
-    }
-
-    return (await response.json()) as Task;
-  } catch (error) {
-    console.error("Failed to schedule task:", error);
-    throw error;
-  }
-}
 //crud operations for the schedule
