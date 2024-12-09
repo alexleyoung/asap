@@ -9,14 +9,17 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Plus, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn, getColor } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
-import { createCalendar, getCalendars } from "@/lib/scheduleCrud";
+import {
+  createCalendar,
+  deleteCalendar,
+  getCalendars,
+} from "@/lib/scheduleCrud";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { useUser } from "@/contexts/UserContext";
 import {
@@ -26,6 +29,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
+import EditCalendarTabs from "@/components/dashboard/forms/EditCalendarTabs";
 import {
   Form,
   FormControl,
@@ -42,6 +53,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { Calendar } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 const colorClasses = {
   red: "rounded-full data-[state=checked]:bg-red-500 border-red-500",
@@ -67,7 +80,11 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function CalendarsCollapsible() {
   const [open, setOpen] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedCalendarForEdit, setSelectedCalendarForEdit] =
+    useState<Calendar | null>(null);
+  const { toast } = useToast();
   const { selectedCalendars, calendars, setCalendars, toggleCalendar } =
     useCalendars();
   const { user } = useUser();
@@ -106,7 +123,7 @@ export default function CalendarsCollapsible() {
         userID: user.id,
       });
       setCalendars((prevCalendars) => [...prevCalendars, calendar]);
-      setDialogOpen(false);
+      setAddDialogOpen(false);
       form.reset();
     } catch (error) {
       console.error("Failed to add calendar:", error);
@@ -122,34 +139,89 @@ export default function CalendarsCollapsible() {
         </Button>
       </CollapsibleTrigger>
 
-      <CollapsibleContent className='w-[240px] mt-3 px-2 space-y-2'>
+      <CollapsibleContent className='px-2 space-y-2'>
         {calendars.map((calendar) => {
           return (
-            <Label htmlFor={calendar.id.toString()} key={calendar.id}>
-              <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md'>
-                <Checkbox
-                  id={calendar.id.toString()}
-                  checked={selectedCalendars.some((c) => c.id === calendar.id)}
-                  onCheckedChange={() => toggleCalendar(calendar)}
-                  className={
-                    colorClasses[calendar.color as keyof typeof colorClasses] ||
-                    colorClasses.blue
-                  }
-                />
-                <span>{calendar.name}</span>
-              </div>
-            </Label>
+            <ContextMenu key={calendar.id}>
+              <ContextMenuTrigger>
+                <div className='flex gap-2 items-center w-full hover:bg-muted transition-colors p-2 rounded-md group'>
+                  <Checkbox
+                    id={calendar.id.toString()}
+                    checked={selectedCalendars.some(
+                      (c) => c.id === calendar.id
+                    )}
+                    onCheckedChange={() => toggleCalendar(calendar)}
+                    className={
+                      colorClasses[
+                        calendar.color as keyof typeof colorClasses
+                      ] || colorClasses.blue
+                    }
+                  />
+                  <Label htmlFor={calendar.id.toString()} className='flex-1'>
+                    {calendar.name}
+                  </Label>
+                  <Button
+                    variant='ghost'
+                    size='icon'
+                    className='h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity'
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedCalendarForEdit(calendar);
+                      setEditDialogOpen(true);
+                    }}
+                    aria-label={`Edit ${calendar.name}`}>
+                    <MoreHorizontal className='h-4 w-4' />
+                  </Button>
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem
+                  onClick={() => {
+                    setSelectedCalendarForEdit(calendar);
+                    setEditDialogOpen(true);
+                  }}>
+                  Edit Calendar
+                </ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem
+                  className='text-red-600'
+                  onClick={async () => {
+                    try {
+                      await deleteCalendar(calendar);
+                      setCalendars((prevCalendars) =>
+                        prevCalendars.filter((c) => c.id !== calendar.id)
+                      );
+                      toast({
+                        title: "Success",
+                        description: "Calendar deleted successfully",
+                        duration: 3000,
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "Error",
+                        description: "Failed to delete calendar",
+                        duration: 3000,
+                      });
+                      console.error("Failed to delete calendar:", error);
+                    }
+                  }}>
+                  Delete Calendar
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           );
         })}
 
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              variant='ghost'
-              className='w-full flex items-center gap-2 mt-2'>
-              <Plus className='text-gray-500' /> Add Calendar
-            </Button>
-          </DialogTrigger>
+        <Button
+          variant='ghost'
+          className='w-full flex items-center gap-2 mt-2'
+          onClick={() => setAddDialogOpen(true)}>
+          <Plus className='text-gray-500' /> Add Calendar
+        </Button>
+
+        {/* Add Calendar Dialog */}
+        <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Calendar</DialogTitle>
@@ -273,6 +345,36 @@ export default function CalendarsCollapsible() {
                 </div>
               </form>
             </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Calendar Dialog */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent>
+            {selectedCalendarForEdit && (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Edit Calendar</DialogTitle>
+                  <DialogDescription className='sr-only'>
+                    Edit calendar details and manage members. You can modify the
+                    calendar name, description, color, and manage who has access
+                    to this calendar.
+                  </DialogDescription>
+                </DialogHeader>
+                <EditCalendarTabs
+                  calendar={selectedCalendarForEdit}
+                  onSave={(updatedCalendar) => {
+                    setCalendars(
+                      calendars.map((c) =>
+                        c.id === updatedCalendar.id ? updatedCalendar : c
+                      )
+                    );
+                    setEditDialogOpen(false);
+                  }}
+                  onClose={() => setEditDialogOpen(false)}
+                />
+              </>
+            )}
           </DialogContent>
         </Dialog>
       </CollapsibleContent>

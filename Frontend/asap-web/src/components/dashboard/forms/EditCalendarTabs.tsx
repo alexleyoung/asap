@@ -23,21 +23,21 @@ export default function EditCalendarTabs({
   };
 
   return (
-    <Tabs defaultValue="details" className="w-full">
+    <Tabs defaultValue='details' className='w-full'>
       <DialogHeader>
-        <TabsList className="w-full flex mt-4">
-          <TabsTrigger value="details" className="flex-1">
+        <TabsList className='w-full flex mt-4'>
+          <TabsTrigger value='details' className='flex-1'>
             <span>Details</span>
           </TabsTrigger>
-          <TabsTrigger value="members" className="flex-1">
+          <TabsTrigger value='members' className='flex-1'>
             <span>Members</span>
           </TabsTrigger>
         </TabsList>
       </DialogHeader>
-      <TabsContent value="details">
+      <TabsContent value='details'>
         <EditCalendarForm calendar={calendar} onSave={handleSave} />
       </TabsContent>
-      <TabsContent value="members">
+      <TabsContent value='members'>
         <CalendarMembers calendar={calendar} />
       </TabsContent>
     </Tabs>

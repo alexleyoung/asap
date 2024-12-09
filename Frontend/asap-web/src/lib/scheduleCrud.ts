@@ -374,8 +374,6 @@ export async function deleteCalendar(calendar: Calendar) {
     if (!response.ok) {
       throw new Error("Failed to delete the calendar");
     }
-
-    return await response.json();
   } catch (error) {
     console.error("Failed to delete the calendar");
     throw error;
