@@ -31,7 +31,9 @@ class UserUpdate(BaseModel):
     firstname: Optional[str] = None
     lastname: Optional[str] = None
     email: Optional[str] = None
-    avatar: Optional[str] = None
+
+
+avatar: Optional[str] = None
 
 
 # main class
@@ -48,6 +50,7 @@ class CalendarBase(BaseModel):
     name: str
     description: str
     timezone: str
+    color: Optional[str] = None
 
 
 # for creating a calendar
@@ -59,6 +62,8 @@ class CalendarCreate(CalendarBase):
 class CalendarUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    timezone: Optional[str] = None
+    color: Optional[str] = None
 
 
 # main class
@@ -138,6 +143,7 @@ class EventBase(BaseModel):
     category: str
     frequency: str
     location: str
+    color: Optional[str] = None
 
 
 # to create
@@ -186,6 +192,7 @@ class TaskBase(BaseModel):
     flexible: bool
     userID: int
     calendarID: int
+    color: Optional[str] = None
 
 
 # to create
@@ -205,6 +212,7 @@ class TaskCreate(BaseModel):
     completed: bool
     userID: int
     calendarID: int
+    color: Optional[str] = None
 
 
 # main class

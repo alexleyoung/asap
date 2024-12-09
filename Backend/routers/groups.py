@@ -17,6 +17,7 @@ router = APIRouter(
 
 newRouter = APIRouter(tags=["groups"])
 
+
 # websocket endpoint for real-time invitations
 @newRouter.websocket("/invitations")
 async def websocket_invitations(websocket: WebSocket):
@@ -77,8 +78,12 @@ async def add_member_endpoint(
     current_userID: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-            
-    await manager.broadcast(json.dumps({"type": "member_added", "groupID": groupID, "userID": membership.userID}))
+
+    await manager.broadcast(
+        json.dumps(
+            {"type": "member_added", "groupID": groupID, "userID": membership.userID}
+        )
+    )
 
     return controller.add_member(db, groupID, membership, current_userID)
 
@@ -117,24 +122,20 @@ def get_group_members(groupID: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Group not found or has no members")
     return members
 
+
 # get group by calendarID
 @router.get("/", response_model=schemas.Group)
-def get_group_by_calendar(
-    calendarID: int,
-    db: Session = Depends(get_db)
-):
+def get_group_by_calendar(calendarID: int, db: Session = Depends(get_db)):
     # Build query based on whether members should be included
     query = db.query(models.Group)
-    
+
     # Get the group
     group = query.filter(models.Group.calendarID == calendarID).first()
-    
+
     if not group:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No group found for calendar ID: {calendarID}"
+            detail=f"No group found for calendar ID: {calendarID}",
         )
-    
+
     return group
-
-

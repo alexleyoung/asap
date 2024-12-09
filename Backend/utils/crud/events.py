@@ -1,10 +1,5 @@
-import json
 from sqlalchemy.orm import Session
 from ...database import schemas, models
-
-# from ...routers.events import manager
-from fastapi import APIRouter, Depends, WebSocket
-from ...utils.websocket_manager import manager
 
 
 async def create_event(db: Session, event: schemas.EventCreate, userID: int):
@@ -18,11 +13,12 @@ async def create_event(db: Session, event: schemas.EventCreate, userID: int):
         location=event.location,
         userID=event.userID,
         calendarID=event.calendarID,
+        color=event.color,
     )
     db.add(db_event)
     db.commit()
     db.refresh(db_event)
-    #manager.broadcast(db_event)
+    # manager.broadcast(db_event)
     return db_event
 
 
@@ -38,7 +34,7 @@ async def delete_event(db: Session, eventID: int):
         return None
     db.delete(db_event)
     db.commit()
-    #manager.broadcast(eventID)
+    # manager.broadcast(eventID)
     return db_event
 
 
@@ -46,26 +42,14 @@ async def delete_event(db: Session, eventID: int):
 def get_events_by_user(db: Session, userID: int):
     return db.query(models.Event).filter(models.Event.userID == userID).all()
 
-# get a user's events by calendar
-def get_events_by_calendar(
-    db: Session, userID: int, calendarID: int
-) -> list[models.Event]:
-    return (
-        db.query(models.Event)
-        .filter(models.Event.userID == userID, models.Event.calendarID == calendarID)
-        .all()
-    )
-
 
 # get a user's events by calendar
-def get_events_by_calendar(
-    db: Session, userID: int, calendarID: int
-) -> list[models.Event]:
-    return (
-        db.query(models.Event)
-        .filter(models.Event.userID == userID, models.Event.calendarID == calendarID)
-        .all()
-    )
+def get_events_by_calendar(db: Session, calendarID: int) -> list[models.Event]:
+    return db.query(models.Event).filter(models.Event.calendarID == calendarID).all()
+
+
+def get_calendar_events(db: Session, calendarID: int) -> list[models.Event]:
+    return db.query(models.Event).filter(models.Event.calendarID == calendarID).all()
 
 
 # edit event
@@ -80,6 +64,5 @@ async def edit_event(db: Session, eventID: int, event_update: schemas.EventUpdat
 
     db.commit()
     db.refresh(db_event)
-    
-    
+
     return db_event

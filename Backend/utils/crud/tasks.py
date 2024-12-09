@@ -19,6 +19,7 @@ def create_task(db: Session, Task: schemas.TaskCreate):
         flexible=Task.flexible,
         userID=Task.userID,
         calendarID=Task.calendarID,
+        color=Task.color,
     )
     db.add(db_task)
     db.commit()

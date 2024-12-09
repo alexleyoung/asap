@@ -200,16 +200,24 @@ async def delete_event_endpoint(eventID: int, db: Session = Depends(get_db)):
 
 
 # get a user's events
-@router.get("/", response_model=list[schemas.Event])
+@router.get("", response_model=list[schemas.Event])
 def get_user_events(
-    userID: int, calendarID: Optional[int] = None, db: Session = Depends(get_db)
+    userID: Optional[int] = None,
+    calendarID: Optional[int] = None,
+    db: Session = Depends(get_db),
 ):
-    if not userID:
-        raise HTTPException(status_code=400, detail="User ID is required")
+    if not calendarID and not userID:
+        raise HTTPException(
+            status_code=400, detail="Either userID or calendarID is required"
+        )
+    elif calendarID and userID:
+        raise HTTPException(
+            status_code=400, detail="Cannot specify both userID and calendarID"
+        )
     if calendarID:
-        events = controller.get_events_by_calendar(db, userID, calendarID)
-    else:
+        events = controller.get_events_by_calendar(db, calendarID)
+    elif userID:
         events = controller.get_events_by_user(db, userID)
-    if not events:
-        return []
+    else:
+        events = []
     return events

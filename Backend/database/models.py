@@ -32,6 +32,7 @@ class Calendar(Base):
     name = Column("name", String)
     description = Column("description", String)
     timezone = Column("timezone", String)
+    color = Column("color", String)
 
     # foreign key
     userID = Column("ownerID", Integer, ForeignKey("users.id"))
@@ -56,6 +57,7 @@ class Event(Base):
     category = Column("category", String)
     frequency = Column("frequency", String)
     location = Column("location", String)
+    color = Column("color", String)
 
     # foreign keys
     userID = Column("userID", Integer, ForeignKey("users.id"))
@@ -83,6 +85,7 @@ class Task(Base):
     difficulty = Column("difficulty", String)
     duration = Column("duration", Integer)
     flexible = Column("flexible", Boolean)
+    color = Column("color", String)
 
     # foreign keys
     userID = Column("userID", Integer, ForeignKey("users.id"))
