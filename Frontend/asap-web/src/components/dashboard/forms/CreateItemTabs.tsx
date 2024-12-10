@@ -11,7 +11,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/contexts/UserContext";
 import { useScheduleItems } from "@/contexts/ScheduleContext";
 
-export default function CreateItemTabs() {
+export default function CreateItemTabs({
+  onSuccess,
+}: {
+  onSuccess?: () => void;
+}) {
   const [loading, setLoading] = useState(false);
   const { user } = useUser();
   const { setEvents, setTasks } = useScheduleItems();
@@ -44,6 +48,7 @@ export default function CreateItemTabs() {
         title: "Success",
         description: "Event created successfully",
       });
+      onSuccess?.();
     } catch (error) {
       toast({
         title: "Error",

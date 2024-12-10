@@ -28,6 +28,8 @@ import { snapToTimeSlot } from "@/lib/utils";
 import { useHotkeys } from "react-hotkeys-hook";
 import { differenceInMinutes, addMinutes, format } from "date-fns"; // Import date-fns functions
 import { isEvent, isTask } from "@/lib/utils"; // Import type guards
+import EditTaskDialog from "../forms/EditTaskDialog";
+import PreviewTaskDialog from "../forms/PreviewTaskDialog";
 
 export type ScheduleProps = {
   events: Event[];
@@ -45,10 +47,11 @@ export default function Schedule({
   selectedCalendars,
 }: ScheduleProps) {
   const { view, setView } = useView();
-  const { setEvents } = useScheduleItems();
+  const { setEvents, setTasks } = useScheduleItems();
   const { currentDate } = useCurrentDate();
   const [newItem, setNewItem] = useState<Partial<Event | Task> | null>(null);
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Event | Task | null>(null);
+  const [previewing, setPreviewing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const scheduleRef = useRef<HTMLDivElement>(null);
@@ -131,17 +134,23 @@ export default function Schedule({
         ws.close();
       }
     };
-  }, []);
+  }, [setEvents]);
 
   const [draggedItem, setDraggedItem] = useState<Event | Task | null>(null);
   const [previewDate, setPreviewDate] = useState<Date | null>(null);
 
   const handleEditEvent = (event: Event) => {
-    setEditingEvent(event);
+    setSelectedItem(event);
     setIsEditing(true);
   };
-  function handleEditTask(task: Task): void {
-    throw new Error("Function not implemented.");
+  function handlePreviewTask(task: Task): void {
+    setSelectedItem(task);
+    setPreviewing(true);
+  }
+  function handleEditTask(task: Task | null): void {
+    setSelectedItem(task);
+    setPreviewing(false);
+    setIsEditing(true);
   }
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -241,7 +250,7 @@ export default function Schedule({
               tasks={tasks}
               selectedCalendars={selectedCalendars}
               onEditEvent={handleEditEvent}
-              onEditTask={handleEditTask}
+              onEditTask={handlePreviewTask}
               scheduleRef={scheduleRef}
               draggedItem={draggedItem}
               previewDate={previewDate}
@@ -272,13 +281,44 @@ export default function Schedule({
       </div>
       <EditEventDialog
         isOpen={isEditing}
-        onClose={() => setIsEditing(false)}
-        eventData={editingEvent}
+        onClose={() => {
+          setIsEditing(false);
+          setSelectedItem(null);
+        }}
+        eventData={
+          selectedItem && "location" in selectedItem ? selectedItem : null
+        }
         onSubmit={(updatedEvent: Event) => {
           onEventUpdate(updatedEvent);
           setIsEditing(false);
         }}
         ws={ws}
+      />
+      <PreviewTaskDialog
+        isOpen={previewing}
+        onClose={() => {
+          setPreviewing(false);
+          setSelectedItem(null);
+        }}
+        onEditTask={() => {
+          setPreviewing(false);
+          handleEditTask(
+            selectedItem && "priority" in selectedItem ? selectedItem : null
+          );
+        }}
+        taskData={
+          selectedItem && "priority" in selectedItem ? selectedItem : null
+        }
+      />
+      <EditTaskDialog
+        isOpen={isEditing}
+        onClose={() => {
+          setIsEditing(false);
+          setSelectedItem(null);
+        }}
+        taskData={
+          selectedItem && "priority" in selectedItem ? selectedItem : null
+        }
       />
     </DndContext>
   );

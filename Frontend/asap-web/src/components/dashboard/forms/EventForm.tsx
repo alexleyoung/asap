@@ -184,9 +184,9 @@ export function EventForm({ onSubmit, loading = false }: EventFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value='work'>Work</SelectItem>
                   <SelectItem value='personal'>Personal</SelectItem>
-                  <SelectItem value='family'>Family</SelectItem>
+                  <SelectItem value='family'>School</SelectItem>
+                  <SelectItem value='work'>Work</SelectItem>
                   <SelectItem value='other'>Other</SelectItem>
                 </SelectContent>
               </Select>
