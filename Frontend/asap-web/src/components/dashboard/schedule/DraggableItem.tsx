@@ -42,7 +42,7 @@ export default function DraggableItem({
       left: `${columnOffset * columnWidth}%`,
       width: `${columnWidth}%`,
       cursor: isDragging ? "grabbing" : "grab",
-      zIndex: isDragging ? 99999999 : 10,
+      zIndex: isDragging ? 99999999 : 1,
       opacity: isDragging ? 0 : 1,
       transform: transform
         ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
@@ -52,20 +52,11 @@ export default function DraggableItem({
   }, [item, dayStart, columnWidth, columnOffset, transform, isDragging]);
 
   const getItemDetails = () => {
-    if (isEvent(item)) {
-      return {
-        title: item.title,
-        startTime: format(item.start, "h:mm a"),
-        endTime: format(item.end, "h:mm a"),
-      };
-    } else {
-      const dueTime = format(item.dueDate, "h:mm a");
-      return {
-        title: item.title,
-        startTime: dueTime,
-        endTime: `${item.duration} min`,
-      };
-    }
+    return {
+      title: item.title,
+      startTime: format(item.start!, "h:mm a"),
+      endTime: format(item.end!, "h:mm a"),
+    };
   };
 
   const { title, startTime, endTime } = getItemDetails();
@@ -80,7 +71,7 @@ export default function DraggableItem({
         e.stopPropagation();
         onItemClick(item);
       }}
-      className={`scale-95 rounded-sm transition-transform p-2 text-white bg-${getColor(
+      className={`scale-95 rounded-sm transition-transform p-2 overflow-hidden text-white bg-${getColor(
         item.color || ""
       )}`}>
       <h3 className='font-medium truncate'>{title}</h3>
@@ -88,9 +79,10 @@ export default function DraggableItem({
         {startTime} - {endTime}
       </p>
       {isTask(item) && (
-        <p className='text-xs mt-1'>
-          {item.completed ? "Completed" : "Pending"}
-        </p>
+        <></>
+        // <p className='text-xs mt-1'>
+        //   {item.completed ? "Completed" : "Pending"}
+        // </p>
       )}
     </div>
   );

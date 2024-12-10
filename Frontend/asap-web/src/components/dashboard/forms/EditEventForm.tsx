@@ -56,16 +56,23 @@ export function EditEventForm({
   ws = null,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
-  const [startString, setStartString] = useState(
-    eventData.start instanceof Date
-      ? eventData.start.toISOString().substring(0, 16)
-      : String(eventData.start).substring(0, 16)
-  );
-  const [endString, setEndString] = useState(
-    eventData.end instanceof Date
-      ? eventData.start.toISOString().substring(0, 16)
-      : String(eventData.start).substring(0, 16)
-  );
+
+  // Format for datetime-local input (YYYY-MM-DDThh:mm)
+  const formatDateForInput = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  const now = new Date();
+  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
+  const [startString, setStartString] = useState(formatDateForInput(now));
+  const [endString, setEndString] = useState(formatDateForInput(oneHourLater));
+
   const { setEvents, events } = useScheduleItems();
   const { toast } = useToast();
 
@@ -195,9 +202,8 @@ export function EditEventForm({
                 <Input
                   type='datetime-local'
                   {...field}
-                  value={startString}
+                  value={formatDateForInput(field.value)}
                   onChange={(e) => {
-                    setStartString(e.target.value);
                     field.onChange(new Date(e.target.value));
                   }}
                 />
@@ -216,9 +222,8 @@ export function EditEventForm({
                 <Input
                   type='datetime-local'
                   {...field}
-                  value={endString}
+                  value={formatDateForInput(field.value)}
                   onChange={(e) => {
-                    setEndString(e.target.value);
                     field.onChange(new Date(e.target.value));
                   }}
                 />

@@ -27,16 +27,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { TaskPost } from "@/lib/types";
 import { useCalendars } from "@/contexts/CalendarsContext";
+import { createTask } from "@/lib/scheduleCrud";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string(),
   duration: z.number().min(1, "Duration must be at least 1 minute"),
-  dueDate: z
-    .date({
-      required_error: "Due date is required",
-    })
-    .default(new Date()),
+  dueDate: z.date({
+    required_error: "Due date is required",
+  }),
   priority: z.enum(["low", "medium", "high"]),
   frequency: z.string(),
   category: z.string(),
@@ -74,16 +73,12 @@ export function TaskForm({ onSubmit, loading }: TaskFormProps) {
       flexible: false,
       completed: false,
       userID: -1,
-      calendarID: calendars[0].id, // temp default
+      calendarID: calendars[0].id,
       color: "blue",
     },
   });
 
-  function onSubmitForm(values: TaskPost) {
-    if (values.auto) {
-      // TBD
-      // values = scheduleTask(values);
-    }
+  async function onSubmitForm(values: TaskPost) {
     onSubmit({ ...values, completed: false });
   }
 
@@ -129,7 +124,7 @@ export function TaskForm({ onSubmit, loading }: TaskFormProps) {
 
           <FormField
             control={form.control}
-            name='start'
+            name='dueDate'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Due Date</FormLabel>

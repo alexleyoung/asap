@@ -87,6 +87,7 @@ export default function SignUpForm({
           description: "Default personal calendar",
           timezone: "",
           userID: user.id,
+          color: "blue",
         });
         router.push("/dashboard");
       } else {

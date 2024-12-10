@@ -9,6 +9,7 @@ import {
   getCalendars,
   getTasks,
   updateEvent,
+  updateTask,
 } from "@/lib/scheduleCrud";
 import { useUser } from "@/contexts/UserContext";
 import { useCalendars } from "@/contexts/CalendarsContext";
@@ -46,7 +47,30 @@ export default function Dashboard() {
       );
     }
   };
-  const handleTaskUpdate = (updatedTask: Task) => {};
+  const handleTaskUpdate = (updatedTask: Task) => {
+    let old: Task;
+    setTasks((prevTasks) => {
+      return prevTasks.map((task) => {
+        if (task.id === updatedTask.id) {
+          old = task;
+          return updatedTask;
+        }
+        return task;
+      });
+    });
+    try {
+      updateTask(updatedTask);
+    } catch (error) {
+      setTasks((prevTasks) =>
+        prevTasks.filter((t) => {
+          if (t.id === updatedTask.id) {
+            return old;
+          }
+          return t;
+        })
+      );
+    }
+  };
 
   useEffect(() => {
     (async () => {

@@ -8,6 +8,7 @@ def create_calendar(db: Session, calendar: schemas.CalendarCreate):
         name=calendar.name,
         description=calendar.description,
         timezone=calendar.timezone,
+        color=calendar.color,
         userID=calendar.userID,  # Linking the calendar to the user who owns it
     )
     db.add(db_calendar)
@@ -36,25 +37,35 @@ def edit_calendar(
         calendar.name = calendar_update.name
     if calendar_update.description is not None:
         calendar.description = calendar_update.description
+    if calendar_update.timezone is not None:
+        calendar.timezone = calendar_update.timezone
+    if calendar_update.color is not None:
+        calendar.color = calendar_update.color
 
     db.commit()
     db.refresh(calendar)
     return calendar
 
+
 # get calendars for user
 def get_calendars_by_user(db: Session, userID: int):
     return db.query(models.Calendar).filter(models.Calendar.userID == userID).all()
 
+
 # delete a calendar
 def delete_calendar(db: Session, calendarID: int) -> bool:
     # First, delete all associated events
-    db.query(models.Event).filter(models.Event.calendarID == calendarID).delete(synchronize_session=False)
-    
+    db.query(models.Event).filter(models.Event.calendarID == calendarID).delete(
+        synchronize_session=False
+    )
+
     # Then delete the calendar
-    calendar = db.query(models.Calendar).filter(models.Calendar.id == calendarID).first()
+    calendar = (
+        db.query(models.Calendar).filter(models.Calendar.id == calendarID).first()
+    )
     if not calendar:
         return False
-    
+
     db.delete(calendar)
     db.commit()
     return True
