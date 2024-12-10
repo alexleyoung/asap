@@ -120,7 +120,12 @@ export default function SignUpForm({
                 <FormItem>
                   <FormLabel>First Name</FormLabel>
                   <FormControl>
-                    <Input {...field} type='text' placeholder='First Name' />
+                    <Input
+                      {...field}
+                      id='firstname'
+                      type='text'
+                      placeholder='First Name'
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -133,7 +138,12 @@ export default function SignUpForm({
                 <FormItem>
                   <FormLabel>Last Name</FormLabel>
                   <FormControl>
-                    <Input {...field} type='text' placeholder='Last Name' />
+                    <Input
+                      {...field}
+                      id='lastname'
+                      type='text'
+                      placeholder='Last Name'
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -147,7 +157,12 @@ export default function SignUpForm({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input {...field} type='email' placeholder='m@email.com' />
+                    <Input
+                      {...field}
+                      id='email'
+                      type='email'
+                      placeholder='m@email.com'
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,6 +177,7 @@ export default function SignUpForm({
                   <FormControl>
                     <Input
                       {...field}
+                      id='password'
                       type='password'
                       placeholder='create a password'
                     />
@@ -179,6 +195,7 @@ export default function SignUpForm({
                   <FormControl>
                     <Input
                       {...field}
+                      id='confirmpassword'
                       type='password'
                       placeholder='confirm password'
                     />

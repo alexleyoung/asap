@@ -87,7 +87,7 @@ export default function SignInForm({
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder='m@email.com' {...field} />
+                    <Input id='email' placeholder='m@email.com' {...field} />
                   </FormControl>
 
                   <FormMessage />
@@ -101,7 +101,11 @@ export default function SignInForm({
                 <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input placeholder='create a password' {...field} />
+                    <Input
+                      id='password'
+                      placeholder='create a password'
+                      {...field}
+                    />
                   </FormControl>
 
                   <Link
