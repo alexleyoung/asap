@@ -8,7 +8,7 @@ import { useUser } from "@/contexts/UserContext";
 
 export default function Home() {
   const [isSignIn, setIsSignIn] = useState(true);
-  const { user, setUser } = useUser();
+  const { setUser } = useUser();
 
   const toggleForm = () => {
     setIsSignIn(!isSignIn);

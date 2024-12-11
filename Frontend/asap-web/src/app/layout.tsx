@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { UserProvider } from "@/contexts/UserContext";
 
 const satoshi = localFont({ src: "../assets/fonts/Satoshi.ttf" });
 
@@ -24,7 +25,7 @@ export default function RootLayout({
           defaultTheme='system'
           enableSystem
           disableTransitionOnChange>
-          {children}
+          <UserProvider>{children}</UserProvider>
           <Toaster />
         </ThemeProvider>
       </body>

@@ -50,13 +50,12 @@ export default function SignInForm({
         data.email,
         data.password
       );
+      console.log(token);
       if (token) {
         localStorage.setItem("token", token.access_token);
-        const userData = await getUserByEmail(data.email);
-        localStorage.setItem("user", JSON.stringify(userData));
-        setUser(userData);
+        const user = await getUserByEmail(data.email);
+        setUser(user);
         setSuccess("Signed in successfully");
-        setError("");
         router.push("/dashboard");
       } else {
         setError("Invalid email or password. Please try again.");

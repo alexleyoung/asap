@@ -16,6 +16,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
+      console.log("Stored user:", storedUser);
       setUser(JSON.parse(storedUser));
     }
   }, []);

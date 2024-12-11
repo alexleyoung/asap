@@ -65,6 +65,7 @@ export function TaskForm({ onSubmit, loading }: TaskFormProps) {
       title: "",
       description: "",
       duration: 30,
+      dueDate: new Date(),
       priority: "medium",
       frequency: "",
       category: "",

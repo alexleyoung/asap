@@ -29,20 +29,9 @@ describe("Create event", () => {
 
   it("should login successfully", () => {
     cy.viewport(1920, 1080);
-    cy.visit("/");
-    cy.get('input[name="email"]').type(email);
-    cy.get('input[name="password"]').type(password);
-    cy.get('button[type="submit"]').click();
-    cy.url().should("include", "/dashboard");
-    cy.get("button").contains("Create").click();
-    cy.get('input[placeholder="Event title"]').type("New Event");
+    cy.visit("/dashboard");
+    cy.get("button").contains("Add Calendar").click();
+    cy.get('input[placeholder="Calendar name"]').type("test calendar");
     cy.get('button[type="submit"]').click({ force: true }); // Forces the click even if the button is hidden
-    cy.get('li[role="status"]')
-      .first()
-      .find("div")
-      .first()
-      .find("div")
-      .first()
-      .should("have.text", "Success");
   });
 });

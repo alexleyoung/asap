@@ -14,6 +14,7 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
@@ -82,6 +83,7 @@ export default function Dashboard() {
         setTasks((await getTasks(user.id))?.tasks || []);
         const calendars = await getCalendars(user.id);
         setCalendars(calendars);
+
         setEvents(await getEvents(calendars));
       } catch (error) {
         console.error("Failed to fetch schedule items:", error);
@@ -93,13 +95,19 @@ export default function Dashboard() {
 
   return (
     <>
-      <Schedule
-        events={events}
-        tasks={tasks}
-        onEventUpdate={handleEventUpdate}
-        onTaskUpdate={handleTaskUpdate}
-        selectedCalendars={selectedCalendars}
-      />
+      {loading ? (
+        <main className='grid place-items-center h-full p-6'>
+          <Skeleton className='size-full' />
+        </main>
+      ) : (
+        <Schedule
+          events={events}
+          tasks={tasks}
+          onEventUpdate={handleEventUpdate}
+          onTaskUpdate={handleTaskUpdate}
+          selectedCalendars={selectedCalendars}
+        />
+      )}
     </>
   );
 }
