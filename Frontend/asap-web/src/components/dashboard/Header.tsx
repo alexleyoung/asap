@@ -190,7 +190,8 @@ export default function Header() {
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("User");
+    localStorage.removeItem("user");
+    localStorage.removeItem("selectedCalendars");
     router.push("/");
   };
 

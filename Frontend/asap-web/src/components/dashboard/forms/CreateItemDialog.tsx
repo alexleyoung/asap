@@ -36,9 +36,7 @@ export default function CreateItemDialog() {
               Create a new item
             </DialogDescription>
           </DialogHeader>
-          <CreateItemTabs
-          // onSuccess={() => setOpen(false)}
-          />
+          <CreateItemTabs onSuccess={() => setOpen(false)} />
         </DialogContent>
       </Dialog>
     </div>

@@ -16,6 +16,7 @@ interface PreviewTaskPopoverProps {
   onClose: () => void;
   taskData: Task | null;
   onEditTask: (task: Task | null) => void;
+  onDeleteTask: (task: Task | null) => void;
 }
 
 export default function PreviewTaskDialog({
@@ -23,6 +24,7 @@ export default function PreviewTaskDialog({
   onClose,
   taskData,
   onEditTask,
+  onDeleteTask,
 }: PreviewTaskPopoverProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -32,7 +34,7 @@ export default function PreviewTaskDialog({
             <Button variant='ghost' onClick={() => onEditTask(taskData)}>
               <Pen size={14} />
             </Button>
-            <Button variant='ghost'>
+            <Button variant='ghost' onClick={() => onDeleteTask(taskData)}>
               <Trash size={14} className='text-red-500' />
             </Button>
           </div>

@@ -80,6 +80,7 @@ export default function Dashboard() {
           // router.push("/");
           return;
         }
+        console.log(user);
         setTasks((await getTasks(user.id))?.tasks || []);
         const calendars = await getCalendars(user.id);
         setCalendars(calendars);

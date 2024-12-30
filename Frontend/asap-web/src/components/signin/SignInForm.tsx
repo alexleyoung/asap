@@ -50,7 +50,6 @@ export default function SignInForm({
         data.email,
         data.password
       );
-      console.log(token);
       if (token) {
         localStorage.setItem("token", token.access_token);
         const user = await getUserByEmail(data.email);
@@ -102,6 +101,7 @@ export default function SignInForm({
                   <FormControl>
                     <Input
                       id='password'
+                      type='password'
                       placeholder='create a password'
                       {...field}
                     />

@@ -30,6 +30,8 @@ import { differenceInMinutes, addMinutes, format } from "date-fns"; // Import da
 import { isEvent, isTask } from "@/lib/utils"; // Import type guards
 import EditTaskDialog from "../forms/EditTaskDialog";
 import PreviewTaskDialog from "../forms/PreviewTaskDialog";
+import { deleteTask } from "@/lib/scheduleCrud";
+import { toast } from "@/hooks/use-toast";
 
 export type ScheduleProps = {
   events: Event[];
@@ -151,6 +153,28 @@ export default function Schedule({
     setSelectedItem(task);
     setPreviewing(false);
     setIsEditing(true);
+  }
+  async function handleDeleteTask(task: Task | null): Promise<void> {
+    if (!task) return;
+    const old = task;
+    setTasks((prevTasks) => prevTasks.filter((t) => t.id !== task?.id));
+    try {
+      await deleteTask(task);
+      toast({
+        title: "Success",
+        description: "Task deleted successfully",
+      });
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      setTasks((prevTasks) => [...prevTasks, old]);
+      toast({
+        title: "Error",
+        description: "Failed to delete task",
+        variant: "destructive",
+      });
+    }
+    setSelectedItem(task);
+    setPreviewing(false);
   }
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
@@ -306,6 +330,7 @@ export default function Schedule({
             selectedItem && "priority" in selectedItem ? selectedItem : null
           );
         }}
+        onDeleteTask={handleDeleteTask}
         taskData={
           selectedItem && "priority" in selectedItem ? selectedItem : null
         }

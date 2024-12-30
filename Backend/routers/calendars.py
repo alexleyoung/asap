@@ -73,7 +73,8 @@ def create_calendar_endpoint(
         raise HTTPException(status_code=404, detail="User not found")
 
     db_calendar = controller.create_calendar(
-        db=db, calendar=calendar, userID=calendar.userID
+        db=db,
+        calendar=calendar,
     )
     return db_calendar
 
@@ -87,17 +88,21 @@ def delete_calendar_endpoint(
 ):
     # controller.check_calendar_permission(current_user.id, calendar_id, "admin", db)
 
-    try:
-        # Attempt to delete the calendar and its events
-        result = controller.delete_calendar(db, calendarID)
-        if not result:
-            raise HTTPException(status_code=404, detail="Calendar not found")
-
-        return None  # 204 No Content response
-
-    except Exception:
-        db.rollback()
-        raise HTTPException(
-            status_code=500,
-            detail="An error occurred while deleting the calendar and its events",
-        )
+    # try:
+    # Attempt to delete the calendar and its events
+    # result = controller.delete_calendar(db, calendarID)
+    # if not result:
+    # raise HTTPException(status_code=404, detail="Calendar not found")
+    #
+    # return None  # 204 No Content response
+    #
+    # except Exception:
+    # db.rollback()
+    # raise HTTPException(
+    # status_code=500,
+    # detail="An error occurred while deleting the calendar and its events",
+    # )
+    result = controller.delete_calendar(db, calendarID)
+    if not result:
+        raise HTTPException(status_code=404, detail="Calendar not found")
+    return None

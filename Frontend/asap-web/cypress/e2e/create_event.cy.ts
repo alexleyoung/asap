@@ -34,6 +34,7 @@ describe("Create event", () => {
     cy.get('input[name="password"]').type(password);
     cy.get('button[type="submit"]').click();
     cy.url().should("include", "/dashboard");
+    cy.wait(1000);
     cy.get("button").contains("Create").click();
     cy.get('input[placeholder="Event title"]').type("New Event");
     cy.get('button[type="submit"]').click({ force: true }); // Forces the click even if the button is hidden

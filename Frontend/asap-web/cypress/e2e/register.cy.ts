@@ -1,7 +1,7 @@
 describe("Register", () => {
   const firstname = "John";
   const lastname = "Doe";
-  const email = "cytest@test.com";
+  const email = "cytest3@test.com";
   const password = "1234567!";
 
   it("should register successfully", () => {

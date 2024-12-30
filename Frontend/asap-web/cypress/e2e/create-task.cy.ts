@@ -30,6 +30,7 @@ describe("Create event", () => {
   it("should login successfully", () => {
     cy.viewport(1920, 1080);
     cy.visit("/dashboard");
+    cy.wait(1000);
     cy.get("button").contains("Create").click();
     cy.get("button[data-state='inactive']").click();
     cy.get('input[placeholder="Enter task title"]').type("test title");

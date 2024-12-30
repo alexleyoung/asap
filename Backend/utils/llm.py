@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from ..database.db import get_db
 from ..database import schemas
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 from .crud import users, tasks, events
 from langchain.chains import LLMChain
@@ -30,15 +31,17 @@ def get_user_context(user_id: int, db: Session = Depends(get_db)):
 
 
 def query(context_data: str, given_task: schemas.TaskCreate):
+    current_time = datetime.now()
 
     # Create a prompt template
     prompt_template = PromptTemplate(
-        input_variables=["context", "task"],
+        input_variables=["context", "task", "current_time"],
         template="""
         Given the rest of the non-mutable tasks and events in this user's schedule:
         {context}
 
         What is the best start and end time for this specific task to maximize this user's productivity? Both start and end time must be before the given due date.
+        The task should not be scheduled outside of the user's preferred working hours: Monday - Friday, 8am to 5pm. The task should be scheduled no earlier than the current time which is {current_time}.
         {task}
 
         Please return a start and end time for this task in ISO 8601 format, with a comma between start and end time. Do not provide any explanation or other information.
@@ -61,7 +64,7 @@ def query(context_data: str, given_task: schemas.TaskCreate):
 
     # Query OpenAI with context data and user query
     response = chain.run(
-        context=context_data, task=given_task
+        context=context_data, task=given_task, current_time=current_time
     )  # the response will be a datetime
     rp = response.split(",")
     given_task.start = rp[0]
