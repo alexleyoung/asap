@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { motion, useScroll, useAnimate } from "framer-motion";
+import { motion, useAnimate } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -20,7 +20,6 @@ import { BackgroundBeams } from "@/components/ui/background-beams";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 export default function LandingPage() {
-  const { scrollYProgress } = useScroll();
   const [scope, animate] = useAnimate();
 
   React.useEffect(() => {
@@ -95,7 +94,8 @@ export default function LandingPage() {
     {
       id: "item-0",
       question: "When will Asap launch?",
-      answer: "We are aiming for an early-access launch by 2025.",
+      answer:
+        "We are aiming for an early-access ASAP. The project is a personal one, so it will take time!",
     },
     {
       id: "item-1",
@@ -108,12 +108,6 @@ export default function LandingPage() {
       question: "How much will Asap cost?",
       answer:
         "Asap will be free for all of early-access. Future pricing will be determined as the product evolves.",
-    },
-    {
-      id: "item-3",
-      question: "Will I be able to use Asap on my phone?",
-      answer:
-        "Asap will have fully native IOS and Android versions on release.",
     },
   ];
 
@@ -298,7 +292,7 @@ export default function LandingPage() {
       </main>
       <footer className='flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t'>
         <p className='text-xs text-gray-500 dark:text-gray-400'>
-          © 2023 Asap Inc. All rights reserved.
+          © 2025 Asap Inc. All rights reserved.
         </p>
         <nav className='sm:ml-auto flex gap-4 sm:gap-6'>
           <Link className='text-xs hover:underline underline-offset-4' href='#'>
