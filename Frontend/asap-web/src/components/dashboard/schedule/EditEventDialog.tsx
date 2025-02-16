@@ -1,20 +1,20 @@
 import React from "react";
+import { Event } from "@/lib/types";
+
+import EditEventForm from "../forms/EditEventForm";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DialogDescription } from "@radix-ui/react-dialog";
-import { Event } from "@/lib/types"; // Import the Event type
-import EditEventForm from "../forms/EditEventForm"; // Assuming this component exists
 
 type EditEventDialogProps = {
   isOpen: boolean;
   onClose: () => void;
   eventData: Event | null;
   onSubmit: (updatedEvent: Event) => void;
-  ws: WebSocket | null;
 };
 
 export default function EditEventDialog({
@@ -22,7 +22,6 @@ export default function EditEventDialog({
   onClose,
   eventData,
   onSubmit,
-  ws = null,
 }: EditEventDialogProps) {
   if (!eventData) return null;
 
@@ -39,7 +38,6 @@ export default function EditEventDialog({
           eventData={{ ...eventData }}
           onClose={onClose}
           onSubmit={onSubmit}
-          ws={ws}
         />
       </DialogContent>
     </Dialog>
