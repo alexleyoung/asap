@@ -1,26 +1,27 @@
 "use client";
+
+import React, { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { signIn } from "../../lib/auth";
+import { useRouter } from "next/navigation";
+import { getUserByEmail } from "@/lib/scheduleCrud";
+import { User } from "@/lib/types";
+
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
-import { signIn } from "../../lib/auth";
-import React, { useState } from "react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useRouter } from "next/navigation";
-import { getUserByEmail } from "@/lib/scheduleCrud";
-import { User } from "@/lib/types";
 
 const formSchema = z.object({
   email: z.string().email().min(1, "Email is required"),
