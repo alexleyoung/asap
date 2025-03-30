@@ -1,10 +1,12 @@
 "use client";
+
+import { useState } from "react";
+import { useUser } from "@/contexts/UserContext";
+import Link from "next/link";
+import Image from "next/image";
+
 import SignInForm from "@/components/signin/SignInForm";
 import SignUpForm from "@/components/signup/SignUpForm";
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useUser } from "@/contexts/UserContext";
 
 export default function Home() {
   const [isSignIn, setIsSignIn] = useState(true);

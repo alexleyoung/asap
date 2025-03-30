@@ -1,9 +1,8 @@
 "use client";
 
-import Schedule from "@/components/dashboard/schedule";
-import { useScheduleItems } from "@/contexts/ScheduleContext";
 import { useEffect, useState } from "react";
-import { Task, Event, Calendar } from "@/lib/types";
+import { useScheduleItems } from "@/contexts/ScheduleContext";
+import { Task, Event } from "@/lib/types";
 import {
   getEvents,
   getCalendars,
@@ -14,13 +13,15 @@ import {
 import { useUser } from "@/contexts/UserContext";
 import { useCalendars } from "@/contexts/CalendarsContext";
 import { useRouter } from "next/navigation";
+
+import Schedule from "@/components/dashboard/schedule";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const { user } = useUser();
   const { events, tasks, setEvents, setTasks } = useScheduleItems();
-  const { calendars, setCalendars, selectedCalendars } = useCalendars();
+  const { setCalendars, selectedCalendars } = useCalendars();
 
   const router = useRouter();
 
@@ -80,14 +81,12 @@ export default function Dashboard() {
           // router.push("/");
           return;
         }
-        console.log(user);
         setTasks((await getTasks(user.id))?.tasks || []);
         const calendars = await getCalendars(user.id);
         setCalendars(calendars);
 
         setEvents(await getEvents(calendars));
       } catch (error) {
-        console.error("Failed to fetch schedule items:", error);
       } finally {
         setLoading(false);
       }

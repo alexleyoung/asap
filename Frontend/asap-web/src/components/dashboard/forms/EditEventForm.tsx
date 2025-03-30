@@ -30,7 +30,6 @@ interface EditEventFormProps {
   onClose: () => void;
   eventData: Event;
   onSubmit: (updatedEvent: Event) => void;
-  ws: WebSocket | null;
 }
 
 const eventSchema = z.object({
@@ -53,7 +52,6 @@ export function EditEventForm({
   onClose,
   eventData,
   onSubmit,
-  ws = null,
 }: EditEventFormProps) {
   const [loading, setLoading] = useState(false);
 
@@ -66,12 +64,6 @@ export function EditEventForm({
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
-
-  const now = new Date();
-  const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-
-  const [startString, setStartString] = useState(formatDateForInput(now));
-  const [endString, setEndString] = useState(formatDateForInput(oneHourLater));
 
   const { setEvents, events } = useScheduleItems();
   const { toast } = useToast();
@@ -95,18 +87,10 @@ export function EditEventForm({
 
   const handleDelete = async () => {
     try {
-      const eventId = eventData.id;
       setEvents((prevEvents) =>
         prevEvents.filter((event) => event.id !== eventData.id)
       );
       await deleteEvent(eventData.id);
-      // Send WebSocket message to notify other clients of the deletion
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ action: "delete_event", data: { eventId } }));
-      } else {
-        console.log("WebSocket is not open. Cannot send message.");
-      }
-
       onClose(); // Close the form after deletion
       toast({
         title: "Event deleted",
@@ -149,12 +133,6 @@ export function EditEventForm({
           return event;
         })
       );
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        console.log("Sending edit event message...");
-        ws.send(JSON.stringify({ action: "edit_event", data: data }));
-      } else {
-        console.log("WebSocket is not open. Cannot send message.");
-      }
       onSubmit(data);
     } catch (error) {
       console.error("Failed to update event:", error);
