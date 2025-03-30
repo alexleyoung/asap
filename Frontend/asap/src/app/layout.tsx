@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Asap",
-  description: "Minimize time spent planning, maximize time spent doing.",
+  title: "asap",
+  description: "spend less time managing your busy schedule and more time getting things done, asap.",
 };
 
 export default function RootLayout({
