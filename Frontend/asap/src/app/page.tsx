@@ -169,23 +169,23 @@ export default function LandingPage() {
             <motion.div
               className='w-full max-w-sm mx-auto space-y-2 hero-cta'
               initial={{ opacity: 0, y: 20 }}>
-              <form
+              <div
                 className='flex space-x-2 items-center'
-                action='https://getlaunchlist.com/s/PStD5f'
-                method='POST'>
+              >
                 <Input
                   name='email'
                   className='max-w-lg flex-1'
                   placeholder='Enter your email'
                   type='email'
+                  disabled
                 />
-                <HoverBorderGradient className='flex gap-2'>
+                <HoverBorderGradient className='flex items-center gap-2 text-gray-400'>
                   Join Waitlist
                   <ArrowRight className='ml-2 h-4 w-4' />
                 </HoverBorderGradient>
-              </form>
+              </div>
               <p className='text-xs text-gray-500 dark:text-gray-400'>
-                get <strong>free</strong> early-access before we launch.
+                this project is currently archived. thank you for your support!
               </p>
             </motion.div>
           </motion.div>
@@ -202,9 +202,8 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className={`flex flex-col ${
-                  index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                } items-center gap-6 md:gap-12 mb-12`}>
+                className={`flex flex-col ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                  } items-center gap-6 md:gap-12 mb-12`}>
                 <div className='w-full md:w-1/2'>
                   <Card>
                     <CardContent className='p-0'>
@@ -268,23 +267,23 @@ export default function LandingPage() {
               join our waitlist and get <strong>free</strong> early access.
             </p>
             <div className='w-full max-w-sm mx-auto space-y-2'>
-              <form
+              <div
                 className='flex space-x-2 items-center'
-                action='https://getlaunchlist.com/s/PStD5f'
-                method='POST'>
+              >
                 <Input
                   name='email'
                   className='max-w-lg flex-1'
                   placeholder='Enter your email'
                   type='email'
+                  disabled
                 />
-                <HoverBorderGradient className='flex gap-2'>
+                <HoverBorderGradient className='flex items-center gap-2 text-gray-400'>
                   Join Waitlist
                   <ArrowRight className='ml-2 h-4 w-4' />
                 </HoverBorderGradient>
-              </form>
+              </div>
               <p className='text-xs text-gray-500 dark:text-gray-400'>
-                we will notify you when asap is ready for early-access!
+                this project is currently archived. thank you for your support!
               </p>
             </div>
           </motion.div>
